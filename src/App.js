@@ -1,11 +1,17 @@
 import React, {useState, useEffect} from 'react';
-import {ThemeProvider} from "styled-components";
-import {AuthProvider} from "./utils/AuthContext";
+import styled, {ThemeProvider} from "styled-components";
 import colors from "./styles/colors";
 import GlobalStyles from "./styles/GlobalStyles";
 import {ToastContainer, toast} from "react-toastify";
-import {BrowserRouter} from "react-router-dom";
 import Router from "./Router";
+import SideBar from "./components/sideBar/SideBar";
+import "react-toastify/dist/ReactToastify.css";
+import {AuthProvider} from "./utils/AuthContext";
+
+const ComponentsBox = styled.div`
+  display: flex;
+  align-items: center;
+`;
 
 function App() {
     const [isLoggedIn, setIsLoggedIn] = useState(null);
@@ -13,10 +19,10 @@ function App() {
     const previousLoading = async () => {
         try {
             const token = await localStorage.getItem("KR_Marketing_token");
-            console.info('???', token);
+
             if (!!token) setIsLoggedIn(true);
             else setIsLoggedIn(false);
-        } catch(e) {
+        } catch (e) {
             throw new Error(e);
         }
     }
@@ -25,17 +31,20 @@ function App() {
         previousLoading();
     }, []);
 
-
     return (
-        <ThemeProvider theme={colors}>
-            <AuthProvider>
-                <GlobalStyles/>
-                <ToastContainer position={toast.POSITION.TOP_RIGHT}/>
-                <BrowserRouter>
-                    <Router isLoggedIn={isLoggedIn} />
-                </BrowserRouter>
-            </AuthProvider>
-        </ThemeProvider>
+
+            <ThemeProvider theme={colors}>
+                <AuthProvider isLoggedIn={isLoggedIn}>
+                    <GlobalStyles/>
+                    <ToastContainer position={toast.POSITION.TOP_RIGHT}/>
+
+                    <ComponentsBox>
+                        {isLoggedIn && <SideBar/>}
+                        <Router isLoggedIn={isLoggedIn}/>
+                    </ComponentsBox>
+                </AuthProvider>
+            </ThemeProvider>
+
     );
 }
 

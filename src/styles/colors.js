@@ -10,10 +10,16 @@ export default {
 
     // Secondary color
     lightBlack: "#333333",
+    deepGray: "#555555",
     gray: "#888888",
+    darkGray: "#777777",
     skyBlue: "#29A7E1",
+    lightBlue: "#4298D9",
+    graySkyblue: "#7094AF",
+    ultraLightSkyBlue: "rgba(13, 111, 184, 0.05)",
 
-    // Feature
     bgColor: "#F6F9FF",
     borderColor: "#AAAAAA",
+    lightBorderColor: "#cccccc",
+    deepWhite: "#FCFCFC",
 }

@@ -1,40 +1,39 @@
-import React, { createContext, useContext, useState } from 'react';
-import { useNavigate } from "react-router-dom";
+import React, {createContext, useState} from 'react';
 
-export const AuthContext = createContext({});
+export const AuthContext = createContext(null);
 
 export const AuthProvider = ({ isLoggedIn: isLoggedInProp, children }) => {
-    // const navigate = useNavigate();
     const [isLoggedIn, setIsLoggedIn] = useState(isLoggedInProp);
 
+    const userLogin = async data => {
+        const { token, id_info } = data;
 
-    const userLogin = async token => {
-        console.info('token', token);
         try {
-            localStorage.setItem("KR_Marketing_token", token);
+            await localStorage.setItem("KR_Marketing_token", token);
+            await localStorage.setItem("customer", JSON.stringify(id_info));
             setIsLoggedIn(true);
-            setTimeout(() => {
-                window.location.reload();
-            }, [700]);
+            window.location.href = '/powerLinkKeyword';
         } catch(e) {
             throw new Error(e);
         }
     }
 
     const userLogout = async () => {
-
+        try {
+            localStorage.removeItem("KR_Marketing_token");
+            localStorage.removeItem("customer");
+            setIsLoggedIn(false);
+            window.location.href = '/';
+        } catch(e) {
+            throw new Error(e);
+        } finally {
+            localStorage.clear();
+        }
     }
-
 
     return (
         <AuthContext.Provider value={{ isLoggedIn, userLogin, userLogout }}>
             {children}
         </AuthContext.Provider>
     )
-}
-
-export const userLogin = () => {
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    let { userLogin } = useContext(AuthContext);
-    return userLogin;
 }

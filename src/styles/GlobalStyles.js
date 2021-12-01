@@ -5,13 +5,14 @@ export default createGlobalStyle`
   ${reset};
   * {
     box-sizing: border-box;
+    white-space: nowrap;
   }
   body {
     font-size: 16px;=
     font-family: 'Noto Sans KR', sans-serif;
     width: 100%;
     height: 100vh;
-    overflow: hidden;
+    overflow: scroll;
     box-sizing: border-box;
     scrollbar-width: none;
     -ms-overflow-style: none;

@@ -63,6 +63,7 @@ const LoginPresenter = ({ id, passwd, onInputChange, handleLogin }) => {
                     placeholder="비밀번호를 입력해주세요."
                     value={passwd}
                     onChange={onInputChange}
+                    onKeyUp={e => e.key === "Enter" && handleLogin()}
                 />
                 <StyledButton
                     title="로 그 인"

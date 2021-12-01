@@ -1,11 +1,8 @@
 import React, { useState, useContext } from 'react';
 import LoginPresenter from "./LoginPresenter";
-import axios from "axios";
+import {toast} from "react-toastify";
 import {AuthContext} from "../../utils/AuthContext";
-import * as constants from "../../utils/Constants";
-
-const serverPROTOCOL = constants.config.PROTOCOL;
-const serverURL = constants.config.URL;
+import SendRequest from "../../utils/SendRequest";
 
 const LoginContainer = () => {
     const { userLogin } = useContext(AuthContext);
@@ -30,16 +27,16 @@ const LoginContainer = () => {
         }
 
         try {
-            const { data } = await axios.post(`${serverPROTOCOL}${serverURL}/User/login`, {
+            const { data } = await SendRequest().post('/User/login', {
                 id: id,
                 passwd: passwd
             });
-            if (!data.done) {
-                alert(data.message);
-            } else {
-                userLogin(data.token);
-            }
 
+            if (!data.done) {
+                toast.error(data.message);
+            } else {
+                userLogin(data);
+            }
         } catch(e) {
             throw new Error(e);
         }
