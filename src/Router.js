@@ -1,4 +1,5 @@
 import React from "react";
+import styled from "styled-components";
 import { Route, Routes } from "react-router-dom";
 import {AuthProvider} from "./utils/AuthContext";
 import Login from "./pages/Login";
@@ -8,6 +9,10 @@ import PowerContentsKeyword from "./pages/PowerContentsKeyword";
 import PowerLinkAutoBid from "./pages/PowerLinkAutoBid";
 import ShoppingAAutoBid from "./pages/ShoppingADAutoBid";
 import PowerContentsAutoBid from "./pages/PowerContentsAutoBid";
+
+const ComponentBox = styled.div`
+  padding-left: 300px;
+`;
 
 const LoggedInRoutes = () => (
     <Routes>
@@ -30,7 +35,7 @@ const Router = ({ isLoggedIn }) => {
     return (
         <AuthProvider>
             {isLoggedIn
-                ? <LoggedInRoutes />
+                ? <ComponentBox><LoggedInRoutes /></ComponentBox>
                 : <LoggedOutRoutes />
             }
         </AuthProvider>

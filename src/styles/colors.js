@@ -22,4 +22,5 @@ export default {
     borderColor: "#AAAAAA",
     lightBorderColor: "#cccccc",
     deepWhite: "#FCFCFC",
+    ultraLightGray: "#EEEEEE",
 }

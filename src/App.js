@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import styled, {ThemeProvider} from "styled-components";
+import {ThemeProvider} from "styled-components";
 import colors from "./styles/colors";
 import GlobalStyles from "./styles/GlobalStyles";
 import {ToastContainer, toast} from "react-toastify";
@@ -8,10 +8,7 @@ import SideBar from "./components/sideBar/SideBar";
 import "react-toastify/dist/ReactToastify.css";
 import {AuthProvider} from "./utils/AuthContext";
 
-const ComponentsBox = styled.div`
-  display: flex;
-  align-items: center;
-`;
+
 
 function App() {
     const [isLoggedIn, setIsLoggedIn] = useState(null);
@@ -38,10 +35,9 @@ function App() {
                     <GlobalStyles/>
                     <ToastContainer position={toast.POSITION.TOP_RIGHT}/>
 
-                    <ComponentsBox>
-                        {isLoggedIn && <SideBar/>}
-                        <Router isLoggedIn={isLoggedIn}/>
-                    </ComponentsBox>
+                    {isLoggedIn && <SideBar/>}
+                    <Router isLoggedIn={isLoggedIn}/>
+
                 </AuthProvider>
             </ThemeProvider>
 

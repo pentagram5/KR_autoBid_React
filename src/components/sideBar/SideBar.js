@@ -10,7 +10,9 @@ const View = styled.div`
   min-width: 300px;
   height: 100vh;
   background-color: ${colors.blue};
-  position: relative;
+  position: fixed;
+  top: 0;
+  z-index: 100;
 `;
 const KRLogoBox = styled.div`
   padding: 38px 0 44px 30px;

@@ -79,12 +79,15 @@ const Box = styled.div`
   display: flex;
 `;
 const TableBox = styled.div`
-    
+
 `;
 const Progress = styled.div`
   width: 100vw;
   height: 100vh;
   position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 9999;
   background: ${colors.black};
   opacity: 0.6;
   display: flex;
@@ -94,23 +97,28 @@ const Progress = styled.div`
 `;
 
 const PowerLinkKeywordPresenter = ({
-                                       customer,
-                                        state,
+                                       loading,
+                                       data,
+                                       error,
+                                       customerList,
+                                       selectCustomer,
+                                       handleAutoBidActive
                                    }) => {
-    const { loading, data: keywordData, error } = state;
 
-    if (loading) return <Progress><CircularProgress /></Progress>
+
     if (error) return null;
+    if (loading || !data || customerList.length === 0) return <Progress><CircularProgress/></Progress>
 
-
+    const { keywords, cycle_count } = data;
+    console.info('customerList :', keywords);
     return (
-        <ContentWrapper
-            title="파워링크 자동입찰관리"
-        >
+        <ContentWrapper title="파워링크 자동입찰관리">
             <AdvertiserSelector>
                 <Text fontSize={24} fontWeight={700}>광고주</Text>
-                <SelectBox>
-                    {customer.map(list => (
+                <SelectBox
+                    onChange={selectCustomer}
+                >
+                    {customerList.id_info.map(list => (
                         <option key={list.CUSTOMER_ID} value={list.CUSTOMER_ID}>{list.show_login}</option>
                     ))}
                 </SelectBox>
@@ -121,25 +129,25 @@ const PowerLinkKeywordPresenter = ({
                     <InfoBox padding="10px 25px 10px 0">
                         <Text fontSize={24} fontWeight={700}>5분</Text>&nbsp;&nbsp;
                         <Text fontSize={18} fontColor={colors.darkGray}>
-                            ({keywordData && keywordData.cycle_count && keywordData.cycle_count._5} 개)
+                            ({cycle_count._5} 개)
                         </Text>
                     </InfoBox>
                     <InfoBox>
                         <Text fontSize={24} fontWeight={700}>10분</Text>&nbsp;&nbsp;
                         <Text fontSize={18} fontColor={colors.darkGray}>
-                            ({keywordData && keywordData.cycle_count && keywordData.cycle_count._10} 개)
+                            ({cycle_count._10} 개)
                         </Text>
                     </InfoBox>
                     <InfoBox>
                         <Text fontSize={24} fontWeight={700}>30분</Text>&nbsp;&nbsp;
                         <Text fontSize={18} fontColor={colors.darkGray}>
-                            ({keywordData && keywordData.cycle_count && keywordData.cycle_count._30} 개)
+                            ({cycle_count._30} 개)
                         </Text>
                     </InfoBox>
                     <InfoBox>
                         <Text fontSize={24} fontWeight={700}>60분</Text>&nbsp;&nbsp;
                         <Text fontSize={18} fontColor={colors.darkGray}>
-                            ({keywordData && keywordData.cycle_count && keywordData.cycle_count._60} 개)
+                            ({cycle_count._60} 개)
                         </Text>
                     </InfoBox>
                 </InfoList>
@@ -155,6 +163,7 @@ const PowerLinkKeywordPresenter = ({
                         bgColor={colors.white}
                         imgSrc={play}
                         height={29}
+                        onClick={handleAutoBidActive}
                     />
                     <ImageButton
                         title="자동입찰 중지"
@@ -192,7 +201,7 @@ const PowerLinkKeywordPresenter = ({
             </TableTop>
             <TableBox>
                 <MaterialTable
-                    tableLists={keywordData && keywordData.data}
+                    tableLists={keywords}
                 />
             </TableBox>
         </ContentWrapper>

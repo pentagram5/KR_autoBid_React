@@ -9,6 +9,7 @@ const instance = () => {
     };
 
     if (token) requestHeaders.Authorization = `Bearer ${token}`;
+    // if (token) requestHeaders.token = `${token}`;
 
     return Axios.create({
         baseURL: apiServerUrl,

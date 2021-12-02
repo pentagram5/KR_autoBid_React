@@ -3,6 +3,7 @@ import styled from "styled-components";
 import Box from '@mui/material/Box';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
+import TableFooter from '@mui/material/TableFooter';
 import TableHead from '@mui/material/TableHead';
 import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
@@ -11,8 +12,11 @@ import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import IconButton from '@mui/material/IconButton';
 import Checkbox from '@mui/material/Checkbox';
+import colors from "../../styles/colors";
+
 
 function TablePaginationActions(props) {
+
     const {count, page, rowsPerPage, onPageChange} = props;
 
     const handleFirstPageButtonClick = e => onPageChange(e, 0);
@@ -21,7 +25,7 @@ function TablePaginationActions(props) {
     const handleLastPageButtonClick = e => onPageChange(e, Math.max(0, Math.ceil(count / rowsPerPage) - 1));
 
     return (
-        <Box>
+        <Box sx={{ flexShrink: 0, ml: 2.5 }}>
             <IconButton
                 onClick={handleFirstPageButtonClick}
                 disabled={page === 0}
@@ -53,29 +57,43 @@ function TablePaginationActions(props) {
         </Box>
     );
 }
+const CustomTable = styled(Table)`
+  min-width: 1200px;
+  
+  thead th {
+    text-align: center;
+    background: ${colors.ultraLightGray};
+  }
+  
+  td {
+    text-align: center;
+  }
+  
+  .css-hbtnrh-MuiTableCell-root {
+    max-width: 50px;
+  }
+  
+  .css-1ex1afd-MuiTableCell-root:nth-child(2),
+  .css-1ex1afd-MuiTableCell-root:nth-child(3),
+  .css-1ex1afd-MuiTableCell-root:nth-child(4) {
+    min-width: 300px !important;
+    white-space: pre;
+  }
 
-function createData(name, calories, fat) {
-    return {name, calories, fat};
-}
-
-const rows = [
-    createData('Cupcake', 305, 3.7),
-    createData('Donut', 452, 25.0),
-    createData('Eclair', 262, 16.0),
-    createData('Frozen yoghurt', 159, 6.0),
-    createData('Gingerbread', 356, 16.0),
-    createData('Honeycomb', 408, 3.2),
-    createData('Ice cream sandwich', 237, 9.0),
-    createData('Jelly Bean', 375, 0.0),
-    createData('KitKat', 518, 26.0),
-    createData('Lollipop', 392, 0.2),
-    createData('Marshmallow', 318, 0),
-    createData('Nougat', 360, 19.0),
-    createData('Oreo', 437, 18.0),
-].sort((a, b) => (a.calories < b.calories ? -1 : 1));
-
-const PagingBox = styled.div`
-
+  .css-1ex1afd-MuiTableCell-root:nth-child(5),
+  .css-1ex1afd-MuiTableCell-root:nth-child(6),
+  .css-1ex1afd-MuiTableCell-root:nth-child(7),
+  .css-1ex1afd-MuiTableCell-root:nth-child(8),
+  .css-1ex1afd-MuiTableCell-root:nth-child(9),
+  .css-1ex1afd-MuiTableCell-root:nth-child(10),
+  .css-1ex1afd-MuiTableCell-root:nth-child(11),
+  .css-1ex1afd-MuiTableCell-root:nth-child(12) {
+    min-width: 100px;
+  }
+`;
+const CustomTableCell = styled(TableCell)`
+  width: ${({ width }) => width}%;
+  background: ${colors.ultraLightGray};
 `;
 
 export default function MaterialTable({ tableLists }) {
@@ -85,9 +103,7 @@ export default function MaterialTable({ tableLists }) {
     const [page, setPage] = React.useState(0);
     const [rowsPerPage, setRowsPerPage] = React.useState(10);
 
-    // Avoid a layout jump when reaching the last page with empty rows.
-    const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
-
+    const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - tableLists.length) : 0;
     const handleChangePage = (e, newPage) => setPage(newPage);
 
     const handleChangeRowsPerPage = e => {
@@ -97,23 +113,23 @@ export default function MaterialTable({ tableLists }) {
 
     return (
         <TableContainer component={Paper}>
-            <Table sx={{minWidth: 500}}>
+            <CustomTable>
                 <TableHead>
                     <TableRow>
-                        <TableCell>
+                        <TableCell padding="checkbox">
                             <Checkbox />
                         </TableCell>
-                        <TableCell component="th" scope="row">캠페인</TableCell>
-                        <TableCell component="th" scope="row">광고그룹</TableCell>
-                        <TableCell component="th" scope="row">키워드</TableCell>
-                        <TableCell component="th" scope="row">디바이스</TableCell>
-                        <TableCell component="th" scope="row">최소입찰가</TableCell>
-                        <TableCell component="th" scope="row">최대입찰가</TableCell>
-                        <TableCell component="th" scope="row">목표순위</TableCell>
-                        <TableCell component="th" scope="row">현재입찰가</TableCell>
-                        <TableCell component="th" scope="row">현재순위</TableCell>
-                        <TableCell component="th" scope="row">자동입찰활성화</TableCell>
-                        <TableCell component="th" scope="row">입찰주기</TableCell>
+                        <TableCell>캠페인</TableCell>
+                        <TableCell>광고그룹</TableCell>
+                        <TableCell>키워드</TableCell>
+                        <TableCell>디바이스</TableCell>
+                        <TableCell>최소입찰가</TableCell>
+                        <TableCell>최대입찰가</TableCell>
+                        <TableCell>목표순위</TableCell>
+                        <TableCell>현재입찰가</TableCell>
+                        <TableCell>현재순위</TableCell>
+                        <TableCell>자동입찰활성화</TableCell>
+                        <TableCell>입찰주기</TableCell>
 
                     </TableRow>
                 </TableHead>
@@ -123,40 +139,40 @@ export default function MaterialTable({ tableLists }) {
                             : tableLists
                     ).map((row) => (
                         <TableRow key={row.nccKeywordId}>
-                            <TableCell style={{width: 10}} align="left">
+                            <TableCell padding="checkbox">
                                 <Checkbox />
                             </TableCell>
-                            <TableCell style={{width: 10}} align="center">
+                            <TableCell>
                                 {row.Campaign_name}
                             </TableCell>
-                            <TableCell style={{width: 50}} align="center">
+                            <TableCell>
                                 {row.Adgroup_name}
                             </TableCell>
-                            <TableCell style={{width: 50}} align="center">
+                            <TableCell>
                                 {row.Keyword}
                             </TableCell>
-                            <TableCell style={{width: 50}} align="center">
+                            <TableCell>
                                 {row.device}
                             </TableCell>
-                            <TableCell style={{width: 50}} align="center">
+                            <TableCell>
                                 {!!row.min_bid ? row.min_bid : '-' }
                             </TableCell>
-                            <TableCell style={{width: 50}} align="center">
+                            <TableCell>
                                 {!!row.max_bid ? row.max_bid : '-' }
                             </TableCell>
-                            <TableCell style={{width: 50}} align="center">
+                            <TableCell>
                                 {row.target_Rank}
                             </TableCell>
-                            <TableCell style={{width: 50}} align="center">
+                            <TableCell>
                                 {row.current_bid} 원
                             </TableCell>
-                            <TableCell style={{width: 50}} align="center">
+                            <TableCell>
                                 {row.current_rank}
                             </TableCell>
-                            <TableCell style={{width: 50}} align="center">
+                            <TableCell>
                                 {!!row.activate ? '활성화' : '비활성화'}
                             </TableCell>
-                            <TableCell style={{width: 50}} align="center">
+                            <TableCell>
                                 {row.bid_cycle} 분
                             </TableCell>
                         </TableRow>
@@ -168,26 +184,27 @@ export default function MaterialTable({ tableLists }) {
                         </TableRow>
                     )}
                 </TableBody>
-
-                <PagingBox>
-                    <TablePagination
-                        rowsPerPageOptions={[10, 20, 30, {label: 'All', value: -1}]}
-                        colSpan={3}
-                        count={rows.length}
-                        rowsPerPage={rowsPerPage}
-                        page={page}
-                        SelectProps={{
-                            inputProps: {
-                                'aria-label': 'rows per page',
-                            },
-                            native: true,
-                        }}
-                        onPageChange={handleChangePage}
-                        onRowsPerPageChange={handleChangeRowsPerPage}
-                        ActionsComponent={TablePaginationActions}
-                    />
-                </PagingBox>
-            </Table>
+                <TableFooter>
+                    <TableRow>
+                        <TablePagination
+                            rowsPerPageOptions={[10, 20, 30, {label: 'All', value: -1}]}
+                            colSpan={11}
+                            count={tableLists.length}
+                            rowsPerPage={rowsPerPage}
+                            page={page}
+                            SelectProps={{
+                                inputProps: {
+                                    'aria-label': 'rows per page',
+                                },
+                                native: true,
+                            }}
+                            onPageChange={handleChangePage}
+                            onRowsPerPageChange={handleChangeRowsPerPage}
+                            ActionsComponent={TablePaginationActions}
+                        />
+                    </TableRow>
+                </TableFooter>
+            </CustomTable>
         </TableContainer>
     )
 }
