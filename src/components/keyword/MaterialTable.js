@@ -58,7 +58,7 @@ function TablePaginationActions(props) {
     );
 }
 const CustomTable = styled(Table)`
-  min-width: 1200px;
+  max-width: 1720px;
   
   thead th {
     text-align: center;
@@ -66,17 +66,18 @@ const CustomTable = styled(Table)`
   }
   
   td {
+    padding: 6px 0;
     text-align: center;
   }
   
   .css-hbtnrh-MuiTableCell-root {
-    max-width: 50px;
+    max-width: 40px;
   }
   
   .css-1ex1afd-MuiTableCell-root:nth-child(2),
   .css-1ex1afd-MuiTableCell-root:nth-child(3),
   .css-1ex1afd-MuiTableCell-root:nth-child(4) {
-    min-width: 300px !important;
+    min-width: 200px !important;
     white-space: pre;
   }
 
@@ -88,17 +89,11 @@ const CustomTable = styled(Table)`
   .css-1ex1afd-MuiTableCell-root:nth-child(10),
   .css-1ex1afd-MuiTableCell-root:nth-child(11),
   .css-1ex1afd-MuiTableCell-root:nth-child(12) {
-    min-width: 100px;
+    width: 50px;
   }
 `;
-const CustomTableCell = styled(TableCell)`
-  width: ${({ width }) => width}%;
-  background: ${colors.ultraLightGray};
-`;
 
-export default function MaterialTable({ tableLists }) {
-
-
+export default function MaterialTable({ tableLists, checked, isChecked, handleChecked, handleAllChecked }) {
 
     const [page, setPage] = React.useState(0);
     const [rowsPerPage, setRowsPerPage] = React.useState(10);
@@ -111,13 +106,20 @@ export default function MaterialTable({ tableLists }) {
         setPage(0);
     };
 
+    // console.info('tableLists.length', tableLists.length);
+    // console.info('checked.length', checked.length);
+    // console.info('checked', tableLists.length > 0 && checked.length === tableLists.length);
+
     return (
         <TableContainer component={Paper}>
             <CustomTable>
                 <TableHead>
                     <TableRow>
                         <TableCell padding="checkbox">
-                            <Checkbox />
+                            <Checkbox
+                                onChange={handleAllChecked}
+                                checked={tableLists.length > 0 && checked.length === tableLists.length}
+                            />
                         </TableCell>
                         <TableCell>캠페인</TableCell>
                         <TableCell>광고그룹</TableCell>
@@ -137,46 +139,52 @@ export default function MaterialTable({ tableLists }) {
                     {(rowsPerPage > 0
                             ? tableLists && tableLists.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                             : tableLists
-                    ).map((row) => (
-                        <TableRow key={row.nccKeywordId}>
-                            <TableCell padding="checkbox">
-                                <Checkbox />
-                            </TableCell>
-                            <TableCell>
-                                {row.Campaign_name}
-                            </TableCell>
-                            <TableCell>
-                                {row.Adgroup_name}
-                            </TableCell>
-                            <TableCell>
-                                {row.Keyword}
-                            </TableCell>
-                            <TableCell>
-                                {row.device}
-                            </TableCell>
-                            <TableCell>
-                                {!!row.min_bid ? row.min_bid : '-' }
-                            </TableCell>
-                            <TableCell>
-                                {!!row.max_bid ? row.max_bid : '-' }
-                            </TableCell>
-                            <TableCell>
-                                {row.target_Rank}
-                            </TableCell>
-                            <TableCell>
-                                {row.current_bid} 원
-                            </TableCell>
-                            <TableCell>
-                                {row.current_rank}
-                            </TableCell>
-                            <TableCell>
-                                {!!row.activate ? '활성화' : '비활성화'}
-                            </TableCell>
-                            <TableCell>
-                                {row.bid_cycle} 분
-                            </TableCell>
-                        </TableRow>
-                    ))}
+                    ).map((row) => {
+                        const isListChecked = isChecked(row.nccKeywordId);
+
+                        return (
+                            <TableRow key={row.nccKeywordId}>
+                                <TableCell padding="checkbox" onClick={e => handleChecked(e, row.nccKeywordId)}>
+                                    <Checkbox
+                                        checked={isListChecked}
+                                    />
+                                </TableCell>
+                                <TableCell>
+                                    {row.Campaign_name}
+                                </TableCell>
+                                <TableCell>
+                                    {row.Adgroup_name}
+                                </TableCell>
+                                <TableCell>
+                                    {row.Keyword}
+                                </TableCell>
+                                <TableCell>
+                                    {row.device}
+                                </TableCell>
+                                <TableCell>
+                                    {!!row.min_bid ? row.min_bid : '-' }
+                                </TableCell>
+                                <TableCell>
+                                    {!!row.max_bid ? row.max_bid : '-' }
+                                </TableCell>
+                                <TableCell>
+                                    {row.target_Rank}
+                                </TableCell>
+                                <TableCell>
+                                    {row.current_bid} 원
+                                </TableCell>
+                                <TableCell>
+                                    {!!row.current_rank ? row.current_rank : '-'}
+                                </TableCell>
+                                <TableCell>
+                                    {!!row.activate ? '활성화' : '비활성화'}
+                                </TableCell>
+                                <TableCell>
+                                    {row.bid_cycle} 분
+                                </TableCell>
+                            </TableRow>
+                        )
+                    })}
 
                     {emptyRows > 0 && (
                         <TableRow style={{height: 53 * emptyRows}}>

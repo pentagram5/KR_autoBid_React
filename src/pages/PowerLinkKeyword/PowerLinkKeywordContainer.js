@@ -1,6 +1,5 @@
 import React, {useEffect, useState, useReducer} from 'react';
-import PowerLinkKeywordPresenter from "./PowerLinkKeywordPresenter";
-import axios from "axios";
+import KeywordPresenter from "../../components/keyword/KeywordPresenter";
 import * as constants from "../../utils/constants";
 import {toast} from "react-toastify";
 import SendRequest from "../../utils/SendRequest";
@@ -8,27 +7,29 @@ import SendRequest from "../../utils/SendRequest";
 const serverPROTOCOL = constants.config.PROTOCOL;
 const serverURL = constants.config.URL;
 
-// const fetchPowerLinkData = async customerId => {
-//     console.info('아이디 ::: ', customerId);
-//     const response =  await axios.get(`${serverPROTOCOL}${serverURL}/autobid/powerlink?CUSTOMER_ID/${customerId}`);
-//
-//     return response.data;
-// }
-
 function reducer(state, action) {
     switch (action.type) {
         case 'LOADING':
             return {
                 loading: true,
                 data: null,
-                error: null
+                error: false
             };
         case 'SUCCESS':
             return {
                 loading: false,
                 data: action.data,
-                error: null
+                error: false
             };
+        case 'RE_REQUEST':
+            return {
+                loading: false,
+                data: {
+                    ...state.data,
+                    "keywords": action.data
+                },
+                error: false
+            }
         case 'ERROR':
             return {
                 loading: false,
@@ -40,40 +41,112 @@ function reducer(state, action) {
     }
 }
 
-const PowerLinkKeywordContainer = () => {
+const PowerLinkKeywordContainer = (url, config) => {
     const [state, dispatch] = useReducer(reducer, {
        loading: true,
        data: null,
        error: false
     });
+    const { loading, data, error } = state;
     const [customer, setCustomer] = useState({});
     const [customerList, setCustomerList] = useState([]);
+    const [checked, setChecked] = useState([]);
+    const [nccKeywordId, setNccKeywordId] = useState([]);
 
-    const { loading, data, error } = state;
+    const handleChangeCustomer = e => customerList.find(list => list.CUSTOMER_ID === e.target.value && setCustomer(list));
 
-    const selectCustomer = e => setCustomer(e.target.value);
+    const handleAllChecked = e => {
+        if (e.target.checked) {
+            const newChecked = data.keywords.map(list => list.nccKeywordId);
+            setChecked(newChecked);
+            return;
+        }
+        setChecked([]);
+    }
 
-    const fetchPowerLinkData = async customerId => {
-        dispatch({ type: 'LOADING' });
+    const handleChecked = (e, id) => {
+        const checkedIndex = checked.indexOf(id);
+        let newChecked = [];
+
+        if (checkedIndex === -1) newChecked = newChecked.concat(checked, id)
+        else if (checkedIndex === 0) newChecked = newChecked.concat(checked.slice(1));
+        else if (checkedIndex === checked.length -1) newChecked = newChecked.concat(checked.slice(0, -1));
+        else if (checkedIndex > 0) newChecked = newChecked.concat(checked.slice(0, checkedIndex), checked.slice(checkedIndex + 1));
+
+        setChecked(newChecked);
+    }
+
+    const handleAutoBidActive = async (type) => {
+        if (checked.length === 0 ) {
+            toast.error(`${type === "active" ? "활성화" : "비활성화"} 할 키워드를 선택해주세요.`);
+            return;
+        }
         try {
-            const powerLinkResponse = await SendRequest().get(`${serverPROTOCOL}${serverURL}/autobid/powerlink?CUSTOMER_ID/${customerId}`);
-            const customerResponse = await SendRequest().get(`${serverPROTOCOL}${serverURL}/autobid/id`);
-            dispatch({ type: 'SUCCESS', data: powerLinkResponse.data });
-            setCustomerList(customerResponse.data);
+            const { data } = await SendRequest().put(`${serverPROTOCOL}${serverURL}/autobid/powerlink/activate?CUSTOMER_ID=${customer["CUSTOMER_ID"]}&activate=${(type === "active")}`, nccKeywordId);
+            dispatch({ type: 'RE_REQUEST', data: data.keywords });
+
+            if (data.done) {
+                toast.info(`선택하신 키워드가 ${type === "active" ? "활성화" : "비활성화"} 되었습니다.`);
+            }
         } catch(e) {
-            dispatch({ type: 'ERROR' });
+            throw new Error(e);
         }
     }
 
-    const handleAutoBidActive = async () => {                                                   // 901474&activate=true
-        let testData = [{"nccKeywordId": "nkw-a001-01-000003468178392__라이브커머스쇼호스트"}];
+    const handleDeleteAutoBid = async () => {
+        if (checked.length === 0 ) {
+            toast.error('삭제할 키워드를 선택해주세요.');
+            return;
+        }
+        if (window.confirm("정말 삭제하시겠습니까?")) {
+            try {
+                const res = await SendRequest().delete(`${serverPROTOCOL}${serverURL}/autobid/powerlink/delete?CUSTOMER_ID=${customer["CUSTOMER_ID"]}`, {data: nccKeywordId});
+                console.info('res', res);
+                if (res.status === 200) {
+                    dispatch({ type: 'SUCCESS', data: res.data });
+                    toast.info('선택한 키워드를 삭제하였습니다.');
+                }
+            } catch(e) {
+                throw new Error(e);
+            }
+        }
+    }
+
+    const handleDownload = async () => {
+        try {
+            const res = await SendRequest().get(`${serverPROTOCOL}${serverURL}/autobid/powerlink/download?CUSTOMER_ID=${customer["CUSTOMER_ID"]}`, {
+                responseType: "blob",
+            });
+            const url = window.URL.createObjectURL(new Blob([res.data], {
+                type: res.headers['content-type'],
+            }));
+
+            let link = document.createElement('a');
+
+            link.href = url;
+            link.target = '_blank';
+            link.click();
+            window.URL.revokeObjectURL(link);
+            link.remove();
+        } catch(e) {
+            throw new Error(e);
+        }
+    }
+
+    const isChecked = id => checked.indexOf(id) !== -1;
+
+    const fetchPowerLinkData = async customerId => {
+        dispatch({ type: 'LOADING' });
 
         try {
-            const test = await SendRequest().put(`http://218.52.115.188:8000/autobid/powerlink/activate?CUSTOMER_ID=${customer["CUSTOMER_ID"]}&activate=${true}`, testData);
+            const powerLinkResponse = await SendRequest().get(`${serverPROTOCOL}${serverURL}/autobid/powerlink?CUSTOMER_ID=${customerId}`);
+            const customerResponse = await SendRequest().get(`${serverPROTOCOL}${serverURL}/autobid/id`);
 
-            console.info('김주년챠챠 !!!', test);
+            dispatch({ type: 'SUCCESS', data: powerLinkResponse.data });
+            setCustomerList(customerResponse.data.id_info);
+
         } catch(e) {
-
+            dispatch({ type: 'ERROR' });
         }
     }
 
@@ -82,18 +155,35 @@ const PowerLinkKeywordContainer = () => {
     }, []);
 
     useEffect(() => {
+        if (checked.length > 0) {
+            setNccKeywordId(checked.reduce((target, key, index) => {
+                target[index] = {"nccKeywordId": key};
+                return target;
+            }, []));
+        }
+    }, [checked]);
+
+    useEffect(() => {
         if (!!customer["CUSTOMER_ID"]) fetchPowerLinkData(customer["CUSTOMER_ID"]);
     }, [customer]);
 
 
     return (
-        <PowerLinkKeywordPresenter
+        <KeywordPresenter
+            title="파워링크 자동입찰관리"
             loading={loading}
             error={error}
             data={data && data}
+            customer={customer}
             customerList={customerList}
-            selectCustomer={selectCustomer}
+            handleChangeCustomer={handleChangeCustomer}
             handleAutoBidActive={handleAutoBidActive}
+            handleDeleteAutoBid={handleDeleteAutoBid}
+            checked={checked}
+            isChecked={isChecked}
+            handleChecked={handleChecked}
+            handleAllChecked={handleAllChecked}
+            handleDownload={handleDownload}
         />
     )
 }

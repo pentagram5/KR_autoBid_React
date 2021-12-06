@@ -30,4 +30,10 @@ export default createGlobalStyle`
   button {
     cursor: pointer;
   }
+  select {
+    padding: 0 10px;
+    outline: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+  }
 `;

@@ -9,7 +9,7 @@ import pause from "../../assets/pause.svg";
 import gear from "../../assets/gear.svg";
 import trashCan from "../../assets/delete.svg";
 import download from "../../assets/download.svg";
-import MaterialTable from "../../components/Keyword/MaterialTable";
+import MaterialTable from ".//MaterialTable";
 import CircularProgress from '@mui/material/CircularProgress';
 
 const AdvertiserSelector = styled.div`
@@ -96,33 +96,43 @@ const Progress = styled.div`
   align-items: center;
 `;
 
-const PowerLinkKeywordPresenter = ({
+const KeywordPresenter = ({
+    title,
                                        loading,
                                        data,
                                        error,
+                                       customer,
                                        customerList,
-                                       selectCustomer,
-                                       handleAutoBidActive
+                                       handleChangeCustomer,
+                                       handleAutoBidActive,
+                                       handleDeleteAutoBid,
+                                       checked,
+                                       isChecked,
+                                       handleChecked,
+                                       handleAllChecked,
+                                       handleDownload
                                    }) => {
 
 
     if (error) return null;
     if (loading || !data || customerList.length === 0) return <Progress><CircularProgress/></Progress>
 
-    const { keywords, cycle_count } = data;
-    console.info('customerList :', keywords);
+    const {keywords, cycle_count} = data;
+
     return (
-        <ContentWrapper title="파워링크 자동입찰관리">
+        <ContentWrapper title={title}>
             <AdvertiserSelector>
                 <Text fontSize={24} fontWeight={700}>광고주</Text>
                 <SelectBox
-                    onChange={selectCustomer}
+                    onChange={handleChangeCustomer}
+                    value={customer.CUSTOMER_ID}
                 >
-                    {customerList.id_info.map(list => (
+                    {customerList.map(list => (
                         <option key={list.CUSTOMER_ID} value={list.CUSTOMER_ID}>{list.show_login}</option>
                     ))}
                 </SelectBox>
             </AdvertiserSelector>
+
             <KeywordInfoBox>
                 <Text fontColor={colors.deepGray} fontSize={14} fontWeight={700}>등록된 주기별 키워드 수</Text>
                 <InfoList>
@@ -163,7 +173,7 @@ const PowerLinkKeywordPresenter = ({
                         bgColor={colors.white}
                         imgSrc={play}
                         height={29}
-                        onClick={handleAutoBidActive}
+                        onClick={() => handleAutoBidActive("active")}
                     />
                     <ImageButton
                         title="자동입찰 중지"
@@ -172,6 +182,7 @@ const PowerLinkKeywordPresenter = ({
                         bgColor={colors.white}
                         imgSrc={pause}
                         height={29}
+                        onClick={() => handleAutoBidActive()}
                     />
                     <ImageButton
                         title="설정"
@@ -188,6 +199,7 @@ const PowerLinkKeywordPresenter = ({
                         bgColor={colors.white}
                         imgSrc={trashCan}
                         height={29}
+                        onClick={handleDeleteAutoBid}
                     />
                 </Box>
                 <ImageButton
@@ -197,15 +209,20 @@ const PowerLinkKeywordPresenter = ({
                     bgColor={colors.white}
                     imgSrc={download}
                     height={29}
+                    onClick={handleDownload}
                 />
             </TableTop>
             <TableBox>
                 <MaterialTable
                     tableLists={keywords}
+                    checked={checked}
+                    isChecked={isChecked}
+                    handleChecked={handleChecked}
+                    handleAllChecked={handleAllChecked}
                 />
             </TableBox>
         </ContentWrapper>
     )
 }
 
-export default PowerLinkKeywordPresenter;
+export default KeywordPresenter;

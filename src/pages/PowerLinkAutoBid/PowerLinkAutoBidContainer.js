@@ -1,10 +1,10 @@
 import React from 'react';
-import PowerLinkAutoBidPresenter from "./PowerLinkAutoBidPresenter";
+import AddAutoBidPresenter from "../../components/addAutoBid/AddAutoBidPresenter";
 
 const PowerLinkAutoBidContainer = () => {
     return (
-        <PowerLinkAutoBidPresenter
-            
+        <AddAutoBidPresenter
+            title="파워링크 자동입찰등록"
         />
     )
 }

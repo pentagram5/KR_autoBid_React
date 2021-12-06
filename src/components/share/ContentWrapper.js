@@ -5,7 +5,7 @@ import colors from "../../styles/colors";
 const View = styled.div`
   width: calc(100vw - 300px);
   height: 100vh;
-  padding: 50px;
+  padding: 30px 50px;
 `;
 const Title = styled.div`
   height: 52px;

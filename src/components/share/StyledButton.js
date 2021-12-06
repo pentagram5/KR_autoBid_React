@@ -1,8 +1,7 @@
 import React from 'react';
-import styled, { css } from "styled-components";
+import styled, {css} from "styled-components";
 
 const Button = styled.button`
-  border-radius: 5px;
   font-size: ${({fontSize}) => fontSize ? fontSize : 18}px;
   font-weight: ${({fontWeight}) => fontWeight ? fontWeight : 600};
   width: ${({width}) => width}px;
@@ -11,10 +10,19 @@ const Button = styled.button`
   border: ${({border}) => border ? border : "none"};
   height: ${({height}) => height}px;
   background-color: ${({bgColor}) => bgColor};
+  border-radius: ${({borderRadius}) => borderRadius ? borderRadius : 5}px;
   
-  ${({ margin }) => margin && css`
+  ${({margin}) => margin && css`
     margin: ${margin};
   `}
+  
+  &:hover {
+    opacity: 0.9;
+  }
+  
+  &:active {
+    opacity: 1;
+  }
 `;
 
 const StyledButton = ({
@@ -25,6 +33,7 @@ const StyledButton = ({
                           fontSize,
                           fontColor,
                           border,
+                          borderRadius,
                           margin,
                           onClick
                       }) => {
@@ -36,6 +45,7 @@ const StyledButton = ({
             fontSize={fontSize}
             fontColor={fontColor}
             border={border}
+            borderRadius={borderRadius}
             margin={margin}
             onClick={onClick}
         >

@@ -68,7 +68,7 @@ const SubMenuBox = styled.div`
 
   ${({active}) => active && css`
     height: 170px;
-    padding: 16px 0;
+    padding: 0 0 16px;
   `}
   &:last-child {
     border-bottom: 1px solid ${colors.lightBlue};

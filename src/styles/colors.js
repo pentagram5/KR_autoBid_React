@@ -10,6 +10,7 @@ export default {
 
     // Secondary color
     lightBlack: "#333333",
+    darkBlack: "#222222",
     deepGray: "#555555",
     gray: "#888888",
     darkGray: "#777777",
