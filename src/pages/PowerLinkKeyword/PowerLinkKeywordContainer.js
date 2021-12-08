@@ -1,8 +1,8 @@
-import React, {useEffect, useState, useReducer} from 'react';
+import React, {useEffect, useState, useReducer, useCallback} from 'react';
 import KeywordPresenter from "../../components/keyword/KeywordPresenter";
-import * as constants from "../../utils/constants";
 import {toast} from "react-toastify";
 import SendRequest from "../../utils/SendRequest";
+import * as constants from "../../utils/constants";
 
 const serverPROTOCOL = constants.config.PROTOCOL;
 const serverURL = constants.config.URL;
@@ -53,7 +53,15 @@ const PowerLinkKeywordContainer = (url, config) => {
     const [checked, setChecked] = useState([]);
     const [nccKeywordId, setNccKeywordId] = useState([]);
 
-    const handleChangeCustomer = e => customerList.find(list => list.CUSTOMER_ID === e.target.value && setCustomer(list));
+    // 광고주 select 선택
+    const handleCustomerChange = useCallback(e => {
+        console.info('커스터머 아이디 값 ::: ', e.target.value);
+        console.info('광고주 리스트  ::: ', customerList);
+        const list = customerList.find(list => list.CUSTOMER_ID === e.target.value);
+        console.info('찾은거 ::: ', list);
+        setCustomer(list);
+        localStorage.setItem("customer", JSON.stringify(list));
+    }, [customerList]);
 
     const handleAllChecked = e => {
         if (e.target.checked) {
@@ -176,7 +184,7 @@ const PowerLinkKeywordContainer = (url, config) => {
             data={data && data}
             customer={customer}
             customerList={customerList}
-            handleChangeCustomer={handleChangeCustomer}
+            handleCustomerChange={handleCustomerChange}
             handleAutoBidActive={handleAutoBidActive}
             handleDeleteAutoBid={handleDeleteAutoBid}
             checked={checked}

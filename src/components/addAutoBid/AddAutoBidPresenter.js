@@ -5,27 +5,24 @@ import Checkbox from '@mui/material/Checkbox';
 import Radio from '@mui/material/Radio';
 import RadioGroup from '@mui/material/RadioGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
+import Chip from '@mui/material/Chip';
 import StyledButton from "../share/StyledButton";
 import selectArrow2 from "../../assets/selectArrow2.svg";
 import selectArrow3 from "../../assets/selectArrow3.svg";
 import rightArrow from "../../assets/rightArrow.svg";
 import rightLeftArrow from "../../assets/rightLeftArrow.svg";
 import delete_2 from "../../assets/delete_2.svg";
+import chipDelete from "../../assets/chipDelete.svg";
+import clock from "../../assets/clock.svg";
+import Header from "../share/Header";
 
 const View = styled.div`
   width: calc(100vw - 300px);
   padding: 30px 50px 400px;
 `;
-const MainTitle = styled.div`
-  height: 52px;
-  color: ${colors.lightBlack};
-  line-height: 1.5;
-  font-size: 36px;
-  font-weight: 700;
-  margin-bottom: 30px;
-`;
 const Title = styled.div`
   font-size: 18px;
+  font-weight: 700;
   color: ${colors.lightBlack};
   margin-bottom: 20px;
 `;
@@ -36,10 +33,15 @@ const SelectForm = styled.div`
 const SelectBox = styled.select`
   width: ${({width}) => width}px;
   height: 40px;
+  padding: ${({padding}) => padding ? padding : "0 20px"};
   color: ${colors.darkGray};
   border-radius: 3px;
   border: 1px solid ${colors.lightBorderColor};
-  background: url(${({bgImg}) => bgImg}) 95% 50% no-repeat;
+  background: url(${({bgImg}) => bgImg}) 90% 55% no-repeat;
+
+  & + & {
+    margin: 0 10px;
+  }
 `;
 const RightArrowBox = styled.div`
   margin: 0 15px;
@@ -50,12 +52,13 @@ const Image = styled.img`
   `}
 `;
 const TableBox = styled.div`
+  width: 1470px;
   display: flex;
   align-items: center;
-  margin: 10px 0 40px;
+  margin: 10px 0 60px;
 `;
 const KeywordTable = styled.div`
-  width: 650px;
+  width: 45%;
   height: 400px;
   font-size: 14px;
   border-top: 2px solid ${colors.deepGray};
@@ -98,12 +101,15 @@ const TableCell = styled.div`
   color: ${({fontColor}) => fontColor ? fontColor : colors.darkGray};
 `;
 const ButtonGroup = styled.div`
+  width: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
+  margin: 60px 0 160px;
 `;
 const SettingTableBox = styled.div`
   width: 100%;
+  margin-bottom: 60px;
   border-top: 2px solid ${colors.deepGray};
   border-bottom: 1px solid ${colors.deepGray};
 `;
@@ -117,7 +123,7 @@ const SettingTable = styled.table`
     vertical-align: middle;
     border-right: 1px solid ${colors.lightBorderColor};
     border-bottom: 1px solid ${colors.lightBorderColor};
-    
+
     &:nth-child(1),
     &:nth-child(3) {
       width: 250px !important;
@@ -127,62 +133,148 @@ const SettingTable = styled.table`
       background-color: ${colors.deepWhite};
     }
   }
-  
+
   .css-ahj2mt-MuiTypography-root {
     color: ${colors.gray};
   }
+
   .css-1hbvpl3-MuiSvgIcon-root {
-   fill: ${colors.gray}; 
+    fill: ${colors.gray};
   }
 `;
 const InputBox = styled.div`
   width: 180px;
   height: 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 10px;
   color: ${colors.gray};
-  border: 1px solid ${colors.borderColor};
+  border: 1px solid ${colors.lightBorderColor};
+`;
+const Input = styled.input`
+  border: none;
+  width: 90%;
+  height: 100%;
+`;
+const ChipBox = styled.div`
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  margin: 20px 0 10px;
+`;
+const StyledChip = styled(Chip)`
+  padding-right: 5px !important;
+  margin-right: 10px !important;
+  background-color: ${colors.lightYellow} !important;
+
+  span {
+    color: ${colors.lightBlack};
+  }
+`;
+const ScheduleGraphBox = styled.div`
+  width: 100%;
+  display: table;
+  border-collapse: collapse;
+  border-top: 2px solid ${colors.deepGray};
+`;
+const Row = styled.div`
+  display: table-row;
+  background: ${({bgColor}) => bgColor ? bgColor : 'inherit'};
+`;
+const Cell = styled.div`
+  width: ${({width}) => width ? width : "auto"};
+  height: 40px;
+  font-size: 14px;
+  color: ${colors.deepGray};
+  vertical-align: middle;
+  display: table-cell;
+  text-align: center;
+  border: 1px solid ${colors.lightBorderColor};
 `;
 
-const AddAutoBidPresenter = ({ title }) => {
+const AddAutoBidPresenter = ({
+                                 title,
+                                 keywordId,
+                                 handleCustomerChange,
+                                 handleKeywordSelected,
+                                 customer,
+                                 customerList,
+                                 campaignList,
+                                 adGroupList,
+                                 keywordList,
+                                 checked,
+                                 isChecked,
+                                 handleChecked,
+                                 handleAllChecked,
+                                 onAddSettingBox,
+                                 settingList
+                             }) => {
     return (
         <View>
-            <MainTitle>{title}</MainTitle>
+            <Header
+                title={title}
+                handleCustomerChange={handleCustomerChange}
+                customer={customer}
+                customerList={customerList}
+            />
+
             <Title>입찰 키워드 설정</Title>
             <SelectForm>
                 <SelectBox
                     width={240}
                     bgImg={selectArrow2}
+                    onChange={e => handleKeywordSelected(e, "nccCampaignId")}
                 >
-                    <option>키워드</option>
+                    <option value="">캠페인명 설정</option>
+                    {campaignList.map(list => (
+                        <option key={list.nccCampaignId} value={list.nccCampaignId}>{list.name}</option>
+                    ))}
                 </SelectBox>
                 <RightArrowBox>
                     <Image src={rightArrow}/>
                 </RightArrowBox>
                 <SelectBox
-                    width={240}
+                    width={260}
                     bgImg={selectArrow2}
+                    onChange={e => handleKeywordSelected(e, "nccAdgroupId")}
                 >
-                    <option>키워드</option>
+                    <option value="">광고그룹명 설정</option>
+                    {adGroupList.map(list => <option key={list.nccAdgroupId} value={list.nccAdgroupId}>{list.name}</option>)}
                 </SelectBox>
             </SelectForm>
             <TableBox>
                 <KeywordTable>
                     <TableRow height={50} borderColor={colors.gray}>
                         <TableCell fontColor={colors.darkBlack}>
-                            <Checkbox/>
+                            <Checkbox
+                                onChange={handleAllChecked}
+                                checked={keywordList.length > 0 && checked.length === keywordList.length}
+                            />
                         </TableCell>
                         <TableCell width={80} fontColor={colors.darkBlack}>키워드</TableCell>
                         <TableCell width={220} fontColor={colors.darkBlack}>키워드 아이디</TableCell>
                     </TableRow>
 
-                    <TableRow borderColor={colors.lightBorderColor}>
-                        <TableCell>
-                            <Checkbox/>
-                        </TableCell>
-                        <TableCell width={80}>키워드</TableCell>
-                        <TableCell width={220}>키워드 아이디</TableCell>
-                    </TableRow>
+
+
+                    {keywordList && keywordList.map(list => {
+                        const isListChecked = isChecked(list.nccKeywordId);
+
+                        return (
+                            <TableRow key={list.nccKeywordId} borderColor={colors.lightBorderColor}>
+                                <TableCell onClick={e => handleChecked(e, list.nccKeywordId)}>
+                                    <Checkbox
+                                        checked={isListChecked}
+                                    />
+                                </TableCell>
+                                <TableCell width={80}>{list.Keyword}</TableCell>
+                                <TableCell width={220}>{list.nccKeywordId}</TableCell>
+                            </TableRow>
+                        )})}
 
                 </KeywordTable>
+
                 <StyledButton
                     title={<Image src={rightLeftArrow}/>}
                     margin="0 50px"
@@ -191,6 +283,7 @@ const AddAutoBidPresenter = ({ title }) => {
                     bgColor={colors.gray}
                     fontColor={colors.white}
                     borderRadius={5}
+                    onClick={onAddSettingBox}
                 />
 
                 <KeywordTable>
@@ -202,117 +295,383 @@ const AddAutoBidPresenter = ({ title }) => {
                         </TableCell>
                     </TableRow>
 
-                    <TableRow borderColor={colors.lightBorderColor}>
-                        <TableCell width={150}>키워드</TableCell>
-                        <TableCell width={200}>키워드 아이디</TableCell>
-                        <TableCell>
-                            <Image src={delete_2} cursor="pointer"/>
-                        </TableCell>
-                    </TableRow>
+                    {settingList && settingList.map(list => {
+                        return (
+                            <TableRow key={list.nccKeywordId} borderColor={colors.lightBorderColor}>
+                                <TableCell width={150}>{list.Keyword}</TableCell>
+                                <TableCell width={200}>{list.nccKeywordId}</TableCell>
+                                <TableCell>
+                                    <Image src={delete_2} cursor="pointer"/>
+                                </TableCell>
+                            </TableRow>
+                        )
+                    })}
                 </KeywordTable>
             </TableBox>
-
-            <ButtonGroup>
-                <StyledButton
-                    title="입찰 전략 설정"
-                    margin="40px 0 60px"
-                    width={200}
-                    height={65}
-                    bgColor={colors.blue}
-                    fontColor={colors.white}
-                    borderRadius={1}
-                />
-            </ButtonGroup>
 
             <Title>입찰 전략 설정</Title>
             <SettingTableBox>
                 <SettingTable>
                     <tbody>
-                        <tr>
-                            <td>
-                                대상 키워드
-                            </td>
-                            <td>
+                    <tr>
+                        <td>
+                            대상 키워드
+                        </td>
+                        <td>
 
-                            </td>
-                            <td>
-                                디바이스
-                            </td>
-                            <td>
-                                <RadioGroup row aria-label="gender" name="row-radio-buttons-group">
-                                    <FormControlLabel value="PC" control={<Radio />} label="PC" />
-                                    <FormControlLabel value="MOBILE" control={<Radio />} label="Mobile" />
-                                </RadioGroup>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                주기 설정
-                            </td>
-                            <td colSpan={3}>
-                                <RadioGroup row aria-label="gender" name="row-radio-buttons-group">
-                                    <FormControlLabel value={5} control={<Radio />} label="5분" />
-                                    <FormControlLabel value={10} control={<Radio />} label="10분" />
-                                    <FormControlLabel value={20} control={<Radio />} label="20분" />
-                                    <FormControlLabel value={30} control={<Radio />} label="30분" />
-                                    <FormControlLabel value={60} control={<Radio />} label="60분" />
-                                </RadioGroup>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                설정 구분
-                            </td>
-                            <td colSpan={3}>
-                                <RadioGroup row aria-label="gender" name="row-radio-buttons-group">
-                                    <FormControlLabel value="PC" control={<Radio />} label="간편 설정" />
-                                    <FormControlLabel value="MOBILE" control={<Radio />} label="고급 설정" />
-                                </RadioGroup>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                입찰 조정 금액
-                            </td>
-                            <td>
-                                <RadioGroup row aria-label="gender" name="row-radio-buttons-group">
-                                    <FormControlLabel value={0} control={<Radio />} label="미사용" />
-                                    <FormControlLabel value={1} control={<Radio />} label="사용" />
-                                </RadioGroup>
-                            </td>
-                            <td>
-                                희망 순위
-                            </td>
-                            <td>
-                                <SelectBox
-                                    width={120}
-                                    bgImg={selectArrow3}
-                                >
-                                    <option>희망순위</option>
-                                </SelectBox>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                최대 입찰가
-                            </td>
-                            <td>
-                                <InputBox>
-                                </InputBox>
-                                원
-                            </td>
-                            <td>
-                                최소 입찰가
-                            </td>
-                            <td>
-                                <InputBox>
-                                </InputBox>
-                                원
-                            </td>
-                        </tr>
+                        </td>
+                        <td>
+                            디바이스
+                        </td>
+                        <td>
+                            <RadioGroup row aria-label="gender" name="row-radio-buttons-group">
+                                <FormControlLabel value="PC" control={<Radio/>} label="PC"/>
+                                <FormControlLabel value="MOBILE" control={<Radio/>} label="Mobile"/>
+                            </RadioGroup>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            주기 설정
+                        </td>
+                        <td colSpan={3}>
+                            <RadioGroup row aria-label="gender" name="row-radio-buttons-group">
+                                <FormControlLabel value={5} control={<Radio/>} label="5분"/>
+                                <FormControlLabel value={10} control={<Radio/>} label="10분"/>
+                                <FormControlLabel value={20} control={<Radio/>} label="20분"/>
+                                <FormControlLabel value={30} control={<Radio/>} label="30분"/>
+                                <FormControlLabel value={60} control={<Radio/>} label="60분"/>
+                            </RadioGroup>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            설정 구분
+                        </td>
+                        <td colSpan={3}>
+                            <RadioGroup row aria-label="gender" name="row-radio-buttons-group">
+                                <FormControlLabel value="PC" control={<Radio/>} label="간편 설정"/>
+                                <FormControlLabel value="MOBILE" control={<Radio/>} label="고급 설정"/>
+                            </RadioGroup>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            입찰 조정 금액
+                        </td>
+                        <td>
+                            <RadioGroup row aria-label="gender" name="row-radio-buttons-group">
+                                <FormControlLabel value={0} control={<Radio/>} label="미사용"/>
+                                <FormControlLabel value={1} control={<Radio/>} label="사용"/>
+                            </RadioGroup>
+                        </td>
+                        <td>
+                            희망 순위
+                        </td>
+                        <td>
+                            <SelectBox
+                                width={120}
+                                bgImg={selectArrow3}
+                                padding="0 10px"
+                            >
+                                <option>희망순위</option>
+                            </SelectBox>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            최대 입찰가
+                        </td>
+                        <td>
+                            <InputBox>
+                                <Input/> 원
+                            </InputBox>
+                        </td>
+                        <td>
+                            최소 입찰가
+                        </td>
+                        <td>
+                            <InputBox>
+                                <Input/> 원
+                            </InputBox>
+                        </td>
+                    </tr>
                     </tbody>
                 </SettingTable>
             </SettingTableBox>
+
+            <Title>입찰 관리 스케줄 설정</Title>
+            <SelectForm>
+                <SelectBox width={140} bgImg={selectArrow3}>
+                    <option>요일선택</option>
+                    <option>월요일</option>
+                    <option>화요일</option>
+                    <option>수요일</option>
+                    <option>목요일</option>
+                    <option>금요일</option>
+                    <option>토요일</option>
+                    <option>일요일</option>
+                </SelectBox>
+                <SelectBox width={140} bgImg={clock}>
+                    <option>시작 시간</option>
+                    <option>00 AM</option>
+                    <option>01 AM</option>
+                </SelectBox>
+                ~
+                <SelectBox width={140} bgImg={clock}>
+                    <option>종료 시간</option>
+                    <option>01 PM</option>
+                </SelectBox>
+            </SelectForm>
+
+            <ChipBox>
+                <StyledChip
+                    label="Clickable Deletable"
+                    onDelete={() => console.info('')}
+                    deleteIcon={<Image src={chipDelete}/>}
+                />
+            </ChipBox>
+            <ScheduleGraphBox>
+                <Row bgColor={colors.bgColor}>
+                    <Cell width="150px"/>
+                    <Cell>00 AM</Cell>
+                    <Cell>01 AM</Cell>
+                    <Cell>02 AM</Cell>
+                    <Cell>03 AM</Cell>
+                    <Cell>04 AM</Cell>
+                    <Cell>05 AM</Cell>
+                    <Cell>06 AM</Cell>
+                    <Cell>07 AM</Cell>
+                    <Cell>08 AM</Cell>
+                    <Cell>09 AM</Cell>
+                    <Cell>10 AM</Cell>
+                    <Cell>11 AM</Cell>
+                    <Cell>12 PM</Cell>
+                    <Cell>01 PM</Cell>
+                    <Cell>02 PM</Cell>
+                    <Cell>03 PM</Cell>
+                    <Cell>04 PM</Cell>
+                    <Cell>05 PM</Cell>
+                    <Cell>06 PM</Cell>
+                    <Cell>07 PM</Cell>
+                    <Cell>08 PM</Cell>
+                    <Cell>09 PM</Cell>
+                    <Cell>10 PM</Cell>
+                    <Cell>11 PM</Cell>
+                </Row>
+                <Row>
+                    <Cell width="150px">월요일</Cell>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                </Row>
+                <Row>
+                    <Cell width="150px">화요일</Cell>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                </Row>
+                <Row>
+                    <Cell width="150px">수요일</Cell>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                </Row>
+                <Row>
+                    <Cell width="150px">목요일</Cell>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                </Row>
+                <Row>
+                    <Cell width="150px">금요일</Cell>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                </Row>
+                <Row>
+                    <Cell width="150px">토요일</Cell>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                </Row>
+                <Row>
+                    <Cell width="150px">일요일</Cell>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                    <Cell/>
+                </Row>
+            </ScheduleGraphBox>
+
+            <ButtonGroup>
+                <StyledButton
+                    title="취소"
+                    width={200}
+                    height={65}
+                    fontSize={18}
+                    fontWeight={500}
+                    bgColor={colors.white}
+                    fontColor={colors.blue}
+                    border={`1px solid ${colors.blue}`}
+                />
+                <StyledButton
+                    title="입찰 등록"
+                    margin="0 0 0 12px"
+                    width={200}
+                    height={65}
+                    fontSize={18}
+                    fontWeight={500}
+                    bgColor={colors.blue}
+                    fontColor={colors.white}
+                />
+            </ButtonGroup>
         </View>
     )
 }

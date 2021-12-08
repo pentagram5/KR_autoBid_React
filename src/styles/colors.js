@@ -9,6 +9,7 @@ export default {
     white: "#fff",
 
     // Secondary color
+    lightYellow: "#F9CB80",
     lightBlack: "#333333",
     darkBlack: "#222222",
     deepGray: "#555555",

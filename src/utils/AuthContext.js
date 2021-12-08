@@ -1,9 +1,10 @@
-import React, {createContext, useState} from 'react';
+import React, {createContext, useState, useEffect} from 'react';
 
 export const AuthContext = createContext(null);
 
-export const AuthProvider = ({ isLoggedIn: isLoggedInProp, children }) => {
+export const AuthProvider = ({ isLoggedIn: isLoggedInProp, customerList: customerListProp,  children }) => {
     const [isLoggedIn, setIsLoggedIn] = useState(isLoggedInProp);
+    const [customerList, setCustomerList] = useState(customerListProp);
 
     const userLogin = async data => {
         const { token, id_info } = data;
@@ -31,8 +32,12 @@ export const AuthProvider = ({ isLoggedIn: isLoggedInProp, children }) => {
         }
     }
 
+    useEffect(() => setIsLoggedIn(isLoggedInProp), [isLoggedInProp]);
+    useEffect(() => setCustomerList(customerListProp), [customerListProp]);
+
+
     return (
-        <AuthContext.Provider value={{ isLoggedIn, userLogin, userLogout }}>
+        <AuthContext.Provider value={{ isLoggedIn, customerList, userLogin, userLogout }}>
             {children}
         </AuthContext.Provider>
     )

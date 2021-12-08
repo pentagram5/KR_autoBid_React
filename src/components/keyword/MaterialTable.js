@@ -64,7 +64,9 @@ const CustomTable = styled(Table)`
     text-align: center;
     background: ${colors.ultraLightGray};
   }
-  
+  td:first-child {
+    padding-left: 4px;
+  }
   td {
     padding: 6px 0;
     text-align: center;
@@ -105,10 +107,6 @@ export default function MaterialTable({ tableLists, checked, isChecked, handleCh
         setRowsPerPage(parseInt(e.target.value, 10));
         setPage(0);
     };
-
-    // console.info('tableLists.length', tableLists.length);
-    // console.info('checked.length', checked.length);
-    // console.info('checked', tableLists.length > 0 && checked.length === tableLists.length);
 
     return (
         <TableContainer component={Paper}>

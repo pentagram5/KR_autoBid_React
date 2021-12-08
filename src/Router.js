@@ -1,7 +1,6 @@
 import React from "react";
 import styled from "styled-components";
 import { Route, Routes } from "react-router-dom";
-import {AuthProvider} from "./utils/AuthContext";
 import Login from "./pages/Login";
 import PowerLinkKeyword from "./pages/PowerLinkKeyword";
 import ShoppingADKeyword from "./pages/ShoppingADKeyword";
@@ -33,12 +32,12 @@ const LoggedOutRoutes = () => (
 
 const Router = ({ isLoggedIn }) => {
     return (
-        <AuthProvider>
+        <>
             {isLoggedIn
                 ? <ComponentBox><LoggedInRoutes /></ComponentBox>
                 : <LoggedOutRoutes />
             }
-        </AuthProvider>
+        </>
     )
 }
 

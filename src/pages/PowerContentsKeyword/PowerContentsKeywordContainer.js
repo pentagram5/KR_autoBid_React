@@ -1,4 +1,4 @@
-import React, {useEffect, useState, useReducer} from 'react';
+import React, {useEffect, useState, useReducer, useCallback} from 'react';
 import KeywordPresenter from "../../components/keyword/KeywordPresenter";
 import * as constants from "../../utils/constants";
 import {toast} from "react-toastify";
@@ -53,18 +53,27 @@ const PowerContentsKeywordContainer = (url, config) => {
     const [checked, setChecked] = useState([]);
     const [nccKeywordId, setNccKeywordId] = useState([]);
 
-    const handleChangeCustomer = e => customerList.find(list => list.CUSTOMER_ID === e.target.value && setCustomer(list));
+    // 체크박스의 배열 중 체크된 리스트 확인
+    const isChecked = useCallback(id => checked.indexOf(id) !== -1, [checked]);
 
-    const handleAllChecked = e => {
+    // 광고주 select 선택
+    const handleCustomerChange = useCallback(e => {
+        const list = customerList.find(list => list.CUSTOMER_ID === e.target.value);
+        setCustomer(list);
+        localStorage.setItem("customer", JSON.stringify(list));
+    }, [customerList]);
+
+    // 체크박스 전체 선택
+    const handleAllChecked = useCallback(e => {
         if (e.target.checked) {
             const newChecked = data.keywords.map(list => list.nccKeywordId);
             setChecked(newChecked);
             return;
         }
         setChecked([]);
-    }
-
-    const handleChecked = (e, id) => {
+    }, [data]);
+    // 체크박스 선택
+    const handleChecked = useCallback((e, id) => {
         const checkedIndex = checked.indexOf(id);
         let newChecked = [];
 
@@ -74,15 +83,15 @@ const PowerContentsKeywordContainer = (url, config) => {
         else if (checkedIndex > 0) newChecked = newChecked.concat(checked.slice(0, checkedIndex), checked.slice(checkedIndex + 1));
 
         setChecked(newChecked);
-    }
+    }, [checked]);
 
-    const handleAutoBidActive = async (type) => {
+    const handleAutoBidActive = useCallback(async (type) => {
         if (checked.length === 0 ) {
             toast.error(`${type === "active" ? "활성화" : "비활성화"} 할 키워드를 선택해주세요.`);
             return;
         }
         try {
-            const { data } = await SendRequest().put(`${serverPROTOCOL}${serverURL}/autobid/powerlink/activate?CUSTOMER_ID=${customer["CUSTOMER_ID"]}&activate=${(type === "active")}`, nccKeywordId);
+            const { data } = await SendRequest().put(`${serverPROTOCOL}${serverURL}/autobid/powercontents/activate?CUSTOMER_ID=${customer["CUSTOMER_ID"]}&activate=${(type === "active")}`, nccKeywordId);
             dispatch({ type: 'RE_REQUEST', data: data.keywords });
 
             if (data.done) {
@@ -91,16 +100,16 @@ const PowerContentsKeywordContainer = (url, config) => {
         } catch(e) {
             throw new Error(e);
         }
-    }
+    }, [checked.length, customer, nccKeywordId]);
 
-    const handleDeleteAutoBid = async () => {
+    const handleDeleteAutoBid = useCallback(async () => {
         if (checked.length === 0 ) {
             toast.error('삭제할 키워드를 선택해주세요.');
             return;
         }
         if (window.confirm("정말 삭제하시겠습니까?")) {
             try {
-                const res = await SendRequest().delete(`${serverPROTOCOL}${serverURL}/autobid/powerlink/delete?CUSTOMER_ID=${customer["CUSTOMER_ID"]}`, {data: nccKeywordId});
+                const res = await SendRequest().delete(`${serverPROTOCOL}${serverURL}/autobid/powercontents/delete?CUSTOMER_ID=${customer["CUSTOMER_ID"]}`, {data: nccKeywordId});
                 console.info('res', res);
                 if (res.status === 200) {
                     dispatch({ type: 'SUCCESS', data: res.data });
@@ -110,14 +119,14 @@ const PowerContentsKeywordContainer = (url, config) => {
                 throw new Error(e);
             }
         }
-    }
+    }, [checked.length, customer, nccKeywordId]);
 
-    const handleDownload = async () => {
+    const handleDownload = useCallback(async () => {
         const config = {
             responseType: "blob",
         }
         try {
-            const res = await SendRequest().get(`${serverPROTOCOL}${serverURL}/autobid/powerlink/download?CUSTOMER_ID=${customer["CUSTOMER_ID"]}`, config);
+            const res = await SendRequest().get(`${serverPROTOCOL}${serverURL}/autobid/powercontents/download?CUSTOMER_ID=${customer["CUSTOMER_ID"]}`, config);
             const url = window.URL.createObjectURL(new Blob([res.data]));
 
             console.info('res', res);
@@ -126,28 +135,22 @@ const PowerContentsKeywordContainer = (url, config) => {
         } catch(e) {
             throw new Error(e);
         }
-    }
+    }, [customer]);
 
-    const isChecked = id => checked.indexOf(id) !== -1;
-
-    const fetchPowerLinkData = async customerId => {
+    const fetchPowerLinkData =  useCallback(async customerId => {
         dispatch({ type: 'LOADING' });
 
         try {
-            const powerLinkResponse = await SendRequest().get(`${serverPROTOCOL}${serverURL}/autobid/powerlink?CUSTOMER_ID=${customerId}`);
+            const powerContentsResponse = await SendRequest().get(`${serverPROTOCOL}${serverURL}/autobid/powercontents?CUSTOMER_ID=${customerId}`);
             const customerResponse = await SendRequest().get(`${serverPROTOCOL}${serverURL}/autobid/id`);
 
-            dispatch({ type: 'SUCCESS', data: powerLinkResponse.data });
+            dispatch({ type: 'SUCCESS', data: powerContentsResponse.data });
             setCustomerList(customerResponse.data.id_info);
 
         } catch(e) {
             dispatch({ type: 'ERROR' });
         }
-    }
-
-    useEffect(() => {
-        console.info('nccKeywordId :: ', nccKeywordId)
-    }, [nccKeywordId]);
+    }, [dispatch]);
 
     useEffect(() => {
         setCustomer(JSON.parse(localStorage.getItem("customer")));
@@ -175,7 +178,7 @@ const PowerContentsKeywordContainer = (url, config) => {
             data={data && data}
             customer={customer}
             customerList={customerList}
-            handleChangeCustomer={handleChangeCustomer}
+            handleCustomerChange={handleCustomerChange}
             handleAutoBidActive={handleAutoBidActive}
             handleDeleteAutoBid={handleDeleteAutoBid}
             checked={checked}

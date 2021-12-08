@@ -1,4 +1,4 @@
-import React, {useEffect, useState, useReducer} from 'react';
+import React, {useEffect, useState, useReducer, useCallback} from 'react';
 import KeywordPresenter from "../../components/keyword/KeywordPresenter";
 import * as constants from "../../utils/constants";
 import {toast} from "react-toastify";
@@ -53,7 +53,12 @@ const ShoppingADKeywordContainer = () => {
     const [checked, setChecked] = useState([]);
     const [nccKeywordId, setNccKeywordId] = useState([]);
 
-    const handleChangeCustomer = e => customerList.find(list => list.CUSTOMER_ID === e.target.value && setCustomer(list));
+    // 광고주 select 선택
+    const handleCustomerChange = useCallback(e => {
+        const list = customerList.find(list => list.CUSTOMER_ID === e.target.value);
+        setCustomer(list);
+        localStorage.setItem("customer", JSON.stringify(list));
+    }, [customerList]);
 
     const handleAllChecked = e => {
         if (e.target.checked) {
@@ -175,7 +180,7 @@ const ShoppingADKeywordContainer = () => {
             data={data && data}
             customer={customer}
             customerList={customerList}
-            handleChangeCustomer={handleChangeCustomer}
+            handleCustomerChange={handleCustomerChange}
             handleAutoBidActive={handleAutoBidActive}
             handleDeleteAutoBid={handleDeleteAutoBid}
             checked={checked}

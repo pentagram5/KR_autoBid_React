@@ -35,5 +35,6 @@ export default createGlobalStyle`
     outline: none;
     -webkit-appearance: none;
     -moz-appearance: none;
+    cursor: pointer;
   }
 `;
