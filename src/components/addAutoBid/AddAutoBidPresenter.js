@@ -195,7 +195,6 @@ const Cell = styled.div`
 
 const AddAutoBidPresenter = ({
                                  title,
-                                 keywordId,
                                  handleCustomerChange,
                                  handleKeywordSelected,
                                  customer,
@@ -208,8 +207,16 @@ const AddAutoBidPresenter = ({
                                  handleChecked,
                                  handleAllChecked,
                                  onAddSettingBox,
-                                 settingList
+                                 settingList,
+                                 onDeleteKeyword,
+                                 keywordOption,
+                                 radioState,
+                                 handleRadioTab,
+                                 onAutoBidChange
                              }) => {
+    const { device, bid_cycle, bid_adj_amount } = keywordOption;
+
+    console.info(bid_adj_amount);
     return (
         <View>
             <Header
@@ -240,7 +247,8 @@ const AddAutoBidPresenter = ({
                     onChange={e => handleKeywordSelected(e, "nccAdgroupId")}
                 >
                     <option value="">광고그룹명 설정</option>
-                    {adGroupList.map(list => <option key={list.nccAdgroupId} value={list.nccAdgroupId}>{list.name}</option>)}
+                    {adGroupList.map(list => <option key={list.nccAdgroupId}
+                                                     value={list.nccAdgroupId}>{list.name}</option>)}
                 </SelectBox>
             </SelectForm>
             <TableBox>
@@ -257,7 +265,6 @@ const AddAutoBidPresenter = ({
                     </TableRow>
 
 
-
                     {keywordList && keywordList.map(list => {
                         const isListChecked = isChecked(list.nccKeywordId);
 
@@ -271,7 +278,8 @@ const AddAutoBidPresenter = ({
                                 <TableCell width={80}>{list.Keyword}</TableCell>
                                 <TableCell width={220}>{list.nccKeywordId}</TableCell>
                             </TableRow>
-                        )})}
+                        )
+                    })}
 
                 </KeywordTable>
 
@@ -301,7 +309,8 @@ const AddAutoBidPresenter = ({
                                 <TableCell width={150}>{list.Keyword}</TableCell>
                                 <TableCell width={200}>{list.nccKeywordId}</TableCell>
                                 <TableCell>
-                                    <Image src={delete_2} cursor="pointer"/>
+                                    <Image src={delete_2} cursor="pointer"
+                                           onClick={() => onDeleteKeyword(list.nccKeywordId)}/>
                                 </TableCell>
                             </TableRow>
                         )
@@ -318,15 +327,15 @@ const AddAutoBidPresenter = ({
                             대상 키워드
                         </td>
                         <td>
-
+                            {settingList[0] && (settingList.length === 1 ? `${settingList[0].Keyword}` : `${settingList[0].Keyword} 외 ${settingList.length - 1}건`)}
                         </td>
                         <td>
                             디바이스
                         </td>
                         <td>
-                            <RadioGroup row aria-label="gender" name="row-radio-buttons-group">
-                                <FormControlLabel value="PC" control={<Radio/>} label="PC"/>
-                                <FormControlLabel value="MOBILE" control={<Radio/>} label="Mobile"/>
+                            <RadioGroup row onChange={e => onAutoBidChange(e, 'device')}>
+                                <FormControlLabel value="PC" name="device" control={<Radio/>} label="PC" checked={device === "PC"} />
+                                <FormControlLabel value="MOBILE" name="device" control={<Radio/>} label="Mobile" />
                             </RadioGroup>
                         </td>
                     </tr>
@@ -335,12 +344,12 @@ const AddAutoBidPresenter = ({
                             주기 설정
                         </td>
                         <td colSpan={3}>
-                            <RadioGroup row aria-label="gender" name="row-radio-buttons-group">
-                                <FormControlLabel value={5} control={<Radio/>} label="5분"/>
-                                <FormControlLabel value={10} control={<Radio/>} label="10분"/>
-                                <FormControlLabel value={20} control={<Radio/>} label="20분"/>
-                                <FormControlLabel value={30} control={<Radio/>} label="30분"/>
-                                <FormControlLabel value={60} control={<Radio/>} label="60분"/>
+                            <RadioGroup row onChange={e => onAutoBidChange(e, 'bid_cycle')}>
+                                <FormControlLabel value={5} name="bid_cycle" control={<Radio/>} label="5분" checked={bid_cycle === 5} />
+                                <FormControlLabel value={10} name="bid_cycle"  control={<Radio/>} label="10분"/>
+                                <FormControlLabel value={20} name="bid_cycle"  control={<Radio/>} label="20분"/>
+                                <FormControlLabel value={30} name="bid_cycle"  control={<Radio/>} label="30분"/>
+                                <FormControlLabel value={60} name="bid_cycle"  control={<Radio/>} label="60분"/>
                             </RadioGroup>
                         </td>
                     </tr>
@@ -349,9 +358,9 @@ const AddAutoBidPresenter = ({
                             설정 구분
                         </td>
                         <td colSpan={3}>
-                            <RadioGroup row aria-label="gender" name="row-radio-buttons-group">
-                                <FormControlLabel value="PC" control={<Radio/>} label="간편 설정"/>
-                                <FormControlLabel value="MOBILE" control={<Radio/>} label="고급 설정"/>
+                            <RadioGroup row onChange={e => handleRadioTab(e, 'simpleHigh')}>
+                                <FormControlLabel value={0} control={<Radio/>} label="간편 설정" checked={radioState.simpleHigh === 0} />
+                                <FormControlLabel value={1} control={<Radio/>} label="고급 설정" />
                             </RadioGroup>
                         </td>
                     </tr>
@@ -360,10 +369,20 @@ const AddAutoBidPresenter = ({
                             입찰 조정 금액
                         </td>
                         <td>
-                            <RadioGroup row aria-label="gender" name="row-radio-buttons-group">
-                                <FormControlLabel value={0} control={<Radio/>} label="미사용"/>
-                                <FormControlLabel value={1} control={<Radio/>} label="사용"/>
-                            </RadioGroup>
+                            <SelectForm>
+                                <RadioGroup row onChange={e => handleRadioTab(e, 'bid_adj_amount')}>
+                                    <FormControlLabel value={0} name="bid_adj_amount" control={<Radio/>} label="미사용" checked={radioState.bid_adj_amount === 0} />
+                                    <FormControlLabel value={1} name="bid_adj_amount" control={<Radio/>} label="사용"/>
+                                </RadioGroup>
+                                {radioState.bid_adj_amount !== 0  &&
+                                    <InputBox>
+                                        <Input
+                                            name="bid_adj_amount"
+                                            value={bid_adj_amount}
+                                            onChange={e => onAutoBidChange(e, 'bid_adj_amount')}
+                                        /> 원
+                                    </InputBox>}
+                            </SelectForm>
                         </td>
                         <td>
                             희망 순위
@@ -374,10 +393,53 @@ const AddAutoBidPresenter = ({
                                 bgImg={selectArrow3}
                                 padding="0 10px"
                             >
-                                <option>희망순위</option>
+                                {device === "PC" ? 
+                                    <>
+                                        <option value={0}>희망순위</option>
+                                        <option value={1}>1 위</option>
+                                        <option value={2}>2 위</option>
+                                        <option value={3}>3 위</option>
+                                        <option value={4}>4 위</option>
+                                        <option value={5}>5 위</option>
+                                        <option value={6}>6 위</option>
+                                        <option value={7}>7 위</option>
+                                        <option value={8}>8 위</option>
+                                        <option value={9}>9 위</option>
+                                        <option value={10}>10 위</option>
+                                    </>
+                                    :
+                                    <>
+                                        <option value={0}>희망순위</option>
+                                        <option value={1}>1 위</option>
+                                        <option value={2}>2 위</option>
+                                        <option value={3}>3 위</option>
+                                        <option value={4}>4 위</option>
+                                        <option value={5}>5 위</option>
+                                    </>
+                                }
+                                
                             </SelectBox>
                         </td>
                     </tr>
+                    {radioState.simpleHigh === 0 &&
+                        <tr>
+                            <td>요일 설정</td>
+                            <td>
+                                <RadioGroup row>
+                                    <FormControlLabel value={0} control={<Radio/>} label="매일"/>
+                                    <FormControlLabel value={1} control={<Radio/>} label="주중"/>
+                                    <FormControlLabel value={1} control={<Radio/>} label="주말"/>
+                                </RadioGroup>
+                            </td>
+                            <td>시간 설정</td>
+                            <td>
+                                <RadioGroup row>
+                                    <FormControlLabel value={0} control={<Radio/>} label="00시~23시"/>
+                                    <FormControlLabel value={1} control={<Radio/>} label="09시~18시"/>
+                                </RadioGroup>
+                            </td>
+                        </tr>
+                    }
                     <tr>
                         <td>
                             최대 입찰가
@@ -403,14 +465,14 @@ const AddAutoBidPresenter = ({
             <Title>입찰 관리 스케줄 설정</Title>
             <SelectForm>
                 <SelectBox width={140} bgImg={selectArrow3}>
-                    <option>요일선택</option>
-                    <option>월요일</option>
-                    <option>화요일</option>
-                    <option>수요일</option>
-                    <option>목요일</option>
-                    <option>금요일</option>
-                    <option>토요일</option>
-                    <option>일요일</option>
+                    <option value="">요일선택</option>
+                    <option value="mon">월요일</option>
+                    <option value="tue">화요일</option>
+                    <option value="web">수요일</option>
+                    <option value="thu">목요일</option>
+                    <option value="fri">금요일</option>
+                    <option value="sat">토요일</option>
+                    <option value="sun">일요일</option>
                 </SelectBox>
                 <SelectBox width={140} bgImg={clock}>
                     <option>시작 시간</option>
