@@ -11,15 +11,14 @@ const Button = styled.button`
   height: ${({height}) => height}px;
   background-color: ${({bgColor}) => bgColor};
   border-radius: ${({borderRadius}) => borderRadius ? borderRadius : 5}px;
-  
+
   ${({margin}) => margin && css`
     margin: ${margin};
   `}
-  
   &:hover {
     opacity: 0.9;
   }
-  
+
   &:active {
     opacity: 1;
   }
@@ -31,6 +30,7 @@ const StyledButton = ({
                           height,
                           bgColor,
                           fontSize,
+                          fontWeight,
                           fontColor,
                           border,
                           borderRadius,
@@ -44,6 +44,7 @@ const StyledButton = ({
             bgColor={bgColor}
             fontSize={fontSize}
             fontColor={fontColor}
+            fontWeight={fontWeight}
             border={border}
             borderRadius={borderRadius}
             margin={margin}

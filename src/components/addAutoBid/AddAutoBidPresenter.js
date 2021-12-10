@@ -212,11 +212,17 @@ const AddAutoBidPresenter = ({
                                  keywordOption,
                                  radioState,
                                  handleRadioTab,
-                                 onAutoBidChange
+                                 onAutoBidChange,
+                                 simpleSchedule,
+                                 handleSimpleScheduleSetting,
+                                 handleHighScheduleSetting,
+                                 scheduleChips,
+                                 onAddChips,
+                                 onDeleteChips,
+                                 selections
                              }) => {
-    const { device, bid_cycle, bid_adj_amount } = keywordOption;
+    const {device, bid_cycle, bid_adj_amount, max_bid, min_bid} = keywordOption;
 
-    console.info(bid_adj_amount);
     return (
         <View>
             <Header
@@ -334,8 +340,9 @@ const AddAutoBidPresenter = ({
                         </td>
                         <td>
                             <RadioGroup row onChange={e => onAutoBidChange(e, 'device')}>
-                                <FormControlLabel value="PC" name="device" control={<Radio/>} label="PC" checked={device === "PC"} />
-                                <FormControlLabel value="MOBILE" name="device" control={<Radio/>} label="Mobile" />
+                                <FormControlLabel value="PC" name="device" control={<Radio/>} label="PC"
+                                                  checked={device === "PC"}/>
+                                <FormControlLabel value="MOBILE" name="device" control={<Radio/>} label="Mobile"/>
                             </RadioGroup>
                         </td>
                     </tr>
@@ -345,11 +352,12 @@ const AddAutoBidPresenter = ({
                         </td>
                         <td colSpan={3}>
                             <RadioGroup row onChange={e => onAutoBidChange(e, 'bid_cycle')}>
-                                <FormControlLabel value={5} name="bid_cycle" control={<Radio/>} label="5분" checked={bid_cycle === 5} />
-                                <FormControlLabel value={10} name="bid_cycle"  control={<Radio/>} label="10분"/>
-                                <FormControlLabel value={20} name="bid_cycle"  control={<Radio/>} label="20분"/>
-                                <FormControlLabel value={30} name="bid_cycle"  control={<Radio/>} label="30분"/>
-                                <FormControlLabel value={60} name="bid_cycle"  control={<Radio/>} label="60분"/>
+                                <FormControlLabel value={5} name="bid_cycle" control={<Radio/>} label="5분"
+                                                  checked={bid_cycle === 5}/>
+                                <FormControlLabel value={10} name="bid_cycle" control={<Radio/>} label="10분"/>
+                                <FormControlLabel value={20} name="bid_cycle" control={<Radio/>} label="20분"/>
+                                <FormControlLabel value={30} name="bid_cycle" control={<Radio/>} label="30분"/>
+                                <FormControlLabel value={60} name="bid_cycle" control={<Radio/>} label="60분"/>
                             </RadioGroup>
                         </td>
                     </tr>
@@ -359,8 +367,8 @@ const AddAutoBidPresenter = ({
                         </td>
                         <td colSpan={3}>
                             <RadioGroup row onChange={e => handleRadioTab(e, 'simpleHigh')}>
-                                <FormControlLabel value={0} control={<Radio/>} label="간편 설정" checked={radioState.simpleHigh === 0} />
-                                <FormControlLabel value={1} control={<Radio/>} label="고급 설정" />
+                                <FormControlLabel value={0} control={<Radio/>} label="간편 설정" checked={radioState.simpleHigh === 0}/>
+                                <FormControlLabel value={1} control={<Radio/>} label="고급 설정"/>
                             </RadioGroup>
                         </td>
                     </tr>
@@ -371,17 +379,17 @@ const AddAutoBidPresenter = ({
                         <td>
                             <SelectForm>
                                 <RadioGroup row onChange={e => handleRadioTab(e, 'bid_adj_amount')}>
-                                    <FormControlLabel value={0} name="bid_adj_amount" control={<Radio/>} label="미사용" checked={radioState.bid_adj_amount === 0} />
+                                    <FormControlLabel value={0} name="bid_adj_amount" control={<Radio/>} label="미사용" checked={radioState.bid_adj_amount === 0}/>
                                     <FormControlLabel value={1} name="bid_adj_amount" control={<Radio/>} label="사용"/>
                                 </RadioGroup>
-                                {radioState.bid_adj_amount !== 0  &&
-                                    <InputBox>
-                                        <Input
-                                            name="bid_adj_amount"
-                                            value={bid_adj_amount}
-                                            onChange={e => onAutoBidChange(e, 'bid_adj_amount')}
-                                        /> 원
-                                    </InputBox>}
+                                {radioState.bid_adj_amount !== 0 &&
+                                <InputBox>
+                                    <Input
+                                        name="bid_adj_amount"
+                                        value={bid_adj_amount}
+                                        onChange={e => onAutoBidChange(e, 'bid_adj_amount')}
+                                    /> 원
+                                </InputBox>}
                             </SelectForm>
                         </td>
                         <td>
@@ -393,7 +401,7 @@ const AddAutoBidPresenter = ({
                                 bgImg={selectArrow3}
                                 padding="0 10px"
                             >
-                                {device === "PC" ? 
+                                {device === "PC" ?
                                     <>
                                         <option value={0}>희망순위</option>
                                         <option value={1}>1 위</option>
@@ -417,28 +425,28 @@ const AddAutoBidPresenter = ({
                                         <option value={5}>5 위</option>
                                     </>
                                 }
-                                
+
                             </SelectBox>
                         </td>
                     </tr>
                     {radioState.simpleHigh === 0 &&
-                        <tr>
-                            <td>요일 설정</td>
-                            <td>
-                                <RadioGroup row>
-                                    <FormControlLabel value={0} control={<Radio/>} label="매일"/>
-                                    <FormControlLabel value={1} control={<Radio/>} label="주중"/>
-                                    <FormControlLabel value={1} control={<Radio/>} label="주말"/>
-                                </RadioGroup>
-                            </td>
-                            <td>시간 설정</td>
-                            <td>
-                                <RadioGroup row>
-                                    <FormControlLabel value={0} control={<Radio/>} label="00시~23시"/>
-                                    <FormControlLabel value={1} control={<Radio/>} label="09시~18시"/>
-                                </RadioGroup>
-                            </td>
-                        </tr>
+                    <tr>
+                        <td>요일 설정</td>
+                        <td>
+                            <RadioGroup row onChange={e => handleSimpleScheduleSetting(e, 'week')}>
+                                <FormControlLabel value="all" control={<Radio/>} label="매일" checked={simpleSchedule.week === 'all'} />
+                                <FormControlLabel value="weekDays" control={<Radio/>} label="주중"/>
+                                <FormControlLabel value="weekend" control={<Radio/>} label="주말"/>
+                            </RadioGroup>
+                        </td>
+                        <td>시간 설정</td>
+                        <td>
+                            <RadioGroup row onChange={e => handleSimpleScheduleSetting(e, 'time')}>
+                                <FormControlLabel value="0~23" control={<Radio/>} label="00시~23시" checked={simpleSchedule.time === '0~23'}/>
+                                <FormControlLabel value="9~18" control={<Radio/>} label="09시~18시"/>
+                            </RadioGroup>
+                        </td>
+                    </tr>
                     }
                     <tr>
                         <td>
@@ -446,7 +454,11 @@ const AddAutoBidPresenter = ({
                         </td>
                         <td>
                             <InputBox>
-                                <Input/> 원
+                                <Input
+                                    name="max_bid"
+                                    value={max_bid}
+                                    onChange={e => onAutoBidChange(e, 'max_bid')}
+                                /> 원
                             </InputBox>
                         </td>
                         <td>
@@ -454,7 +466,11 @@ const AddAutoBidPresenter = ({
                         </td>
                         <td>
                             <InputBox>
-                                <Input/> 원
+                                <Input
+                                    name="min_bid"
+                                    value={min_bid}
+                                    onChange={e => onAutoBidChange(e, 'min_bid')}
+                                /> 원
                             </InputBox>
                         </td>
                     </tr>
@@ -462,255 +478,307 @@ const AddAutoBidPresenter = ({
                 </SettingTable>
             </SettingTableBox>
 
-            <Title>입찰 관리 스케줄 설정</Title>
-            <SelectForm>
-                <SelectBox width={140} bgImg={selectArrow3}>
-                    <option value="">요일선택</option>
-                    <option value="mon">월요일</option>
-                    <option value="tue">화요일</option>
-                    <option value="web">수요일</option>
-                    <option value="thu">목요일</option>
-                    <option value="fri">금요일</option>
-                    <option value="sat">토요일</option>
-                    <option value="sun">일요일</option>
-                </SelectBox>
-                <SelectBox width={140} bgImg={clock}>
-                    <option>시작 시간</option>
-                    <option>00 AM</option>
-                    <option>01 AM</option>
-                </SelectBox>
-                ~
-                <SelectBox width={140} bgImg={clock}>
-                    <option>종료 시간</option>
-                    <option>01 PM</option>
-                </SelectBox>
-            </SelectForm>
+            {radioState.simpleHigh === 1 &&
+            <>
+                <Title>입찰 관리 스케줄 설정</Title>
+                <SelectForm>
+                    <SelectBox width={140} bgImg={selectArrow3} name="week" onChange={handleHighScheduleSetting}>
+                        <option value="">요일선택</option>
+                        <option value="mon">월요일</option>
+                        <option value="tue">화요일</option>
+                        <option value="wed">수요일</option>
+                        <option value="thu">목요일</option>
+                        <option value="fri">금요일</option>
+                        <option value="sat">토요일</option>
+                        <option value="sun">일요일</option>
+                    </SelectBox>
+                    <SelectBox width={140} bgImg={clock} name="start" onChange={handleHighScheduleSetting}>
+                        <option value="">시작 시간</option>
+                        <option value="00">00시</option>
+                        <option value="01">01시</option>
+                        <option value="02">02시</option>
+                        <option value="03">03시</option>
+                        <option value="04">04시</option>
+                        <option value="05">05시</option>
+                        <option value="06">06시</option>
+                        <option value="07">07시</option>
+                        <option value="08">08시</option>
+                        <option value="09">09시</option>
+                        <option value="10">10시</option>
+                        <option value="11">11시</option>
+                        <option value="12">12시</option>
+                        <option value="13">13시</option>
+                        <option value="14">14시</option>
+                        <option value="15">15시</option>
+                        <option value="16">16시</option>
+                        <option value="17">17시</option>
+                        <option value="18">18시</option>
+                        <option value="19">19시</option>
+                        <option value="20">20시</option>
+                        <option value="21">21시</option>
+                        <option value="22">22시</option>
+                        <option value="23">23시</option>
+                    </SelectBox>
+                    ~
+                    <SelectBox width={140} bgImg={clock} name="finish" onChange={handleHighScheduleSetting}>
+                        <option value="">종료 시간</option>
+                        <option value="00">00시</option>
+                        <option value="01">01시</option>
+                        <option value="02">02시</option>
+                        <option value="03">03시</option>
+                        <option value="04">04시</option>
+                        <option value="05">05시</option>
+                        <option value="06">06시</option>
+                        <option value="07">07시</option>
+                        <option value="08">08시</option>
+                        <option value="09">09시</option>
+                        <option value="10">10시</option>
+                        <option value="11">11시</option>
+                        <option value="12">12시</option>
+                        <option value="13">13시</option>
+                        <option value="14">14시</option>
+                        <option value="15">15시</option>
+                        <option value="16">16시</option>
+                        <option value="17">17시</option>
+                        <option value="18">18시</option>
+                        <option value="19">19시</option>
+                        <option value="20">20시</option>
+                        <option value="21">21시</option>
+                        <option value="22">22시</option>
+                        <option value="23">23시</option>
+                    </SelectBox>
 
-            <ChipBox>
-                <StyledChip
-                    label="Clickable Deletable"
-                    onDelete={() => console.info('')}
-                    deleteIcon={<Image src={chipDelete}/>}
-                />
-            </ChipBox>
-            <ScheduleGraphBox>
-                <Row bgColor={colors.bgColor}>
-                    <Cell width="150px"/>
-                    <Cell>00 AM</Cell>
-                    <Cell>01 AM</Cell>
-                    <Cell>02 AM</Cell>
-                    <Cell>03 AM</Cell>
-                    <Cell>04 AM</Cell>
-                    <Cell>05 AM</Cell>
-                    <Cell>06 AM</Cell>
-                    <Cell>07 AM</Cell>
-                    <Cell>08 AM</Cell>
-                    <Cell>09 AM</Cell>
-                    <Cell>10 AM</Cell>
-                    <Cell>11 AM</Cell>
-                    <Cell>12 PM</Cell>
-                    <Cell>01 PM</Cell>
-                    <Cell>02 PM</Cell>
-                    <Cell>03 PM</Cell>
-                    <Cell>04 PM</Cell>
-                    <Cell>05 PM</Cell>
-                    <Cell>06 PM</Cell>
-                    <Cell>07 PM</Cell>
-                    <Cell>08 PM</Cell>
-                    <Cell>09 PM</Cell>
-                    <Cell>10 PM</Cell>
-                    <Cell>11 PM</Cell>
-                </Row>
-                <Row>
-                    <Cell width="150px">월요일</Cell>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                </Row>
-                <Row>
-                    <Cell width="150px">화요일</Cell>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                </Row>
-                <Row>
-                    <Cell width="150px">수요일</Cell>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                </Row>
-                <Row>
-                    <Cell width="150px">목요일</Cell>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                </Row>
-                <Row>
-                    <Cell width="150px">금요일</Cell>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                </Row>
-                <Row>
-                    <Cell width="150px">토요일</Cell>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                </Row>
-                <Row>
-                    <Cell width="150px">일요일</Cell>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                    <Cell/>
-                </Row>
-            </ScheduleGraphBox>
+                    <StyledButton
+                        title="추가하기"
+                        width={100}
+                        height={40}
+                        bgColor={colors.blue}
+                        borderRadius={3}
+                        fontSize={14}
+                        fontWeight={400}
+                        fontColor={colors.white}
+                        onClick={onAddChips}
+                    />
+                </SelectForm>
+
+                <ChipBox>
+                    {scheduleChips.map(chip => (
+                        <StyledChip
+                            key={chip}
+                            label={chip}
+                            onDelete={() => onDeleteChips(chip)}
+                            deleteIcon={<Image src={chipDelete}/>}
+                        />
+                    ))}
+                </ChipBox>
+                <ScheduleGraphBox>
+                    <Row bgColor={colors.bgColor}>
+                        <Cell width="150px"/>
+                        <Cell>00 AM</Cell>
+                        <Cell>01 AM</Cell>
+                        <Cell>02 AM</Cell>
+                        <Cell>03 AM</Cell>
+                        <Cell>04 AM</Cell>
+                        <Cell>05 AM</Cell>
+                        <Cell>06 AM</Cell>
+                        <Cell>07 AM</Cell>
+                        <Cell>08 AM</Cell>
+                        <Cell>09 AM</Cell>
+                        <Cell>10 AM</Cell>
+                        <Cell>11 AM</Cell>
+                        <Cell>12 PM</Cell>
+                        <Cell>01 PM</Cell>
+                        <Cell>02 PM</Cell>
+                        <Cell>03 PM</Cell>
+                        <Cell>04 PM</Cell>
+                        <Cell>05 PM</Cell>
+                        <Cell>06 PM</Cell>
+                        <Cell>07 PM</Cell>
+                        <Cell>08 PM</Cell>
+                        <Cell>09 PM</Cell>
+                        <Cell>10 PM</Cell>
+                        <Cell>11 PM</Cell>
+                    </Row>
+                    <Row>
+                        <Cell width="150px">월요일</Cell>
+
+                        {Array.from({length: 24}).map((a, i) => {
+                            if( selections.mon.find((b) => {
+                                if( b === i )
+                                    return true;
+                            }) !== undefined) {
+                                return <Cell key={i} style={{background: 'black'}}/>;
+                            } else {
+                                return <Cell key={i} />;
+                            }
+                        })}
+
+                    </Row>
+                    <Row>
+                        <Cell width="150px">화요일</Cell>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                    </Row>
+                    <Row>
+                        <Cell width="150px">수요일</Cell>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                    </Row>
+                    <Row>
+                        <Cell width="150px">목요일</Cell>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                    </Row>
+                    <Row>
+                        <Cell width="150px">금요일</Cell>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                    </Row>
+                    <Row>
+                        <Cell width="150px">토요일</Cell>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                    </Row>
+                    <Row>
+                        <Cell width="150px">일요일</Cell>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                        <Cell/>
+                    </Row>
+                </ScheduleGraphBox>
+            </>
+            }
 
             <ButtonGroup>
                 <StyledButton

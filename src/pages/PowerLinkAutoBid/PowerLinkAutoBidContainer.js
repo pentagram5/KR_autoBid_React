@@ -24,37 +24,50 @@ const PowerLinkAutoBidContainer = () => {
         simpleHigh: 0,
         bid_adj_amount: 0
     });
+    const [simpleSchedule, setSimpleSchedule] = useState({
+        week: 'all',
+        time: '0~23',
+    });
     const [keywordOption, setKeywordOption] = useState({
-            device: "PC",
-            bid_cycle: 5,
-            target_Rank: 5,
-            max_bid: 0,
-            min_bid: 0,
-            bid_adj_amount: 0,
-            setting: {
-                mon: '0',
-                tue: '0',
-                wed: '0',
-                thu: '0',
-                fri: '0',
-                sat: '0',
-                sun: '0',
-            }
+        device: "PC",
+        bid_cycle: 5,
+        target_Rank: 5,
+        max_bid: 0,
+        min_bid: 0,
+        bid_adj_amount: 0,
+        setting: {
+            mon: '0~23',
+            tue: '0~23',
+            wed: '0~23',
+            thu: '0~23',
+            fri: '0~23',
+            sat: '0~23',
+            sun: '0~23',
+        }
     });
 
-    const handleRadioTab = (e, type) => {
+    // 간편 설정 요일, 시간 설정
+    const handleSimpleScheduleSetting = useCallback((e, type) => {
+        const {value} = e.target;
+        setSimpleSchedule({
+            ...simpleSchedule,
+            [type]: value,
+        });
+    }, [simpleSchedule]);
+
+    // 설정 구분, 입찰 조정 금액 Radio 상태
+    const handleRadioTab = useCallback((e, type) => {
         setRadioState({
             ...radioState,
             [type]: parseInt(e.target.value)
         });
-    }
-
+    }, [radioState]);
 
     // 입찰 전략 설정
-    const onAutoBidChange = (e, type) => {
-        let { name, value } = e.target;
+    const onAutoBidChange = useCallback((e, type) => {
+        let {name, value} = e.target;
 
-        switch(type) {
+        switch (type) {
             case 'device':
                 setKeywordOption({
                     ...keywordOption,
@@ -76,7 +89,7 @@ const PowerLinkAutoBidContainer = () => {
             default:
                 return;
         }
-    }
+    }, [keywordOption]);
 
     // 체크박스의 배열 중 체크된 리스트 확인
     const isChecked = useCallback(id => checked.indexOf(id) !== -1, [checked]);
@@ -98,7 +111,7 @@ const PowerLinkAutoBidContainer = () => {
 
         if (checkedIndex === -1) newChecked = newChecked.concat(checked, id);
         else if (checkedIndex === 0) newChecked = newChecked.concat(checked.slice(1));
-        else if (checkedIndex === checked.length -1) newChecked = newChecked.concat(checked.slice(0, -1));
+        else if (checkedIndex === checked.length - 1) newChecked = newChecked.concat(checked.slice(0, -1));
         else if (checkedIndex === 0) newChecked = newChecked.concat(checked.slice(0, checkedIndex), checked.slice(checkedIndex + 1));
 
         setChecked(newChecked);
@@ -112,7 +125,7 @@ const PowerLinkAutoBidContainer = () => {
     }, [customerList]);
 
     // 체크된 keyword SettingList 박스에 추가
-    const onAddSettingBox = () => {
+    const onAddSettingBox = useCallback(() => {
         let newSettingList = [...settingList];
 
         keywordList.forEach((list, index) => {
@@ -127,12 +140,12 @@ const PowerLinkAutoBidContainer = () => {
 
         setSettingList(newSettingList);
         setChecked([]);
-    }
+    }, [checked, keywordList, settingList]);
 
     // SettingList keyword 삭제
-    const onDeleteKeyword = nccKeywordId => {
+    const onDeleteKeyword = useCallback(nccKeywordId => {
         setSettingList(settingList.filter(list => list.nccKeywordId !== nccKeywordId));
-    }
+    }, [settingList]);
 
     // 입찰 키워드 select 선택
     const handleKeywordSelected = useCallback(async (e, type) => {
@@ -160,8 +173,50 @@ const PowerLinkAutoBidContainer = () => {
         }
     }, [customer]);
 
-    // useEffect(() => console.info('수정 리스트 ::: ', settingList), [settingList]);
-    // useEffect(() => console.info('keywordOption ::: ', keywordOption), [keywordOption]);
+    // 간편 설정 요일 및 시간 data 변환
+    useEffect(() => {
+        const {week, time} = simpleSchedule;
+        if (week === 'all') {
+            setKeywordOption({
+                ...keywordOption,
+                setting: {
+                    mon: time,
+                    tue: time,
+                    wed: time,
+                    thu: time,
+                    fri: time,
+                    sat: time,
+                    sun: time,
+                }
+            });
+        } else if (week === 'weekDays') {
+            setKeywordOption({
+                ...keywordOption,
+                setting: {
+                    mon: time,
+                    tue: time,
+                    wed: time,
+                    thu: time,
+                    fri: time,
+                    sat: '0',
+                    sun: '0',
+                }
+            });
+        } else if (week === 'weekend') {
+            setKeywordOption({
+                ...keywordOption,
+                setting: {
+                    mon: '0',
+                    tue: '0',
+                    wed: '0',
+                    thu: '0',
+                    fri: '0',
+                    sat: time,
+                    sun: time,
+                }
+            });
+        }
+    }, [simpleSchedule]);
 
     useEffect(() => {
         fetchCampaignData();
@@ -188,6 +243,119 @@ const PowerLinkAutoBidContainer = () => {
     //     }
     // }, [checked]);
 
+
+    // for( let i = 0 ; i < 24 ; i ++ ) {
+    //     mondayArr.push(0);
+    // }
+
+
+    // 선택시
+    // mondayArr[ 1 ] = 1;
+    // mondayArr[ 2 ] = 1;
+    // mondayArr[ 3 ] = 1;
+    // mondayArr[ 4 ] = 1;
+    // mondayArr[23] = 1;
+
+    const [selections, setSelections] = useState({
+        mon: [],
+        tue: [],
+        wed: [],
+        thu: [],
+        fri: [],
+        sat: [],
+        sun: [],
+    });
+
+    //나중에 보낼때
+    let mondaySelectionFlag2 = 0;
+    selections.mon.forEach((x, i) => {
+        mondaySelectionFlag2 += Math.pow(2, x);
+    });
+    console.info("monday2 ", mondaySelectionFlag2);
+
+
+    // 입찰 관리 스케줄 고급 설정
+    const [highSchedule, setHighSchedule] = useState({
+        week: '',
+        start: '',
+        finish: '',
+    });
+
+    const [scheduleChips, setScheduleChips] = useState([]);
+
+    const handleHighScheduleSetting = e => {
+        const {name, value} = e.target;
+
+        setHighSchedule({
+            ...highSchedule,
+            [name]: value
+        });
+    }
+    const onAddChips = () => {
+        const {week, start, finish} = highSchedule;
+        if (week === '' || start === '' || finish === '') {
+            alert('요일 및 시간을 설정해주세요.');
+            return;
+        }
+
+        let weekKor = '';
+        switch (week) {
+            case 'mon':
+                weekKor = '월';
+                break;
+            case 'tue':
+                weekKor = '화';
+                break;
+            case 'web':
+                weekKor = '수';
+                break;
+            case 'thu':
+                weekKor = '목';
+                break;
+            case 'fri':
+                weekKor = '금';
+                break;
+            case 'sat':
+                weekKor = '토';
+                break;
+            case 'sun':
+                weekKor = '일';
+                break;
+        }
+        let chip = `${weekKor} ${start}시~${finish}시`;
+
+        let selectedValue = selections[week].find((x) => {
+            console.info(Number(start));
+            if (x >= Number(start) && x <= Number(finish)) {
+                return x;
+            }
+        });
+
+        if (selectedValue) {
+            alert(`[${weekKor}] ${selectedValue}시는 이미 선택하셨습니다.`);
+            return;
+        }
+        let tmp = [...selections[week]];
+        for (let i = Number(start); i <= Number(finish); i++) {
+            tmp.push(i);
+            console.info(i);
+        }
+        setSelections({...selections, [week]: tmp});
+
+        setScheduleChips([...scheduleChips, chip]);
+    }
+
+    const onDeleteChips = (item) => setScheduleChips(scheduleChips.filter(chip => chip !== item));
+
+    // useEffect(() => {
+    //     console.info('고급설정 : ', highSchedule.mon[0]["00AM"]);
+    //     console.info('고급설정 : ', highSchedule);
+    // }, [highSchedule]);
+
+    useEffect(() => {
+        console.info('scheduleChips : ', scheduleChips);
+    }, [scheduleChips]);
+
     return (
         <AddAutoBidPresenter
             title="파워링크 자동입찰등록"
@@ -209,8 +377,15 @@ const PowerLinkAutoBidContainer = () => {
             radioState={radioState}
             handleRadioTab={handleRadioTab}
             onAutoBidChange={onAutoBidChange}
+            simpleSchedule={simpleSchedule}
+            handleSimpleScheduleSetting={handleSimpleScheduleSetting}
+            handleHighScheduleSetting={handleHighScheduleSetting}
+            scheduleChips={scheduleChips}
+            onAddChips={onAddChips}
+            onDeleteChips={onDeleteChips}
+            selections={selections}
         />
     )
 }
 
-export default PowerLinkAutoBidContainer;
+export default React.memo(PowerLinkAutoBidContainer);
