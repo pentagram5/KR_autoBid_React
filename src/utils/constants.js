@@ -1,10 +1,10 @@
 const prod = {
-    PROTOCOL: 'http://',
-    URL: ''
+    PROTOCOL: 'https://',
+    URL: 'autoad.catbellcompany.com'
 }
 const dev = {
-    PROTOCOL: 'http://',
-    URL: '218.52.115.188:8000'
+    PROTOCOL: 'https://',
+    URL: 'autoad.catbellcompany.com'
 }
 
 export const config = process.env.NODE_ENV === 'development' ? dev : prod;

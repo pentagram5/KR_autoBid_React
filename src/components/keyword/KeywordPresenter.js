@@ -1,15 +1,18 @@
 import React from 'react';
 import styled from "styled-components";
+import MaterialTable from "./MaterialTable";
+import CircularProgress from '@mui/material/CircularProgress';
+import Modal from '@mui/material/Modal';
 import Header from "../share/Header";
 import colors from "../../styles/colors";
 import ImageButton from "../../components/share/ImageButton";
+import timer from "../../assets/timer.svg";
 import play from "../../assets/play.svg";
 import pause from "../../assets/pause.svg";
 import gear from "../../assets/gear.svg";
 import trashCan from "../../assets/delete.svg";
 import download from "../../assets/download.svg";
-import MaterialTable from "./MaterialTable";
-import CircularProgress from '@mui/material/CircularProgress';
+import AutoBidCycleChangeModal from "./AutoBidCycleChangeModal";
 
 const Wrapper = styled.div`
   width: calc(100vw - 300px);
@@ -63,7 +66,7 @@ const Box = styled.div`
   display: flex;
 `;
 const TableBox = styled.div`
-
+  
 `;
 const Progress = styled.div`
   width: 100vw;
@@ -71,7 +74,7 @@ const Progress = styled.div`
   position: absolute;
   top: 0;
   left: 0;
-  z-index: 9999;
+  z-index: 1111;
   background: ${colors.black};
   opacity: 0.6;
   display: flex;
@@ -94,7 +97,21 @@ const KeywordPresenter = ({
                               isChecked,
                               handleChecked,
                               handleAllChecked,
-                              handleDownload
+                              handleDownload,
+
+                              orderBy,
+                              order,
+                              handleRequestSort,
+                              getComparator,
+
+                              page,
+                              rowsPerPage,
+                              handleChangePage,
+                              handleChangeRowsPerPage,
+
+                              cycleChangeOpen,
+                              handleModalOpen,
+                              handleModalClose,
                           }) => {
 
 
@@ -144,6 +161,15 @@ const KeywordPresenter = ({
                 <Text fontSize={18} fontWeight={700}>키워드 관리</Text>
                 <TableTop>
                     <Box>
+                        <ImageButton
+                            title="입찰 주기 변경"
+                            fontColor={colors.skyBlue}
+                            border={`1px solid ${colors.skyBlue}`}
+                            bgColor={colors.white}
+                            imgSrc={timer}
+                            height={29}
+                            onClick={handleModalOpen}
+                        />
                         <ImageButton
                             title="자동입찰 사용"
                             fontColor={colors.skyBlue}
@@ -197,8 +223,29 @@ const KeywordPresenter = ({
                         isChecked={isChecked}
                         handleChecked={handleChecked}
                         handleAllChecked={handleAllChecked}
+
+                        orderBy={orderBy}
+                        order={order}
+                        handleRequestSort={handleRequestSort}
+                        getComparator={getComparator}
+
+                        page={page}
+                        rowsPerPage={rowsPerPage}
+                        handleChangePage={handleChangePage}
+                        handleChangeRowsPerPage={handleChangeRowsPerPage}
                     />
                 </TableBox>
+
+
+                <Modal
+                    open={cycleChangeOpen}
+                    onClose={handleModalClose}
+                    aria-labelledby="입찰 주기 변경"
+                >
+                    <>
+                        <AutoBidCycleChangeModal />
+                    </>
+                </Modal>
             </Wrapper>
         </>
     )

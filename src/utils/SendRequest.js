@@ -13,7 +13,7 @@ const instance = () => {
 
     return Axios.create({
         baseURL: apiServerUrl,
-        timeout: 5000,
+        timeout: 40000,
         mode: 'cors',
         headers: requestHeaders,
         withCredentials: true,

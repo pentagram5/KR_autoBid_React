@@ -37,7 +37,14 @@ const SelectBox = styled.select`
   background: url(${selectArrow}) 95% 50% no-repeat ${colors.graySkyblue};
 `;
 
-const Header = ({ title, handleCustomerChange, customer, customerList }) => {
+
+
+const Header = ({
+                    title,
+                    handleCustomerChange,
+                    customer,
+                    customerList
+}) => {
     return (
         <View>
             <Title>{title}</Title>

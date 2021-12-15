@@ -52,20 +52,33 @@ const PowerLinkKeywordContainer = (url, config) => {
     const [customerList, setCustomerList] = useState([]);
     const [checked, setChecked] = useState([]);
     const [nccKeywordId, setNccKeywordId] = useState([]);
+    const [page, setPage] = React.useState(0);
+    const [rowsPerPage, setRowsPerPage] = React.useState(10);
+    const [cycleChangeOpen, setCycleChangeOpen] = useState(false);
+
+    const handleModalOpen = () => setCycleChangeOpen(true);
+    const handleModalClose = () => setCycleChangeOpen(false);
+
+    const handleChangePage = (e, newPage) => {
+        setPage(newPage);
+        setChecked([]);
+    }
+
+    const handleChangeRowsPerPage = e => {
+        setRowsPerPage(parseInt(e.target.value, 10));
+        setPage(0);
+    };
 
     // 광고주 select 선택
     const handleCustomerChange = useCallback(e => {
-        console.info('커스터머 아이디 값 ::: ', e.target.value);
-        console.info('광고주 리스트  ::: ', customerList);
         const list = customerList.find(list => list.CUSTOMER_ID === e.target.value);
-        console.info('찾은거 ::: ', list);
         setCustomer(list);
         localStorage.setItem("customer", JSON.stringify(list));
     }, [customerList]);
 
     const handleAllChecked = e => {
         if (e.target.checked) {
-            const newChecked = data.keywords.map(list => list.nccKeywordId);
+            const newChecked = data.keywords.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map(list => list.nccKeywordId); // .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
             setChecked(newChecked);
             return;
         }
@@ -176,6 +189,37 @@ const PowerLinkKeywordContainer = (url, config) => {
     }, [customer]);
 
 
+    // 정렬
+    const [order, setOrder] = useState('asc');
+    const [orderBy, setOrderBy] = useState('campaign');
+
+    const handleRequestSort = (e, property) => {
+        const isAsc = (orderBy === property) && order === 'asc';
+
+        setOrder(isAsc ? 'desc' : 'asc');
+        setOrderBy(property);
+    };
+
+    const getComparator = (order, orderBy) => {
+        return order === 'desc'
+            ? (a, b) => descendingComparator(a, b, orderBy)
+            : (a, b) => -descendingComparator(a, b, orderBy);
+    }
+
+    const descendingComparator = (a, b, orderBy) => {
+        if (b[orderBy] < a[orderBy]) {
+            return -1;
+        }
+        if (b[orderBy] > a[orderBy]) {
+            return 1;
+        }
+        return 0;
+    }
+
+    useEffect(() => {
+        console.info('data', data);
+    }, [data]);
+
     return (
         <KeywordPresenter
             title="파워링크 자동입찰관리"
@@ -192,6 +236,20 @@ const PowerLinkKeywordContainer = (url, config) => {
             handleChecked={handleChecked}
             handleAllChecked={handleAllChecked}
             handleDownload={handleDownload}
+
+            orderBy={orderBy}
+            order={order}
+            handleRequestSort={handleRequestSort}
+            getComparator={getComparator}
+
+            page={page}
+            rowsPerPage={rowsPerPage}
+            handleChangePage={handleChangePage}
+            handleChangeRowsPerPage={handleChangeRowsPerPage}
+
+            cycleChangeOpen={cycleChangeOpen}
+            handleModalOpen={handleModalOpen}
+            handleModalClose={handleModalClose}
         />
     )
 }
