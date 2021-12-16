@@ -8,6 +8,13 @@ export default {
     black: "#000",
     white: "#fff",
 
+    // Pastel
+    pastelRed: "#FCC5C5",
+    pastelYellow: "#F9CB80",
+    pastelGreen: "#AAEAAD",
+    pastelBlue: "#B3D6F6",
+    pastelPurple: "#D7B6F0",
+
     // Secondary color
     lightYellow: "#F9CB80",
     lightBlack: "#333333",

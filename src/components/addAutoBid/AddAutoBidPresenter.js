@@ -16,6 +16,7 @@ import delete_2 from "../../assets/delete_2.svg";
 import chipDelete from "../../assets/chipDelete.svg";
 import clock from "../../assets/clock.svg";
 import Header from "../share/Header";
+import ScheduleCard from "../share/ScheduleCard";
 
 const View = styled.div`
   width: calc(100vw - 300px);
@@ -158,11 +159,11 @@ const Input = styled.input`
   width: 90%;
   height: 100%;
 `;
-const ChipBox = styled.div`
+const ScheduleCardBox = styled.div`
   width: 100%;
   display: flex;
   flex-wrap: wrap;
-  margin: 20px 0 10px;
+  margin: 20px 0;
 `;
 const StyledChip = styled(Chip)`
   padding-right: 5px !important;
@@ -561,19 +562,21 @@ const AddAutoBidPresenter = ({
                             />
                         </SelectForm>
 
-                        <ChipBox>
+                        <ScheduleCardBox>
 
+                            <ScheduleCard
 
+                            />
 
-                            {scheduleChips.map(chip => (
+                            {/*{scheduleChips.map(chip => (
                                 <StyledChip
                                     key={chip}
                                     label={chip}
                                     onDelete={() => onDeleteChips(chip)}
                                     deleteIcon={<Image src={chipDelete}/>}
                                 />
-                            ))}
-                        </ChipBox>
+                            ))}*/}
+                        </ScheduleCardBox>
                         <ScheduleGraphBox>
                             <Row bgColor={colors.bgColor}>
                                 <Cell width="150px"/>

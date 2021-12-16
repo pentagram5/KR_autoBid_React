@@ -117,8 +117,6 @@ export default function MaterialTable({
 
     const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - tableLists.length) : 0;
 
-
-
     const createSortHandler = property => e => handleRequestSort(e, property);
 
     return (
@@ -293,8 +291,11 @@ export default function MaterialTable({
                                 <TableCell>
                                     {row.current_bid} 원
                                 </TableCell>
+                                {/*  88 순위밖, 99 - */}
                                 <TableCell>
-                                    {!!row.current_rank ? row.current_rank : '-'}
+                                    {(row.current_rank !== 99 && row.current_rank !== 88) && row.current_rank}
+                                    {(row.current_rank === 99 && row.current_rank !== 88) && '-'}
+                                    {(row.current_rank === 88 && row.current_rank !== 99) && '순위밖'}
                                 </TableCell>
                                 <TableCell>
                                     {!!row.activate ? '활성화' : '비활성화'}

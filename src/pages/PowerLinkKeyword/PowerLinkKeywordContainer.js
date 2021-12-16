@@ -43,11 +43,11 @@ function reducer(state, action) {
 
 const PowerLinkKeywordContainer = (url, config) => {
     const [state, dispatch] = useReducer(reducer, {
-       loading: true,
-       data: null,
-       error: false
+        loading: true,
+        data: null,
+        error: false
     });
-    const { loading, data, error } = state;
+    const {loading, data, error} = state;
     const [customer, setCustomer] = useState({});
     const [customerList, setCustomerList] = useState([]);
     const [checked, setChecked] = useState([]);
@@ -55,8 +55,15 @@ const PowerLinkKeywordContainer = (url, config) => {
     const [page, setPage] = React.useState(0);
     const [rowsPerPage, setRowsPerPage] = React.useState(10);
     const [cycleChangeOpen, setCycleChangeOpen] = useState(false);
+    const [autoBidCycle, setAutoBidCycle] = useState(5);
 
-    const handleModalOpen = () => setCycleChangeOpen(true);
+    const handleModalOpen = () => {
+        if (checked.length === 0) {
+            toast.error('변경하실 키워드를 선택해주세요.');
+            return;
+        }
+        setCycleChangeOpen(true);
+    }
     const handleModalClose = () => setCycleChangeOpen(false);
 
     const handleChangePage = (e, newPage) => {
@@ -85,51 +92,72 @@ const PowerLinkKeywordContainer = (url, config) => {
         setChecked([]);
     }
 
+    // 체크박스 체크
     const handleChecked = (e, id) => {
         const checkedIndex = checked.indexOf(id);
         let newChecked = [];
 
         if (checkedIndex === -1) newChecked = newChecked.concat(checked, id)
         else if (checkedIndex === 0) newChecked = newChecked.concat(checked.slice(1));
-        else if (checkedIndex === checked.length -1) newChecked = newChecked.concat(checked.slice(0, -1));
+        else if (checkedIndex === checked.length - 1) newChecked = newChecked.concat(checked.slice(0, -1));
         else if (checkedIndex > 0) newChecked = newChecked.concat(checked.slice(0, checkedIndex), checked.slice(checkedIndex + 1));
 
         setChecked(newChecked);
     }
 
+    // 자동입찰 활성화 / 비활성화
     const handleAutoBidActive = async (type) => {
-        if (checked.length === 0 ) {
+        if (checked.length === 0) {
             toast.error(`${type === "active" ? "활성화" : "비활성화"} 할 키워드를 선택해주세요.`);
             return;
         }
         try {
-            const { data } = await SendRequest().put(`${serverPROTOCOL}${serverURL}/autobid/powerlink/activate?CUSTOMER_ID=${customer["CUSTOMER_ID"]}&activate=${(type === "active")}`, nccKeywordId);
-            dispatch({ type: 'RE_REQUEST', data: data.keywords });
+            const {data} = await SendRequest().put(`${serverPROTOCOL}${serverURL}/autobid/powerlink/activate?CUSTOMER_ID=${customer["CUSTOMER_ID"]}&activate=${(type === "active")}`, nccKeywordId);
+            dispatch({type: 'RE_REQUEST', data: data.keywords});
 
             if (data.done) {
                 toast.info(`선택하신 키워드가 ${type === "active" ? "활성화" : "비활성화"} 되었습니다.`);
             }
-        } catch(e) {
+        } catch (e) {
             throw new Error(e);
         }
     }
 
+    // 자동입찰 삭제
     const handleDeleteAutoBid = async () => {
-        if (checked.length === 0 ) {
+        if (checked.length === 0) {
             toast.error('삭제할 키워드를 선택해주세요.');
             return;
         }
         if (window.confirm("정말 삭제하시겠습니까?")) {
             try {
                 const res = await SendRequest().delete(`${serverPROTOCOL}${serverURL}/autobid/powerlink/delete?CUSTOMER_ID=${customer["CUSTOMER_ID"]}`, {data: nccKeywordId});
-                console.info('res', res);
                 if (res.status === 200) {
-                    dispatch({ type: 'SUCCESS', data: res.data });
+                    dispatch({type: 'SUCCESS', data: res.data});
                     toast.info('선택한 키워드를 삭제하였습니다.');
                 }
-            } catch(e) {
+            } catch (e) {
                 throw new Error(e);
             }
+        }
+    }
+
+    const onAutoBidCycleChange = useCallback(e => setAutoBidCycle(e.target.value), []);
+
+    // 입찰 주기 변경
+    const handleChangeAutoBidCycle = async () => {
+        try {
+            const { data } = await SendRequest().put(`${serverPROTOCOL}${serverURL}/autobid/powerlink/cycle?CUSTOMER_ID=${customer["CUSTOMER_ID"]}&cycle=${autoBidCycle}`, nccKeywordId);
+
+            if (!!data) {
+                toast.info('선택한 키워드의 주기를 변경하였습니다.');
+                dispatch({ type: 'SUCCESS', data: data });
+                setCycleChangeOpen(false);
+                setAutoBidCycle(5);
+                setChecked([]);
+            }
+        } catch(e) {
+            throw new Error(e);
         }
     }
 
@@ -149,7 +177,7 @@ const PowerLinkKeywordContainer = (url, config) => {
             link.click();
             window.URL.revokeObjectURL(link);
             link.remove();
-        } catch(e) {
+        } catch (e) {
             throw new Error(e);
         }
     }
@@ -157,17 +185,17 @@ const PowerLinkKeywordContainer = (url, config) => {
     const isChecked = id => checked.indexOf(id) !== -1;
 
     const fetchPowerLinkData = async customerId => {
-        dispatch({ type: 'LOADING' });
+        dispatch({type: 'LOADING'});
 
         try {
             const powerLinkResponse = await SendRequest().get(`${serverPROTOCOL}${serverURL}/autobid/powerlink?CUSTOMER_ID=${customerId}`);
             const customerResponse = await SendRequest().get(`${serverPROTOCOL}${serverURL}/autobid/id`);
 
-            dispatch({ type: 'SUCCESS', data: powerLinkResponse.data });
+            dispatch({type: 'SUCCESS', data: powerLinkResponse.data});
             setCustomerList(customerResponse.data.id_info);
 
-        } catch(e) {
-            dispatch({ type: 'ERROR' });
+        } catch (e) {
+            dispatch({type: 'ERROR'});
         }
     }
 
@@ -250,6 +278,11 @@ const PowerLinkKeywordContainer = (url, config) => {
             cycleChangeOpen={cycleChangeOpen}
             handleModalOpen={handleModalOpen}
             handleModalClose={handleModalClose}
+
+            autoBidCycle={autoBidCycle}
+            onAutoBidCycleChange={onAutoBidCycleChange}
+            handleChangeAutoBidCycle={handleChangeAutoBidCycle}
+            nccKeywordId={nccKeywordId}
         />
     )
 }

@@ -1,5 +1,6 @@
 import React from 'react';
 import styled, {css} from "styled-components";
+import colors from "../../styles/colors";
 
 const Button = styled.button`
   font-size: ${({fontSize}) => fontSize ? fontSize : 18}px;
@@ -10,8 +11,8 @@ const Button = styled.button`
   border: ${({border}) => border ? border : "none"};
   height: ${({height}) => height}px;
   background-color: ${({bgColor}) => bgColor};
-  border-radius: ${({borderRadius}) => borderRadius ? borderRadius : 5}px;
-
+  border-radius: ${({borderRadius}) => borderRadius ? borderRadius : 4}px;
+  
   ${({margin}) => margin && css`
     margin: ${margin};
   `}
@@ -35,7 +36,7 @@ const StyledButton = ({
                           border,
                           borderRadius,
                           margin,
-                          onClick
+                          onClick,
                       }) => {
     return (
         <Button

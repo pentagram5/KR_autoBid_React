@@ -13,6 +13,7 @@ import gear from "../../assets/gear.svg";
 import trashCan from "../../assets/delete.svg";
 import download from "../../assets/download.svg";
 import AutoBidCycleChangeModal from "./AutoBidCycleChangeModal";
+import StyledButton from "../share/StyledButton";
 
 const Wrapper = styled.div`
   width: calc(100vw - 300px);
@@ -64,6 +65,7 @@ const TableTop = styled.div`
 `;
 const Box = styled.div`
   display: flex;
+  position: relative;
 `;
 const TableBox = styled.div`
   
@@ -81,6 +83,15 @@ const Progress = styled.div`
   flex-direction: column;
   justify-content: center;
   align-items: center;
+`;
+const FilterWrapper = styled.div`
+  width: 500px;
+  height: 300px;
+  position: absolute;
+  z-index: 50;
+  top: 50px;
+  right: 0;
+  background-color: ${colors.white};
 `;
 
 const KeywordPresenter = ({
@@ -112,6 +123,11 @@ const KeywordPresenter = ({
                               cycleChangeOpen,
                               handleModalOpen,
                               handleModalClose,
+
+                              autoBidCycle,
+                              onAutoBidCycleChange,
+                              handleChangeAutoBidCycle,
+                              nccKeywordId
                           }) => {
 
 
@@ -206,15 +222,32 @@ const KeywordPresenter = ({
                             onClick={handleDeleteAutoBid}
                         />
                     </Box>
-                    <ImageButton
-                        title="다운로드"
-                        fontColor={colors.blue}
-                        border={`1px solid ${colors.blue}`}
-                        bgColor={colors.white}
-                        imgSrc={download}
-                        height={29}
-                        onClick={handleDownload}
-                    />
+                    <Box>
+                        <StyledButton
+                            title="조회필터"
+                            width={78}
+                            fontSize={13}
+                            fontWeight={400}
+                            fontColor={colors.white}
+                            bgColor={colors.blue}
+                            margin="0 10px 0 0"
+                            height={29}
+                            type="filter"
+                            // onClick={handleDownload}
+                        />
+                        <ImageButton
+                            title="다운로드"
+                            fontColor={colors.blue}
+                            border={`1px solid ${colors.blue}`}
+                            bgColor={colors.white}
+                            imgSrc={download}
+                            height={29}
+                            onClick={handleDownload}
+                        />
+                        <FilterWrapper>
+
+                        </FilterWrapper>
+                    </Box>
                 </TableTop>
                 <TableBox>
                     <MaterialTable
@@ -243,7 +276,13 @@ const KeywordPresenter = ({
                     aria-labelledby="입찰 주기 변경"
                 >
                     <>
-                        <AutoBidCycleChangeModal />
+                        <AutoBidCycleChangeModal
+                            nccKeywordId={nccKeywordId}
+                            handleModalClose={handleModalClose}
+                            autoBidCycle={autoBidCycle}
+                            onAutoBidCycleChange={onAutoBidCycleChange}
+                            handleChangeAutoBidCycle={handleChangeAutoBidCycle}
+                        />
                     </>
                 </Modal>
             </Wrapper>

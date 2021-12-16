@@ -29,6 +29,7 @@ export default createGlobalStyle`
   }
   button {
     cursor: pointer;
+    outline: none;
   }
   select {
     padding: 0 10px;
