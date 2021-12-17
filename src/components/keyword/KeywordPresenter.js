@@ -14,6 +14,9 @@ import trashCan from "../../assets/delete.svg";
 import download from "../../assets/download.svg";
 import AutoBidCycleChangeModal from "./AutoBidCycleChangeModal";
 import StyledButton from "../share/StyledButton";
+import FilterInput from "../share/FilterInputs";
+import refresh from "../../assets/refresh.svg";
+import close from "../../assets/close.svg";
 
 const Wrapper = styled.div`
   width: calc(100vw - 300px);
@@ -68,7 +71,7 @@ const Box = styled.div`
   position: relative;
 `;
 const TableBox = styled.div`
-  
+
 `;
 const Progress = styled.div`
   width: 100vw;
@@ -85,14 +88,48 @@ const Progress = styled.div`
   align-items: center;
 `;
 const FilterWrapper = styled.div`
-  width: 500px;
-  height: 300px;
+  width: 720px;
+  height: 490px;
+  padding: 30px 0 105px;
+  display: flex;
+  justify-content: center;
   position: absolute;
   z-index: 50;
   top: 50px;
-  right: 0;
+  right: 100px;
+  border: 1px solid ${colors.skyBlue};
   background-color: ${colors.white};
+  box-shadow: 0 0 26px ${colors.ultraLightGray};
 `;
+const FilterBox = styled.div`
+  width: 50%;
+  padding: 0 30px;
+
+  &:first-child {
+    border-right: 1px solid ${colors.ultraLightGray};
+  }
+`;
+const BottomBox = styled.div`
+  padding: 18px 30px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 75px;
+  background-color: ${colors.skyBlue};
+`;
+const CloseButton = styled.div`
+  width: 14px;
+  height: 14px;
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  cursor: pointer;
+`;
+const Image = styled.img``;
+
 
 const KeywordPresenter = ({
                               title,
@@ -127,9 +164,19 @@ const KeywordPresenter = ({
                               autoBidCycle,
                               onAutoBidCycleChange,
                               handleChangeAutoBidCycle,
-                              nccKeywordId
+                              nccKeywordId,
+
+                              filterRef,
+                              searchFilterOpen,
+                              handleFilterOpen,
+                              handleFilterClose,
+                              searchFilter,
+                              onFilterChange,
+                              onRefresh,
+                              onSearchFilter
                           }) => {
 
+    const { campaignName, adgroupName, keyword, device, activate, targetRank, maxBid, bidCycle } = searchFilter;
 
     if (error) return null;
     if (loading || !data || customerList.length === 0) return <Progress><CircularProgress/></Progress>
@@ -233,7 +280,7 @@ const KeywordPresenter = ({
                             margin="0 10px 0 0"
                             height={29}
                             type="filter"
-                            // onClick={handleDownload}
+                            onClick={handleFilterOpen}
                         />
                         <ImageButton
                             title="다운로드"
@@ -244,9 +291,118 @@ const KeywordPresenter = ({
                             height={29}
                             onClick={handleDownload}
                         />
-                        <FilterWrapper>
+                        {searchFilterOpen &&
+                        <FilterWrapper ref={filterRef}>
+                            <CloseButton onClick={handleFilterClose}>
+                                <Image src={close}/>
+                            </CloseButton>
+                            <FilterBox>
+                                <FilterInput
+                                    input
+                                    title="캠페인명"
+                                    name="campaignName"
+                                    value={campaignName}
+                                    onChange={onFilterChange}
+                                />
+                                <FilterInput
+                                    input
+                                    title="광고그룹명"
+                                    name="adgroupName"
+                                    value={adgroupName}
+                                    onChange={onFilterChange}
 
+                                />
+                                <FilterInput
+                                    input
+                                    title="키워드명"
+                                    name="keyword"
+                                    value={keyword}
+                                    onChange={onFilterChange}
+
+                                />
+                                <FilterInput
+                                    select
+                                    title="디바이스"
+                                    name="device"
+                                    value={device}
+                                    onChange={onFilterChange}
+                                    options={[
+                                        {
+                                            name: "PC",
+                                            value: "PC"
+                                        },
+                                        {
+                                            name: "MOBILE",
+                                            value: "MOBILE"
+                                        }
+                                    ]}
+                                />
+                            </FilterBox>
+                            <FilterBox>
+                                <FilterInput
+                                    select
+                                    title="자동입찰 사용 여부"
+                                    name="activate"
+                                    value={activate}
+                                    onChange={onFilterChange}
+                                    options={[
+                                        {
+                                            name: "활성화",
+                                            value: "1"
+                                        },
+                                        {
+                                            name: "비활성화",
+                                            value: "0"
+                                        }
+                                    ]}
+                                />
+                                <FilterInput
+                                    select
+                                    title="희망순위"
+                                    name="targetRank"
+                                    value={targetRank}
+                                    onChange={onFilterChange}
+                                    options={["1","2","3","4","5","6","7","8","9","10"]}
+                                />
+                                <FilterInput
+                                    input
+                                    title="최대 입찰가"
+                                    name="maxBid"
+                                    value={maxBid}
+                                    onChange={onFilterChange}
+                                />
+                                <FilterInput
+                                    select
+                                    title="주기"
+                                    name="bidCycle"
+                                    value={bidCycle}
+                                    onChange={onFilterChange}
+                                    options={["5", "10", "30", "60"]}
+                                />
+                            </FilterBox>
+                            <BottomBox>
+                                <ImageButton
+                                    title="초기화"
+                                    width={100}
+                                    height={40}
+                                    bgColor={colors.skyBlue}
+                                    imgSrc={refresh}
+                                    fontColor={colors.white}
+                                    fontSize={16}
+                                    onClick={onRefresh}
+                                />
+                                <StyledButton
+                                    title="조회하기"
+                                    width={100}
+                                    height={40}
+                                    bgColor={colors.skyBlue}
+                                    fontColor={colors.white}
+                                    border={`1px solid ${colors.white}`}
+                                    onClick={onSearchFilter}
+                                />
+                            </BottomBox>
                         </FilterWrapper>
+                        }
                     </Box>
                 </TableTop>
                 <TableBox>

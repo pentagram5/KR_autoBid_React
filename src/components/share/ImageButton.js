@@ -3,7 +3,6 @@ import styled, {css} from "styled-components";
 
 const Button = styled.button`
   border-radius: 3px;
-  font-size: 13px;
   font-weight: 500;
   width: ${({width}) => width}px;
   height: ${({height}) => height}px;
@@ -15,7 +14,8 @@ const Button = styled.button`
   display: flex;
   align-items: center;
   margin-right: 5px;
-  
+  font-size: ${({ fontSize }) => fontSize ? fontSize : 13}px;
+    
   ${({ margin }) => margin && css`
     margin: ${margin};
   `}
@@ -34,6 +34,7 @@ const ImageButton = ({
                          padding,
                          bgColor,
                          fontColor,
+                        fontSize,
                          border,
                          margin,
                          onClick,
@@ -44,6 +45,7 @@ const ImageButton = ({
             width={width}
             height={height}
             bgColor={bgColor}
+            fontSize={fontSize}
             fontColor={fontColor}
             padding={padding}
             border={border}

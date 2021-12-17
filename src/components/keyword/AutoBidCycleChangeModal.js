@@ -46,14 +46,7 @@ const AutoBidCycleChangeModal = ({
                                      onAutoBidCycleChange,
                                      handleChangeAutoBidCycle,
                                  }) => {
-
-    console.info('nccKeywordId', nccKeywordId.length);
-
     const title = nccKeywordId[0].nccKeywordId.split('__')[1];
-
-
-    console.info('title', title);
-
 
     return (
         <Wrapper>

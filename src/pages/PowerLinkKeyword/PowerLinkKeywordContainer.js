@@ -1,4 +1,4 @@
-import React, {useEffect, useState, useReducer, useCallback} from 'react';
+import React, {useEffect, useState, useReducer, useCallback, useRef} from 'react';
 import KeywordPresenter from "../../components/keyword/KeywordPresenter";
 import {toast} from "react-toastify";
 import SendRequest from "../../utils/SendRequest";
@@ -41,7 +41,8 @@ function reducer(state, action) {
     }
 }
 
-const PowerLinkKeywordContainer = (url, config) => {
+const PowerLinkKeywordContainer = () => {
+    const filterRef = useRef();
     const [state, dispatch] = useReducer(reducer, {
         loading: true,
         data: null,
@@ -56,7 +57,78 @@ const PowerLinkKeywordContainer = (url, config) => {
     const [rowsPerPage, setRowsPerPage] = React.useState(10);
     const [cycleChangeOpen, setCycleChangeOpen] = useState(false);
     const [autoBidCycle, setAutoBidCycle] = useState(5);
+    const [searchFilterOpen, setSearchFilterOpen] = useState(false);
+    const [searchFilter, setSearchFilter] = useState({
+        campaignName: "",
+        adgroupName: "",
+        keyword: "",
+        device: "",
+        activate: "",
+        targetRank: "",
+        maxBid: "",
+        bidCycle: ""
+    });
 
+    // 조회 필터 input 값
+    const onFilterChange = e => {
+        const { name, value } = e.target;
+        setSearchFilter({
+            ...searchFilter,
+            [name]: value
+        });
+    }
+
+    // 초기화
+    const onRefresh = () => {
+        setSearchFilter({
+            campaignName: "",
+            adgroupName: "",
+            keyword: "",
+            device: "",
+            activate: "",
+            targetRank: "",
+            maxBid: "",
+            bidCycle: ""
+        });
+    }
+
+    // 조회필터 검색
+    const onSearchFilter = async () => {
+        const { campaignName, adgroupName, keyword, device, activate, targetRank, maxBid, bidCycle } = searchFilter;
+
+        try {
+            const res = await SendRequest().post(`${serverPROTOCOL}${serverURL}/autobid/powerlink/filter?CUSTOMER_ID=${customer["CUSTOMER_ID"]}`, {
+                Campaign_name: campaignName,
+                Adgroup_name: adgroupName,
+                Keyword: keyword,
+                device: device,
+                activate: activate,
+                target_Rank: targetRank,
+                max_bid: maxBid,
+                bid_cycle: bidCycle
+            });
+            dispatch({ type: "RE_REQUEST", data: res.data.keywords });
+            onRefresh();
+            setSearchFilterOpen(false);
+        } catch(e) {
+            throw new Error(e);
+        }
+    }
+
+    useEffect(() => {
+        console.info('filterRef', filterRef)
+        window.addEventListener('click', handleFilterClose);
+        return () => window.removeEventListener('click', handleFilterClose);
+    }, []);
+
+    // 조회필터 창 open
+    const handleFilterOpen = () => setSearchFilterOpen(!searchFilterOpen);
+    // 조회필터 창 close
+    const handleFilterClose = e => {
+        if (searchFilterOpen && (!filterRef.current || !filterRef.current.contains(e.target))) setSearchFilterOpen(false);
+    }
+
+    // 입찰 주기 변경 모달 open
     const handleModalOpen = () => {
         if (checked.length === 0) {
             toast.error('변경하실 키워드를 선택해주세요.');
@@ -64,6 +136,7 @@ const PowerLinkKeywordContainer = (url, config) => {
         }
         setCycleChangeOpen(true);
     }
+    // 입찰 주기 변경 모달 close
     const handleModalClose = () => setCycleChangeOpen(false);
 
     const handleChangePage = (e, newPage) => {
@@ -283,6 +356,15 @@ const PowerLinkKeywordContainer = (url, config) => {
             onAutoBidCycleChange={onAutoBidCycleChange}
             handleChangeAutoBidCycle={handleChangeAutoBidCycle}
             nccKeywordId={nccKeywordId}
+
+            filterRef={filterRef}
+            searchFilterOpen={searchFilterOpen}
+            handleFilterOpen={handleFilterOpen}
+            handleFilterClose={handleFilterClose}
+            searchFilter={searchFilter}
+            onFilterChange={onFilterChange}
+            onRefresh={onRefresh}
+            onSearchFilter={onSearchFilter}
         />
     )
 }
