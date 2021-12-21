@@ -370,10 +370,21 @@ const AddAutoBidPresenter = ({
                                 </td>
                                 <td>
                                     <RadioGroup row onChange={e => onAutoBidChange(e, 'device')}>
-                                        <FormControlLabel value="PC" name="device" control={<Radio/>} label="PC"
-                                                          checked={device === "PC"}/>
-                                        <FormControlLabel value="MOBILE" name="device" control={<Radio/>}
-                                                          label="Mobile"/>
+                                        <FormControlLabel
+                                            label="PC"
+                                            value="PC"
+                                            name="device"
+                                            control={<Radio/>}
+                                            checked={device === "PC"}
+                                            disabled={!!radioState.simpleHigh}
+                                        />
+                                        <FormControlLabel
+                                            label="Mobile"
+                                            value="MOBILE"
+                                            name="device"
+                                            control={<Radio/>}
+                                            disabled={!!radioState.simpleHigh}
+                                        />
                                     </RadioGroup>
                                 </td>
                             </tr>
@@ -383,11 +394,35 @@ const AddAutoBidPresenter = ({
                                 </td>
                                 <td colSpan={3}>
                                     <RadioGroup row onChange={e => onAutoBidChange(e, 'bid_cycle')}>
-                                        <FormControlLabel value={5} name="bid_cycle" control={<Radio/>} label="5분"
-                                                          checked={bid_cycle === 5}/>
-                                        <FormControlLabel value={10} name="bid_cycle" control={<Radio/>} label="10분"/>
-                                        <FormControlLabel value={30} name="bid_cycle" control={<Radio/>} label="30분"/>
-                                        <FormControlLabel value={60} name="bid_cycle" control={<Radio/>} label="60분"/>
+                                        <FormControlLabel
+                                            label="5분"
+                                            name="bid_cycle"
+                                            value={5}
+                                            control={<Radio/>}
+                                            checked={bid_cycle === 5}
+                                            disabled={!!radioState.simpleHigh}
+                                        />
+                                        <FormControlLabel
+                                            label="10분"
+                                            name="bid_cycle"
+                                            value={10}
+                                            control={<Radio/>}
+                                            disabled={!!radioState.simpleHigh}
+                                        />
+                                        <FormControlLabel
+                                            label="30분"
+                                            name="bid_cycle"
+                                            value={30}
+                                            control={<Radio/>}
+                                            disabled={!!radioState.simpleHigh}
+                                        />
+                                        <FormControlLabel
+                                            label="60분"
+                                            name="bid_cycle"
+                                            value={60}
+                                            control={<Radio/>}
+                                            disabled={!!radioState.simpleHigh}
+                                        />
                                     </RadioGroup>
                                 </td>
                             </tr>
@@ -535,7 +570,8 @@ const AddAutoBidPresenter = ({
                                 <option value="">시작 시간</option>
                                 {[...Array(24)].map((none, index) => {
                                     return (
-                                        <option key={index < 10 ? `0${index}` : index} value={index < 10 ? `0${index}` : index}>{index < 10 ? `0${index}` : index}시</option>
+                                        <option key={index < 10 ? `0${index}` : index}
+                                                value={index < 10 ? `0${index}` : index}>{index < 10 ? `0${index}` : index}시</option>
                                     )
                                 })}
                             </SelectBox>
@@ -544,7 +580,8 @@ const AddAutoBidPresenter = ({
                                 <option value="">종료 시간</option>
                                 {[...Array(24)].map((none, index) => {
                                     return (
-                                        <option key={index < 9 ? `0${index + 1}` : index + 1} value={index < 9 ? `0${index + 1}` : index + 1}>{index < 9 ? `0${index + 1}` : index + 1}시</option>
+                                        <option key={index < 9 ? `0${index + 1}` : index + 1}
+                                                value={index < 9 ? `0${index + 1}` : index + 1}>{index < 9 ? `0${index + 1}` : index + 1}시</option>
                                     )
                                 })}
                             </SelectBox>
@@ -565,7 +602,7 @@ const AddAutoBidPresenter = ({
                         <ScheduleCardBox>
 
                             <ScheduleCard
-
+                                bgColor={colors.pastelRed}
                             />
 
                             {/*{scheduleChips.map(chip => (

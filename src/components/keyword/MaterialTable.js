@@ -280,22 +280,22 @@ export default function MaterialTable({
                                     {row.device}
                                 </TableCell>
                                 <TableCell>
-                                    {!!row.min_bid ? row.min_bid : '-'}
+                                    {!!row.min_bid ? `${parseInt(row.min_bid).toLocaleString()} 원` : '-'}
                                 </TableCell>
                                 <TableCell>
-                                    {!!row.max_bid ? row.max_bid : '-'}
+                                    {!!row.max_bid ? `${parseInt(row.max_bid).toLocaleString()} 원` : '-'}
                                 </TableCell>
                                 <TableCell>
                                     {row.target_Rank}
                                 </TableCell>
                                 <TableCell>
-                                    {row.current_bid} 원
+                                    {parseInt(row.current_bid).toLocaleString()} 원
                                 </TableCell>
                                 {/*  88 순위밖, 99 - */}
                                 <TableCell>
                                     {(row.current_rank !== 99 && row.current_rank !== 88) && row.current_rank}
-                                    {(row.current_rank === 99 && row.current_rank !== 88) && '-'}
-                                    {(row.current_rank === 88 && row.current_rank !== 99) && '순위밖'}
+                                    {(row.current_rank === 99 && row.current_rank !== 88) && '스케줄 밖'}
+                                    {(row.current_rank === 88 && row.current_rank !== 99) && '순위 밖'}
                                 </TableCell>
                                 <TableCell>
                                     {!!row.activate ? '활성화' : '비활성화'}

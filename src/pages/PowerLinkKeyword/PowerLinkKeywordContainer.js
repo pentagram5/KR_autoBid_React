@@ -42,7 +42,7 @@ function reducer(state, action) {
 }
 
 const PowerLinkKeywordContainer = () => {
-    const filterRef = useRef();
+    const filterRef = useRef(null);
     const [state, dispatch] = useReducer(reducer, {
         loading: true,
         data: null,
@@ -107,6 +107,9 @@ const PowerLinkKeywordContainer = () => {
                 max_bid: maxBid,
                 bid_cycle: bidCycle
             });
+
+            console.info('?????/**/', res.data.keywords);
+
             dispatch({ type: "RE_REQUEST", data: res.data.keywords });
             onRefresh();
             setSearchFilterOpen(false);
@@ -115,17 +118,11 @@ const PowerLinkKeywordContainer = () => {
         }
     }
 
-    useEffect(() => {
-        console.info('filterRef', filterRef)
-        window.addEventListener('click', handleFilterClose);
-        return () => window.removeEventListener('click', handleFilterClose);
-    }, []);
-
-    // 조회필터 창 open
-    const handleFilterOpen = () => setSearchFilterOpen(!searchFilterOpen);
-    // 조회필터 창 close
+    // 조회필터 창 open / close
+    const handleFilterOpen = () => setSearchFilterOpen(true);
     const handleFilterClose = e => {
-        if (searchFilterOpen && (!filterRef.current || !filterRef.current.contains(e.target))) setSearchFilterOpen(false);
+        if ((searchFilterOpen && (!filterRef.current || !filterRef.current.contains(e.target))) || (e.target.name === "close")) setSearchFilterOpen(false);
+
     }
 
     // 입찰 주기 변경 모달 open
@@ -289,6 +286,10 @@ const PowerLinkKeywordContainer = () => {
         if (!!customer["CUSTOMER_ID"]) fetchPowerLinkData(customer["CUSTOMER_ID"]);
     }, [customer]);
 
+    useEffect(() => {
+        window.addEventListener('click', handleFilterClose);
+        return () => window.removeEventListener('click', handleFilterClose);
+    }, [searchFilterOpen]);
 
     // 정렬
     const [order, setOrder] = useState('asc');

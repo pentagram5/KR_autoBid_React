@@ -269,7 +269,7 @@ const KeywordPresenter = ({
                             onClick={handleDeleteAutoBid}
                         />
                     </Box>
-                    <Box>
+                    <Box ref={filterRef}>
                         <StyledButton
                             title="조회필터"
                             width={78}
@@ -291,117 +291,118 @@ const KeywordPresenter = ({
                             height={29}
                             onClick={handleDownload}
                         />
+                        {/* 조회필터 Dropdown */}
                         {searchFilterOpen &&
-                        <FilterWrapper ref={filterRef}>
-                            <CloseButton onClick={handleFilterClose}>
-                                <Image src={close}/>
-                            </CloseButton>
-                            <FilterBox>
-                                <FilterInput
-                                    input
-                                    title="캠페인명"
-                                    name="campaignName"
-                                    value={campaignName}
-                                    onChange={onFilterChange}
-                                />
-                                <FilterInput
-                                    input
-                                    title="광고그룹명"
-                                    name="adgroupName"
-                                    value={adgroupName}
-                                    onChange={onFilterChange}
+                            <FilterWrapper >
+                                <CloseButton onClick={handleFilterClose}>
+                                    <Image name="close" src={close}/>
+                                </CloseButton>
+                                <FilterBox>
+                                    <FilterInput
+                                        input
+                                        title="캠페인명"
+                                        name="campaignName"
+                                        value={campaignName}
+                                        onChange={onFilterChange}
+                                    />
+                                    <FilterInput
+                                        input
+                                        title="광고그룹명"
+                                        name="adgroupName"
+                                        value={adgroupName}
+                                        onChange={onFilterChange}
 
-                                />
-                                <FilterInput
-                                    input
-                                    title="키워드명"
-                                    name="keyword"
-                                    value={keyword}
-                                    onChange={onFilterChange}
+                                    />
+                                    <FilterInput
+                                        input
+                                        title="키워드명"
+                                        name="keyword"
+                                        value={keyword}
+                                        onChange={onFilterChange}
 
-                                />
-                                <FilterInput
-                                    select
-                                    title="디바이스"
-                                    name="device"
-                                    value={device}
-                                    onChange={onFilterChange}
-                                    options={[
-                                        {
-                                            name: "PC",
-                                            value: "PC"
-                                        },
-                                        {
-                                            name: "MOBILE",
-                                            value: "MOBILE"
-                                        }
-                                    ]}
-                                />
-                            </FilterBox>
-                            <FilterBox>
-                                <FilterInput
-                                    select
-                                    title="자동입찰 사용 여부"
-                                    name="activate"
-                                    value={activate}
-                                    onChange={onFilterChange}
-                                    options={[
-                                        {
-                                            name: "활성화",
-                                            value: "1"
-                                        },
-                                        {
-                                            name: "비활성화",
-                                            value: "0"
-                                        }
-                                    ]}
-                                />
-                                <FilterInput
-                                    select
-                                    title="희망순위"
-                                    name="targetRank"
-                                    value={targetRank}
-                                    onChange={onFilterChange}
-                                    options={["1","2","3","4","5","6","7","8","9","10"]}
-                                />
-                                <FilterInput
-                                    input
-                                    title="최대 입찰가"
-                                    name="maxBid"
-                                    value={maxBid}
-                                    onChange={onFilterChange}
-                                />
-                                <FilterInput
-                                    select
-                                    title="주기"
-                                    name="bidCycle"
-                                    value={bidCycle}
-                                    onChange={onFilterChange}
-                                    options={["5", "10", "30", "60"]}
-                                />
-                            </FilterBox>
-                            <BottomBox>
-                                <ImageButton
-                                    title="초기화"
-                                    width={100}
-                                    height={40}
-                                    bgColor={colors.skyBlue}
-                                    imgSrc={refresh}
-                                    fontColor={colors.white}
-                                    fontSize={16}
-                                    onClick={onRefresh}
-                                />
-                                <StyledButton
-                                    title="조회하기"
-                                    width={100}
-                                    height={40}
-                                    bgColor={colors.skyBlue}
-                                    fontColor={colors.white}
-                                    border={`1px solid ${colors.white}`}
-                                    onClick={onSearchFilter}
-                                />
-                            </BottomBox>
-                        </FilterWrapper>
+                                    />
+                                    <FilterInput
+                                        select
+                                        title="디바이스"
+                                        name="device"
+                                        value={device}
+                                        onChange={onFilterChange}
+                                        options={[
+                                            {
+                                                name: "PC",
+                                                value: "PC"
+                                            },
+                                            {
+                                                name: "MOBILE",
+                                                value: "MOBILE"
+                                            }
+                                        ]}
+                                    />
+                                </FilterBox>
+                                <FilterBox>
+                                    <FilterInput
+                                        select
+                                        title="자동입찰 사용 여부"
+                                        name="activate"
+                                        value={activate}
+                                        onChange={onFilterChange}
+                                        options={[
+                                            {
+                                                name: "활성화",
+                                                value: "1"
+                                            },
+                                            {
+                                                name: "비활성화",
+                                                value: "0"
+                                            }
+                                        ]}
+                                    />
+                                    <FilterInput
+                                        select
+                                        title="희망순위"
+                                        name="targetRank"
+                                        value={targetRank}
+                                        onChange={onFilterChange}
+                                        options={["1","2","3","4","5","6","7","8","9","10"]}
+                                    />
+                                    <FilterInput
+                                        input
+                                        title="최대 입찰가"
+                                        name="maxBid"
+                                        value={maxBid}
+                                        onChange={onFilterChange}
+                                    />
+                                    <FilterInput
+                                        select
+                                        title="주기"
+                                        name="bidCycle"
+                                        value={bidCycle}
+                                        onChange={onFilterChange}
+                                        options={["5", "10", "30", "60"]}
+                                    />
+                                </FilterBox>
+                                <BottomBox>
+                                    <ImageButton
+                                        title="초기화"
+                                        width={100}
+                                        height={40}
+                                        bgColor={colors.skyBlue}
+                                        imgSrc={refresh}
+                                        fontColor={colors.white}
+                                        fontSize={16}
+                                        onClick={onRefresh}
+                                    />
+                                    <StyledButton
+                                        title="조회하기"
+                                        width={100}
+                                        height={40}
+                                        bgColor={colors.skyBlue}
+                                        fontColor={colors.white}
+                                        border={`1px solid ${colors.white}`}
+                                        onClick={onSearchFilter}
+                                    />
+                                </BottomBox>
+                            </FilterWrapper>
                         }
                     </Box>
                 </TableTop>

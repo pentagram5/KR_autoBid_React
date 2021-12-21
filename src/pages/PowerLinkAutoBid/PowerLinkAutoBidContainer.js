@@ -34,10 +34,6 @@ const PowerLinkAutoBidContainer = () => {
         keyword_info: [],
         device: "PC",
         bid_cycle: 5,
-        target_Rank: 0,
-        max_bid: 0,
-        min_bid: 0,
-        bid_adj_amount: 0,
         setting: {
             mon: '0~23',
             tue: '0~23',
@@ -46,6 +42,10 @@ const PowerLinkAutoBidContainer = () => {
             fri: '0~23',
             sat: '0~23',
             sun: '0~23',
+            target_Rank: 0,
+            max_bid: 0,
+            min_bid: 0,
+            bid_adj_amount: 0,
         }
     });
 
@@ -80,8 +80,18 @@ const PowerLinkAutoBidContainer = () => {
             case 'max_bid':
             case 'min_bid':
             case 'target_Rank':
-            case 'bid_cycle':
             case 'bid_adj_amount':
+                value = parseInt(value);
+                if (isNaN(value)) value = 0;
+                setKeywordOption({
+                    ...keywordOption,
+                    setting: {
+                        ...keywordOption.setting,
+                        [name]: value
+                    }
+                });
+                break;
+            case 'bid_cycle':
                 value = parseInt(value);
                 if (isNaN(value)) value = 0;
                 setKeywordOption({
@@ -194,6 +204,7 @@ const PowerLinkAutoBidContainer = () => {
             setKeywordOption({
                 ...keywordOption,
                 setting: {
+                    ...keywordOption.setting,
                     mon: time,
                     tue: time,
                     wed: time,
@@ -207,6 +218,7 @@ const PowerLinkAutoBidContainer = () => {
             setKeywordOption({
                 ...keywordOption,
                 setting: {
+                    ...keywordOption.setting,
                     mon: time,
                     tue: time,
                     wed: time,
@@ -220,6 +232,7 @@ const PowerLinkAutoBidContainer = () => {
             setKeywordOption({
                 ...keywordOption,
                 setting: {
+                    ...keywordOption.setting,
                     mon: '0',
                     tue: '0',
                     wed: '0',
@@ -238,6 +251,7 @@ const PowerLinkAutoBidContainer = () => {
 
     useEffect(() => {
         setCustomer(JSON.parse(localStorage.getItem("customer")));
+        return () => setLoading(false);
     }, []);
 
     const [selections, setSelections] = useState({
@@ -252,11 +266,8 @@ const PowerLinkAutoBidContainer = () => {
 
     // 나중에 보낼때
     let mondaySelectionFlag = 0;
-    selections.mon.forEach((x, i) => {
-        mondaySelectionFlag += Math.pow(2, x);
-    });
+    selections.mon.forEach((x, i) => mondaySelectionFlag += Math.pow(2, x));
     // console.info("monday2 ", mondaySelectionFlag2);
-
 
     // 입찰 관리 스케줄 고급 설정
     const [highSchedule, setHighSchedule] = useState({
@@ -277,6 +288,7 @@ const PowerLinkAutoBidContainer = () => {
         });
     }
 
+    // 스케줄 추가
     const onAddChips = () => {
         const {week, start, finish} = highSchedule;
         let weekKor = '';
@@ -318,8 +330,6 @@ const PowerLinkAutoBidContainer = () => {
 
         let chip = `${weekKor} ${start}시~${finish}시`;
 
-
-
         let selectedValue = selections[week].find(time => {
             if (time >= parseInt(start) && time <= parseInt(finish)) {
                 return time;
@@ -337,8 +347,6 @@ const PowerLinkAutoBidContainer = () => {
             console.info('for 문 내부 ::: ', i);
             tmp.push(i);
         }
-
-
 
         setSelections({...selections, [week]: tmp});
         setScheduleChips([...scheduleChips, chip]);
@@ -394,20 +402,41 @@ const PowerLinkAutoBidContainer = () => {
     }
 
     const onAddAutoBid = async () => {
-        if (!keywordOption.target_Rank) {
+        if (keywordOption.keyword_info.length === 0) {
+            alert('등록하실 키워드를 추가해주세요.');
+            return;
+        } else if (!keywordOption.setting.target_Rank) {
             alert('희망 순위를 설정해주세요.');
             return;
         }
+
         setLoading(true);
         try {
-            const response = await SendRequest().post(`${serverPROTOCOL}${serverURL}/autobid/powerlink?CUSTOMER_ID=${customer["CUSTOMER_ID"]}`, keywordOption);
+            const response = await SendRequest().post(`${serverPROTOCOL}${serverURL}/autobid/powerlink?CUSTOMER_ID=${customer["CUSTOMER_ID"]}`, [keywordOption]);
 
             console.info(response);
             if (response.status === 200) {
                 setLoading(false);
-                toast.info('입찰 등록이 완료되었습니다.');
 
-                // window.location.reload();
+                setKeywordOption({
+                    keyword_info: [],
+                    device: "PC",
+                    bid_cycle: 5,
+                    setting: {
+                        mon: '0~23',
+                        tue: '0~23',
+                        wed: '0~23',
+                        thu: '0~23',
+                        fri: '0~23',
+                        sat: '0~23',
+                        sun: '0~23',
+                        target_Rank: 0,
+                        max_bid: 0,
+                        min_bid: 0,
+                        bid_adj_amount: 0,
+                    }
+                });
+                setKeywordList([]);
             }
 
         } catch (e) {
@@ -421,6 +450,7 @@ const PowerLinkAutoBidContainer = () => {
             keyword_info: settingList.map(list => list.nccKeywordId)
         });
     }, [settingList]);
+
 
     return (
         <AddAutoBidPresenter
