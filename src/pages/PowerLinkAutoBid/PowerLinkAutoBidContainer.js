@@ -3,6 +3,7 @@ import AddAutoBidPresenter from "../../components/addAutoBid/AddAutoBidPresenter
 import {AuthContext} from "../../utils/AuthContext";
 import SendRequest from "../../utils/SendRequest";
 import * as constants from "../../utils/constants";
+import colors from "../../styles/colors";
 import {toast} from "react-toastify";
 
 const serverPROTOCOL = constants.config.PROTOCOL;
@@ -288,9 +289,46 @@ const PowerLinkAutoBidContainer = () => {
         });
     }
 
+    const scheduleBgColor = [colors.pastelRed, colors.pastelYellow, colors.pastelGreen, colors.pastelBlue, colors. pastelPurple];
+    const {week, start, finish} = highSchedule;
+
     // 스케줄 추가
+    const onAddSchedule = () => {
+        if (scheduleChips.length > 4) {
+            alert('스케줄은 한번에 최대 5개까지 설정할 수 있습니다.');
+            return;
+        } else if (keywordOption.setting.target_Rank < 1) {
+            alert('희망 순위를 설정해주세요.');
+            return;
+        }
+
+        let chip = {
+            targetRank: keywordOption.setting.target_Rank,
+            maxBid: keywordOption.setting.max_bid,
+            minBid: keywordOption.setting.min_bid,
+            active: false,
+            bgColor: scheduleBgColor[scheduleChips.length],
+            mon: [],
+            tue: [],
+            wed: [],
+            thu: [],
+            fri: [],
+            sat: [],
+            sun: [],
+        };
+        setScheduleChips([...scheduleChips, chip]);
+    }
+
+    // 스케줄 click
+    const onScheduleClick = index => setScheduleChips( scheduleChips.map((chip, idx) => index === idx ? { ...chip, active: !chip.active } : { ...chip, active: false }));
+
+
+    useEffect(() => {
+        console.info(scheduleChips)
+    }, [scheduleChips]);
+
+    // 시간 설정
     const onAddChips = () => {
-        const {week, start, finish} = highSchedule;
         let weekKor = '';
 
         if (week === '' || start === '' || finish === '') {
@@ -302,35 +340,89 @@ const PowerLinkAutoBidContainer = () => {
             return false;
         }
 
+        let tmp;
         switch (week) {
             case 'mon':
+                tmp = [...scheduleChips[week]];
                 weekKor = '월';
+                for (let i = parseInt(start); i <= parseInt(finish); i++) tmp.push(i);
                 break;
             case 'tue':
+                tmp = [...scheduleChips[week]];
                 weekKor = '화';
+                for (let i = parseInt(start); i <= parseInt(finish); i++) tmp.push(i);
                 break;
             case 'web':
+                tmp = [...scheduleChips[week]];
                 weekKor = '수';
+                for (let i = parseInt(start); i <= parseInt(finish); i++) tmp.push(i);
                 break;
             case 'thu':
+                tmp = [...scheduleChips[week]];
                 weekKor = '목';
+                for (let i = parseInt(start); i <= parseInt(finish); i++) tmp.push(i);
                 break;
             case 'fri':
+                tmp = [...scheduleChips[week]];
                 weekKor = '금';
+                for (let i = parseInt(start); i <= parseInt(finish); i++) tmp.push(i);
                 break;
             case 'sat':
+                tmp = [...scheduleChips[week]];
                 weekKor = '토';
+                for (let i = parseInt(start); i <= parseInt(finish); i++) tmp.push(i);
                 break;
             case 'sun':
+                tmp = [...scheduleChips[week]];
                 weekKor = '일';
+                for (let i = parseInt(start); i <= parseInt(finish); i++) tmp.push(i);
+                break;
+            case 'weekDays':
+                let tmpWeekDays = [];
+                for (let i = parseInt(start); i <= parseInt(finish); i++) tmpWeekDays.push(i);
+                setSelections({
+                    mon: [...scheduleChips.mon, tmpWeekDays],
+                    tue: [...scheduleChips.tue, tmpWeekDays],
+                    wed: [...scheduleChips.wed, tmpWeekDays],
+                    thu: [...scheduleChips.thu, tmpWeekDays],
+                    fri: [...scheduleChips.fri, tmpWeekDays],
+                    sat: [...scheduleChips.sat, tmpWeekDays],
+                    sun: [...scheduleChips.sun, tmpWeekDays],
+                });
+                break;
+            case 'weekend':
+                let tmpWeekend = [];
+                for (let i = parseInt(start); i <= parseInt(finish); i++) tmpWeekend.push(i);
+                setSelections({
+                    mon: [...scheduleChips.mon],
+                    tue: [...scheduleChips.tue],
+                    wed: [...scheduleChips.wed],
+                    thu: [...scheduleChips.thu],
+                    fri: [...scheduleChips.fri],
+                    sat: [...scheduleChips.sat, tmpWeekend],
+                    sun: [...scheduleChips.sun, tmpWeekend],
+                });
+                break;
+            case 'all':
+                let tmpAll = [];
+                for (let i = parseInt(start); i <= parseInt(finish); i++) tmpAll.push(i);
+                setSelections({
+                    mon: [...scheduleChips.mon, tmpAll],
+                    tue: [...scheduleChips.tue, tmpAll],
+                    wed: [...scheduleChips.wed, tmpAll],
+                    thu: [...scheduleChips.thu, tmpAll],
+                    fri: [...scheduleChips.fri, tmpAll],
+                    sat: [...scheduleChips.sat, tmpAll],
+                    sun: [...scheduleChips.sun, tmpAll],
+                });
                 break;
             default:
                 weekKor = '';
         }
 
-        let chip = `${weekKor} ${start}시~${finish}시`;
 
-        let selectedValue = selections[week].find(time => {
+
+        let selectedValue = scheduleChips[week].find(time => {
             if (time >= parseInt(start) && time <= parseInt(finish)) {
                 return time;
             } else {
@@ -342,56 +434,27 @@ const PowerLinkAutoBidContainer = () => {
             alert(`[${weekKor}요일] ${selectedValue}시는 이미 선택하셨습니다.`);
             return;
         }
-        let tmp = [...selections[week]];
-        for (let i = parseInt(start); i <= parseInt(finish); i++) {
-            console.info('for 문 내부 ::: ', i);
-            tmp.push(i);
-        }
 
-        setSelections({...selections, [week]: tmp});
-        setScheduleChips([...scheduleChips, chip]);
+
+        // for (let i = parseInt(start); i <= parseInt(finish); i++) {
+        //     console.info('for 문 내부 ::: ', i);
+        //     tmp.push(i);
+        // }
+
+        // setSelections({...selections, [week]: tmp});
+        setScheduleChips([ ...scheduleChips, scheduleChips[week]]);
     }
 
     useEffect(() => {
         console.info('scheduleChips ::: ', scheduleChips);
-        console.info('selections ::: ', selections);
-    }, [scheduleChips, selections]);
+    }, [scheduleChips]);
 
     const onDeleteChips = (item) => {
         // setScheduleChips(scheduleChips.filter(chip => chip !== item));
         scheduleChips.map(chip => {
-            const weekKor = chip.split(' ')[0];
             const start = parseInt(chip.split(' ')[1].split('~')[0].slice(0, -1));
             const finish = parseInt(chip.split(' ')[1].split('~')[1].slice(0, -1));
-            let week;
 
-            switch (weekKor) {
-                case '월':
-                    week = 'mon';
-                    break;
-                case '화':
-                    week = 'tue';
-                    break;
-                case '수':
-                    week = 'web';
-                    break;
-                case '목':
-                    week = 'thu';
-                    break;
-                case '금':
-                    week = 'fri';
-                    break;
-                case '토':
-                    week = 'sat';
-                    break;
-                case '일':
-                    week = 'sun';
-                    break;
-                default:
-                    week = '';
-            }
-
-            console.info('요일 ::: ', weekKor);
             console.info('시작 ::: ', start);
             console.info('끝 ::: ', finish);
         })
@@ -477,6 +540,8 @@ const PowerLinkAutoBidContainer = () => {
             handleSimpleScheduleSetting={handleSimpleScheduleSetting}
             handleHighScheduleSetting={handleHighScheduleSetting}
             scheduleChips={scheduleChips}
+            onAddSchedule={onAddSchedule}
+            onScheduleClick={onScheduleClick}
             onAddChips={onAddChips}
             onDeleteChips={onDeleteChips}
             selections={selections}

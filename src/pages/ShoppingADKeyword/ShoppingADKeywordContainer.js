@@ -1,4 +1,4 @@
-import React, {useEffect, useState, useReducer, useCallback} from 'react';
+import React, {useEffect, useState, useReducer, useCallback, useRef} from 'react';
 import KeywordPresenter from "../../components/keyword/KeywordPresenter";
 import * as constants from "../../utils/constants";
 import {toast} from "react-toastify";
@@ -42,6 +42,7 @@ function reducer(state, action) {
 }
 
 const ShoppingADKeywordContainer = () => {
+    const filterRef = useRef(null);
     const [state, dispatch] = useReducer(reducer, {
         loading: true,
         data: null,
@@ -52,6 +53,96 @@ const ShoppingADKeywordContainer = () => {
     const [customerList, setCustomerList] = useState([]);
     const [checked, setChecked] = useState([]);
     const [nccKeywordId, setNccKeywordId] = useState([]);
+    const [page, setPage] = React.useState(0);
+    const [rowsPerPage, setRowsPerPage] = React.useState(10);
+    const [cycleChangeOpen, setCycleChangeOpen] = useState(false);
+    const [autoBidCycle, setAutoBidCycle] = useState(5);
+    const [searchFilterOpen, setSearchFilterOpen] = useState(false);
+    const [searchFilter, setSearchFilter] = useState({
+        campaignName: "",
+        adgroupName: "",
+        keyword: "",
+        device: "",
+        activate: "",
+        targetRank: "",
+        maxBid: "",
+        bidCycle: ""
+    });
+
+    // 조회 필터 input 값
+    const onFilterChange = e => {
+        const { name, value } = e.target;
+        setSearchFilter({
+            ...searchFilter,
+            [name]: value
+        });
+    }
+
+    // 초기화
+    const onRefresh = () => {
+        setSearchFilter({
+            campaignName: "",
+            adgroupName: "",
+            keyword: "",
+            device: "",
+            activate: "",
+            targetRank: "",
+            maxBid: "",
+            bidCycle: ""
+        });
+    }
+
+    // 조회필터 검색
+    const onSearchFilter = async () => {
+        const { campaignName, adgroupName, keyword, device, activate, targetRank, maxBid, bidCycle } = searchFilter;
+
+        try {
+            const res = await SendRequest().post(`${serverPROTOCOL}${serverURL}/autobid/shopping_ad/filter?CUSTOMER_ID=${customer["CUSTOMER_ID"]}`, {
+                Campaign_name: campaignName,
+                Adgroup_name: adgroupName,
+                Keyword: keyword,
+                device: device,
+                activate: activate,
+                target_Rank: targetRank,
+                max_bid: maxBid,
+                bid_cycle: bidCycle
+            });
+
+            dispatch({ type: "RE_REQUEST", data: res.data.keywords });
+            onRefresh();
+            setSearchFilterOpen(false);
+        } catch(e) {
+            throw new Error(e);
+        }
+    }
+
+    // 조회필터 창 open / close
+    const handleFilterOpen = () => setSearchFilterOpen(true);
+    const handleFilterClose = e => {
+        if ((searchFilterOpen && (!filterRef.current || !filterRef.current.contains(e.target))) || (e.target.name === "close")) setSearchFilterOpen(false);
+
+    }
+
+    // 입찰 주기 변경 모달 open
+    const handleModalOpen = () => {
+        if (checked.length === 0) {
+            toast.error('변경하실 키워드를 선택해주세요.');
+            return;
+        }
+        setCycleChangeOpen(true);
+    }
+    // 입찰 주기 변경 모달 close
+    const handleModalClose = () => setCycleChangeOpen(false);
+
+    const handleChangePage = (e, newPage) => {
+        setPage(newPage);
+        setChecked([]);
+    }
+
+    const handleChangeRowsPerPage = e => {
+        setRowsPerPage(parseInt(e.target.value, 10));
+        setPage(0);
+    };
 
     // 광고주 select 선택
     const handleCustomerChange = useCallback(e => {
@@ -133,8 +224,10 @@ const ShoppingADKeywordContainer = () => {
         }
     }
 
+    // 체크박스 선택 checked
     const isChecked = id => checked.indexOf(id) !== -1;
 
+    // data fetching
     const fetchShoppingADData = async customerId => {
         dispatch({ type: 'LOADING' });
 
@@ -150,9 +243,32 @@ const ShoppingADKeywordContainer = () => {
         }
     }
 
-    useEffect(() => {
-        console.info('nccKeywordId :: ', nccKeywordId)
-    }, [nccKeywordId]);
+    // 정렬
+    const [order, setOrder] = useState('asc');
+    const [orderBy, setOrderBy] = useState('campaign');
+
+    const handleRequestSort = (e, property) => {
+        const isAsc = (orderBy === property) && order === 'asc';
+
+        setOrder(isAsc ? 'desc' : 'asc');
+        setOrderBy(property);
+    };
+
+    const getComparator = (order, orderBy) => {
+        return order === 'desc'
+            ? (a, b) => descendingComparator(a, b, orderBy)
+            : (a, b) => -descendingComparator(a, b, orderBy);
+    }
+
+    const descendingComparator = (a, b, orderBy) => {
+        if (b[orderBy] < a[orderBy]) {
+            return -1;
+        }
+        if (b[orderBy] > a[orderBy]) {
+            return 1;
+        }
+        return 0;
+    }
 
     useEffect(() => {
         setCustomer(JSON.parse(localStorage.getItem("customer")));

@@ -10,6 +10,17 @@ const Wrapper = styled.div`
   height: 116px;
   border-radius: 6px;
   border: 1px solid ${colors.lightBorderColor};
+  transition: 0.3s;
+  cursor: pointer;
+  
+  & + & {
+    margin-left: 20px;
+  }
+  
+  ${({ active }) => active && css`
+    transform: scale(1.1);
+    box-shadow: 0 3px 5px 3px rgba(0, 0, 0, 0.1);
+  `}
 `;
 const Top = styled.div`
   height: 36px;
@@ -55,11 +66,19 @@ const Box = styled.div`
   align-items: center;
 `;
 
-const ScheduleCard = ({bgColor, onDeleteChips}) => {
+const ScheduleCard = ({
+                          bgColor,
+                          onDeleteChips,
+                          targetRank,
+                          maxBid,
+                          minBid,
+                          active,
+                          onScheduleClick
+                      }) => {
     return (
-        <Wrapper>
+        <Wrapper active={active} onClick={onScheduleClick}>
             <Top bgColor={bgColor}>
-                <Text>1위</Text>
+                <Text>{targetRank} 위</Text>
                 <DeleteButton onClick={onDeleteChips}>
                     <Image src={chipDelete}/>
                 </DeleteButton>
@@ -71,7 +90,7 @@ const ScheduleCard = ({bgColor, onDeleteChips}) => {
                         <Image src={blueUpArrow}/>
                     </Box>
                     <Box>
-                        {2220} 원
+                        {maxBid} 원
                     </Box>
                 </Row>
 
@@ -81,7 +100,7 @@ const ScheduleCard = ({bgColor, onDeleteChips}) => {
                         <Image src={redDownArrow}/>
                     </Box>
                     <Box>
-                        {2220} 원
+                        {minBid} 원
                     </Box>
                 </Row>
             </Body>

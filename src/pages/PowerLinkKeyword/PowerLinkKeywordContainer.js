@@ -136,11 +136,13 @@ const PowerLinkKeywordContainer = () => {
     // 입찰 주기 변경 모달 close
     const handleModalClose = () => setCycleChangeOpen(false);
 
+    // 페이징
     const handleChangePage = (e, newPage) => {
         setPage(newPage);
         setChecked([]);
     }
 
+    // 페이지 row
     const handleChangeRowsPerPage = e => {
         setRowsPerPage(parseInt(e.target.value, 10));
         setPage(0);
@@ -155,7 +157,7 @@ const PowerLinkKeywordContainer = () => {
 
     const handleAllChecked = e => {
         if (e.target.checked) {
-            const newChecked = data.keywords.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map(list => list.nccKeywordId); // .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+            const newChecked = (rowsPerPage > 0 ? data.keywords.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage) : data.keywords).map(list => list.nccKeywordId);
             setChecked(newChecked);
             return;
         }
@@ -252,8 +254,10 @@ const PowerLinkKeywordContainer = () => {
         }
     }
 
+    // 체크박스 선택 checked
     const isChecked = id => checked.indexOf(id) !== -1;
 
+    // data fetching
     const fetchPowerLinkData = async customerId => {
         dispatch({type: 'LOADING'});
 
@@ -268,28 +272,6 @@ const PowerLinkKeywordContainer = () => {
             dispatch({type: 'ERROR'});
         }
     }
-
-    useEffect(() => {
-        setCustomer(JSON.parse(localStorage.getItem("customer")));
-    }, []);
-
-    useEffect(() => {
-        if (checked.length > 0) {
-            setNccKeywordId(checked.reduce((target, key, index) => {
-                target[index] = {"nccKeywordId": key};
-                return target;
-            }, []));
-        }
-    }, [checked]);
-
-    useEffect(() => {
-        if (!!customer["CUSTOMER_ID"]) fetchPowerLinkData(customer["CUSTOMER_ID"]);
-    }, [customer]);
-
-    useEffect(() => {
-        window.addEventListener('click', handleFilterClose);
-        return () => window.removeEventListener('click', handleFilterClose);
-    }, [searchFilterOpen]);
 
     // 정렬
     const [order, setOrder] = useState('asc');
@@ -317,6 +299,28 @@ const PowerLinkKeywordContainer = () => {
         }
         return 0;
     }
+
+    useEffect(() => {
+        setCustomer(JSON.parse(localStorage.getItem("customer")));
+    }, []);
+
+    useEffect(() => {
+        if (checked.length > 0) {
+            setNccKeywordId(checked.reduce((target, key, index) => {
+                target[index] = {"nccKeywordId": key};
+                return target;
+            }, []));
+        }
+    }, [checked]);
+
+    useEffect(() => {
+        if (!!customer["CUSTOMER_ID"]) fetchPowerLinkData(customer["CUSTOMER_ID"]);
+    }, [customer]);
+
+    useEffect(() => {
+        window.addEventListener('click', handleFilterClose);
+        return () => window.removeEventListener('click', handleFilterClose);
+    }, [searchFilterOpen]);
 
     useEffect(() => {
         console.info('data', data);

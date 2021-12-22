@@ -5,7 +5,6 @@ import Checkbox from '@mui/material/Checkbox';
 import Radio from '@mui/material/Radio';
 import RadioGroup from '@mui/material/RadioGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
-import Chip from '@mui/material/Chip';
 import CircularProgress from '@mui/material/CircularProgress';
 import StyledButton from "../share/StyledButton";
 import selectArrow2 from "../../assets/selectArrow2.svg";
@@ -13,7 +12,6 @@ import selectArrow3 from "../../assets/selectArrow3.svg";
 import rightArrow from "../../assets/rightArrow.svg";
 import rightLeftArrow from "../../assets/rightLeftArrow.svg";
 import delete_2 from "../../assets/delete_2.svg";
-import chipDelete from "../../assets/chipDelete.svg";
 import clock from "../../assets/clock.svg";
 import Header from "../share/Header";
 import ScheduleCard from "../share/ScheduleCard";
@@ -31,6 +29,7 @@ const Title = styled.div`
 const SelectForm = styled.div`
   display: flex;
   align-items: center;
+  margin-bottom: 20px;
 `;
 const SelectBox = styled.select`
   width: ${({width}) => width}px;
@@ -107,7 +106,7 @@ const ButtonGroup = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  margin: 60px 0 160px;
+  margin: ${({margin}) => margin ? margin : "60px 0 160px"};
 `;
 const SettingTableBox = styled.div`
   width: 100%;
@@ -162,17 +161,8 @@ const Input = styled.input`
 const ScheduleCardBox = styled.div`
   width: 100%;
   display: flex;
-  flex-wrap: wrap;
-  margin: 20px 0;
-`;
-const StyledChip = styled(Chip)`
-  padding-right: 5px !important;
-  margin-right: 10px !important;
-  background-color: ${colors.lightYellow} !important;
-
-  span {
-    color: ${colors.lightBlack};
-  }
+  flex-wrap: nowrap;
+  margin: 20px 0 30px;
 `;
 const ScheduleGraphBox = styled.div`
   width: 100%;
@@ -237,6 +227,8 @@ const AddAutoBidPresenter = ({
                                  handleSimpleScheduleSetting,
                                  handleHighScheduleSetting,
                                  scheduleChips,
+                                 onAddSchedule,
+                                 onScheduleClick,
                                  onAddChips,
                                  onDeleteChips,
                                  selections,
@@ -472,29 +464,20 @@ const AddAutoBidPresenter = ({
                                         name="target_Rank"
                                         onChange={e => onAutoBidChange(e, 'target_Rank')}
                                     >
-                                        {device === "PC" ?
-                                            <>
-                                                <option value={0}>희망순위</option>
-                                                <option value={1}>1 위</option>
-                                                <option value={2}>2 위</option>
-                                                <option value={3}>3 위</option>
-                                                <option value={4}>4 위</option>
-                                                <option value={5}>5 위</option>
-                                                <option value={6}>6 위</option>
-                                                <option value={7}>7 위</option>
-                                                <option value={8}>8 위</option>
-                                                <option value={9}>9 위</option>
-                                                <option value={10}>10 위</option>
-                                            </>
-                                            :
-                                            <>
-                                                <option value={0}>희망순위</option>
-                                                <option value={1}>1 위</option>
-                                                <option value={2}>2 위</option>
-                                                <option value={3}>3 위</option>
-                                                <option value={4}>4 위</option>
-                                                <option value={5}>5 위</option>
-                                            </>
+                                        <option value={0}>희망순위</option>
+                                        <option value={1}>1 위</option>
+                                        <option value={2}>2 위</option>
+                                        <option value={3}>3 위</option>
+                                        <option value={4}>4 위</option>
+                                        <option value={5}>5 위</option>
+                                        {device === "PC" &&
+                                        <>
+                                            <option value={6}>6 위</option>
+                                            <option value={7}>7 위</option>
+                                            <option value={8}>8 위</option>
+                                            <option value={9}>9 위</option>
+                                            <option value={10}>10 위</option>
+                                        </>
                                         }
 
                                     </SelectBox>
@@ -551,9 +534,39 @@ const AddAutoBidPresenter = ({
                         </SettingTable>
                     </SettingTableBox>
 
+
                     {radioState.simpleHigh === 1 &&
                     <>
+                        <ButtonGroup margin="20px 0 30px">
+                            <StyledButton
+                                title="스케줄 추가"
+                                width={110}
+                                height={40}
+                                borderRadius={3}
+                                fontSize={14}
+                                fontWeight={400}
+                                fontColor={colors.white}
+                                bgColor={colors.blue}
+                                onClick={onAddSchedule}
+                            />
+                        </ButtonGroup>
                         <Title>입찰 관리 스케줄 설정</Title>
+                        <ScheduleCardBox>
+                            {scheduleChips.map((chip, index) => (
+                                <ScheduleCard
+                                    key={index}
+                                    bgColor={chip.bgColor}
+                                    targetRank={chip.targetRank}
+                                    maxBid={chip.maxBid}
+                                    minBid={chip.minBid}
+                                    active={chip.active}
+                                    onScheduleClick={() => onScheduleClick(index)}
+                                />
+                            ))}
+
+                        </ScheduleCardBox>
+
+
                         <SelectForm>
                             <SelectBox width={140} bgImg={selectArrow3} name="week"
                                        onChange={handleHighScheduleSetting}>
@@ -565,6 +578,9 @@ const AddAutoBidPresenter = ({
                                 <option value="fri">금요일</option>
                                 <option value="sat">토요일</option>
                                 <option value="sun">일요일</option>
+                                <option value="weekDays">주중</option>
+                                <option value="weekend">주말</option>
+                                <option value="all">매일</option>
                             </SelectBox>
                             <SelectBox width={140} bgImg={clock} name="start" onChange={handleHighScheduleSetting}>
                                 <option value="">시작 시간</option>
@@ -587,7 +603,7 @@ const AddAutoBidPresenter = ({
                             </SelectBox>
 
                             <StyledButton
-                                title="추가하기"
+                                title="시간 설정"
                                 width={100}
                                 height={40}
                                 bgColor={colors.blue}
@@ -599,21 +615,7 @@ const AddAutoBidPresenter = ({
                             />
                         </SelectForm>
 
-                        <ScheduleCardBox>
 
-                            <ScheduleCard
-                                bgColor={colors.pastelRed}
-                            />
-
-                            {/*{scheduleChips.map(chip => (
-                                <StyledChip
-                                    key={chip}
-                                    label={chip}
-                                    onDelete={() => onDeleteChips(chip)}
-                                    deleteIcon={<Image src={chipDelete}/>}
-                                />
-                            ))}*/}
-                        </ScheduleCardBox>
                         <ScheduleGraphBox>
                             <Row bgColor={colors.bgColor}>
                                 <Cell width="150px"/>

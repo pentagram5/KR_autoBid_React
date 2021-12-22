@@ -127,7 +127,7 @@ export default function MaterialTable({
                         <TableCell padding="checkbox">
                             <Checkbox
                                 onChange={handleAllChecked}
-                                checked={tableLists.length > 0 && checked.length === rowsPerPage}
+                                checked={tableLists.length > 0 && (rowsPerPage > 0 ? checked.length === rowsPerPage : checked.length === tableLists.length)}
                             />
                         </TableCell>
                         <TableCell
@@ -254,12 +254,14 @@ export default function MaterialTable({
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {tableLists && tableLists.sort(getComparator(order, orderBy)).slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
+                    {tableLists &&
+                    (rowsPerPage > 0
+                            ? tableLists.sort(getComparator(order, orderBy)).slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                            : tableLists
+                    ).map(row => {
                         const isListChecked = isChecked(row.nccKeywordId);
 
-
-                        // console.info('row :::::: ', row);
-
+                        // console.info('row : ', row);
                         return (
                             <TableRow key={row.nccKeywordId}>
                                 <TableCell padding="checkbox" onClick={e => handleChecked(e, row.nccKeywordId)}>
