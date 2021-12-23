@@ -10,16 +10,21 @@ const Wrapper = styled.div`
   height: 116px;
   border-radius: 6px;
   border: 1px solid ${colors.lightBorderColor};
-  transition: 0.3s;
+  transition: 0.2s;
   cursor: pointer;
   
   & + & {
     margin-left: 20px;
   }
   
+  &:hover {
+    box-shadow: 0 3px 5px 3px rgba(0, 0, 0, 0.2);
+  }
+  
   ${({ active }) => active && css`
-    transform: scale(1.1);
-    box-shadow: 0 3px 5px 3px rgba(0, 0, 0, 0.1);
+    transform: scale(1.03);
+    border: 1px solid ${colors.deepGray};
+    box-shadow: 0 3px 5px 3px rgba(0, 0, 0, 0.2);
   `}
 `;
 const Top = styled.div`
@@ -28,6 +33,7 @@ const Top = styled.div`
   align-items: center;
   justify-content: space-between;
   padding: 8px 10px 8px 20px;
+  border-radius: 4px 4px 0 0;
   background-color: ${({bgColor}) => bgColor};
 `;
 const Text = styled.div`

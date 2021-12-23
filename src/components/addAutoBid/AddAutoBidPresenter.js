@@ -185,8 +185,8 @@ const Cell = styled.div`
   text-align: center;
   border: 1px solid ${colors.lightBorderColor};
 
-  ${({active}) => active && css`
-    background-color: ${colors.lightYellow};
+  ${({bgColor}) => bgColor && css`
+    background-color: ${bgColor};
   `}
 `;
 const ProgressBox = styled.div`
@@ -647,13 +647,41 @@ const AddAutoBidPresenter = ({
                             <Row>
                                 <Cell width="150px">월요일</Cell>
 
+
                                 {[...Array(24)].map((none, index) => {
+                                    let schedule = scheduleChips.map((a, rankIdx) => {
+                                        return {
+                                            rank: rankIdx + 1, bgColor: a.bgColor, time: a['mon'].find((b) => {
+                                                if (b === index)
+                                                    return true;
+                                            })
+                                        }
+                                    });
+                                    let cell = schedule.find(c => {
+                                        if (c.time === index)
+                                            return true;
+                                    });
+                                    return <Cell key={index} bgColor={cell ? cell.bgColor : undefined} />
+                                })}
+
+
+                                {/*{[...Array(24)].map((none, index) => {
+                                    if ((!!scheduleChips[index] && scheduleChips[index].mon && scheduleChips[index].mon.find(time => (time === index)) !== undefined)) {
+                                        console.info('색 :  ', scheduleChips[index].bgColor);
+                                        return <Cell key={index}
+                                                     bgColor={scheduleChips[index].bgColor && colors.pink}/>;
+                                    } else {
+                                        console.info('false :  ');
+                                        return <Cell key={index}/>;
+                                    }
+                                })}*/}
+                                {/*{[...Array(24)].map((none, index) => {
                                     if (selections.mon.find(time => (time === index)) !== undefined) {
-                                        return <Cell key={index} active={index + 1}/>;
+                                        return <Cell key={index} active={index + 1}  />;
                                     } else {
                                         return <Cell key={index}/>;
                                     }
-                                })}
+                                })}*/}
                             </Row>
                             <Row>
                                 <Cell width="150px">화요일</Cell>

@@ -317,7 +317,8 @@ export default function MaterialTable({
                 <TableFooter>
                     <TableRow>
                         <TablePagination
-                            rowsPerPageOptions={[10, 20, 30, {label: 'All', value: -1}]}
+                            // rowsPerPageOptions={[10, 20, 30, {label: 'All', value: -1}]}
+                            rowsPerPageOptions={[10, 30, 50, 100]}
                             colSpan={11}
                             count={tableLists.length}
                             rowsPerPage={rowsPerPage}

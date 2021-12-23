@@ -5,6 +5,7 @@ import SendRequest from "../../utils/SendRequest";
 import * as constants from "../../utils/constants";
 import colors from "../../styles/colors";
 import {toast} from "react-toastify";
+import {korWeekChange} from "../../utils/common";
 
 const serverPROTOCOL = constants.config.PROTOCOL;
 const serverURL = constants.config.URL;
@@ -289,8 +290,15 @@ const PowerLinkAutoBidContainer = () => {
         });
     }
 
-    const scheduleBgColor = [colors.pastelRed, colors.pastelYellow, colors.pastelGreen, colors.pastelBlue, colors. pastelPurple];
+    const scheduleBgColor = [colors.pastelRed, colors.pastelYellow, colors.pastelGreen, colors.pastelBlue, colors.pastelPurple];
     const {week, start, finish} = highSchedule;
+
+    // 스케줄 중복 data finder
+    const sameScheduleFinder = schedules => schedules.find(list => keywordOption.setting.target_Rank === list.targetRank && keywordOption.setting.max_bid === list.maxBid && keywordOption.setting.min_bid === list.minBid);
+
+    useEffect(() => {
+        console.info('keywordOption ::: ', keywordOption.setting);
+    }, [keywordOption]);
 
     // 스케줄 추가
     const onAddSchedule = () => {
@@ -299,6 +307,9 @@ const PowerLinkAutoBidContainer = () => {
             return;
         } else if (keywordOption.setting.target_Rank < 1) {
             alert('희망 순위를 설정해주세요.');
+            return;
+        } else if (sameScheduleFinder(scheduleChips)) {
+            alert('동일한 스케줄이 이미 추가되었습니다.');
             return;
         }
 
@@ -320,100 +331,87 @@ const PowerLinkAutoBidContainer = () => {
     }
 
     // 스케줄 click
-    const onScheduleClick = index => setScheduleChips( scheduleChips.map((chip, idx) => index === idx ? { ...chip, active: !chip.active } : { ...chip, active: false }));
+    const onScheduleClick = index => setScheduleChips(scheduleChips.map((chip, idx) => index === idx ? {
+        ...chip,
+        active: !chip.active
+    } : {...chip, active: false}));
 
 
     useEffect(() => {
-        console.info(scheduleChips)
+        console.info('scheduleChips : ', scheduleChips)
     }, [scheduleChips]);
 
     // 시간 설정
     const onAddChips = () => {
-        let weekKor = '';
-
         if (week === '' || start === '' || finish === '') {
             alert('요일 및 시간을 설정해주세요.');
             return;
-        }
-        if (parseInt(start) > parseInt(finish)) {
+        } else if (parseInt(start) > parseInt(finish)) {
             alert('시작시간은 종료시간보다 빠른시간을 선택해주세요.');
             return false;
         }
 
         let tmp;
+        let weekKor = '';
+        let copyChips = scheduleChips.find(item => item.active && item);
+
+        console.info(copyChips);
+
+        if (!copyChips || copyChips.length < 1) {
+            alert('추가하신 스케줄을 눌러 선택해주세요.');
+            return;
+        }
+
+
         switch (week) {
             case 'mon':
-                tmp = [...scheduleChips[week]];
-                weekKor = '월';
-                for (let i = parseInt(start); i <= parseInt(finish); i++) tmp.push(i);
-                break;
             case 'tue':
-                tmp = [...scheduleChips[week]];
-                weekKor = '화';
-                for (let i = parseInt(start); i <= parseInt(finish); i++) tmp.push(i);
-                break;
             case 'web':
-                tmp = [...scheduleChips[week]];
-                weekKor = '수';
-                for (let i = parseInt(start); i <= parseInt(finish); i++) tmp.push(i);
-                break;
             case 'thu':
-                tmp = [...scheduleChips[week]];
-                weekKor = '목';
-                for (let i = parseInt(start); i <= parseInt(finish); i++) tmp.push(i);
-                break;
             case 'fri':
-                tmp = [...scheduleChips[week]];
-                weekKor = '금';
-                for (let i = parseInt(start); i <= parseInt(finish); i++) tmp.push(i);
-                break;
             case 'sat':
-                tmp = [...scheduleChips[week]];
-                weekKor = '토';
-                for (let i = parseInt(start); i <= parseInt(finish); i++) tmp.push(i);
-                break;
             case 'sun':
-                tmp = [...scheduleChips[week]];
-                weekKor = '일';
+                tmp = [...copyChips[week]];
+                weekKor = korWeekChange(week);
                 for (let i = parseInt(start); i <= parseInt(finish); i++) tmp.push(i);
                 break;
             case 'weekDays':
                 let tmpWeekDays = [];
                 for (let i = parseInt(start); i <= parseInt(finish); i++) tmpWeekDays.push(i);
                 setSelections({
-                    mon: [...scheduleChips.mon, tmpWeekDays],
-                    tue: [...scheduleChips.tue, tmpWeekDays],
-                    wed: [...scheduleChips.wed, tmpWeekDays],
-                    thu: [...scheduleChips.thu, tmpWeekDays],
-                    fri: [...scheduleChips.fri, tmpWeekDays],
-                    sat: [...scheduleChips.sat, tmpWeekDays],
-                    sun: [...scheduleChips.sun, tmpWeekDays],
+                    mon: [...copyChips.mon, tmpWeekDays],
+                    tue: [...copyChips.tue, tmpWeekDays],
+                    wed: [...copyChips.wed, tmpWeekDays],
+                    thu: [...copyChips.thu, tmpWeekDays],
+                    fri: [...copyChips.fri, tmpWeekDays],
+                    sat: [...copyChips.sat, tmpWeekDays],
+                    sun: [...copyChips.sun, tmpWeekDays],
                 });
                 break;
             case 'weekend':
                 let tmpWeekend = [];
                 for (let i = parseInt(start); i <= parseInt(finish); i++) tmpWeekend.push(i);
                 setSelections({
-                    mon: [...scheduleChips.mon],
-                    tue: [...scheduleChips.tue],
-                    wed: [...scheduleChips.wed],
-                    thu: [...scheduleChips.thu],
-                    fri: [...scheduleChips.fri],
-                    sat: [...scheduleChips.sat, tmpWeekend],
-                    sun: [...scheduleChips.sun, tmpWeekend],
+                    mon: [...copyChips.mon],
+                    tue: [...copyChips.tue],
+                    wed: [...copyChips.wed],
+                    thu: [...copyChips.thu],
+                    fri: [...copyChips.fri],
+                    sat: [...copyChips.sat, tmpWeekend],
+                    sun: [...copyChips.sun, tmpWeekend],
                 });
                 break;
             case 'all':
                 let tmpAll = [];
                 for (let i = parseInt(start); i <= parseInt(finish); i++) tmpAll.push(i);
                 setSelections({
-                    mon: [...scheduleChips.mon, tmpAll],
-                    tue: [...scheduleChips.tue, tmpAll],
-                    wed: [...scheduleChips.wed, tmpAll],
-                    thu: [...scheduleChips.thu, tmpAll],
-                    fri: [...scheduleChips.fri, tmpAll],
-                    sat: [...scheduleChips.sat, tmpAll],
-                    sun: [...scheduleChips.sun, tmpAll],
+                    mon: [...copyChips.mon, tmpAll],
+                    tue: [...copyChips.tue, tmpAll],
+                    wed: [...copyChips.wed, tmpAll],
+                    thu: [...copyChips.thu, tmpAll],
+                    fri: [...copyChips.fri, tmpAll],
+                    sat: [...copyChips.sat, tmpAll],
+                    sun: [...copyChips.sun, tmpAll],
                 });
                 break;
             default:
@@ -421,13 +419,11 @@ const PowerLinkAutoBidContainer = () => {
         }
 
 
-
-        let selectedValue = scheduleChips[week].find(time => {
-            if (time >= parseInt(start) && time <= parseInt(finish)) {
+        let selectedValue = copyChips[week].find(time => {
+            if (time >= parseInt(start) && time <= parseInt(finish))
                 return time;
-            } else {
+            else
                 return false;
-            }
         });
 
         if (selectedValue) {
@@ -435,29 +431,22 @@ const PowerLinkAutoBidContainer = () => {
             return;
         }
 
+        copyChips = {...copyChips, [week]: tmp};
 
         // for (let i = parseInt(start); i <= parseInt(finish); i++) {
         //     console.info('for 문 내부 ::: ', i);
         //     tmp.push(i);
         // }
-
         // setSelections({...selections, [week]: tmp});
-        setScheduleChips([ ...scheduleChips, scheduleChips[week]]);
-    }
 
-    useEffect(() => {
-        console.info('scheduleChips ::: ', scheduleChips);
-    }, [scheduleChips]);
+        setScheduleChips(scheduleChips.map(item => item.active === copyChips.active ? copyChips : item ));
+    }
 
     const onDeleteChips = (item) => {
         // setScheduleChips(scheduleChips.filter(chip => chip !== item));
         scheduleChips.map(chip => {
-            const start = parseInt(chip.split(' ')[1].split('~')[0].slice(0, -1));
-            const finish = parseInt(chip.split(' ')[1].split('~')[1].slice(0, -1));
-
-            console.info('시작 ::: ', start);
-            console.info('끝 ::: ', finish);
-        })
+            console.info('chip ::: ', chip);
+        });
     }
 
     const onCancel = () => {
