@@ -114,9 +114,9 @@ export default function MaterialTable({
                                           handleChangeRowsPerPage,
                                       }) {
 
-
+    // 남는 column row 채우기
     const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - tableLists.length) : 0;
-
+    // 정렬 handler
     const createSortHandler = property => e => handleRequestSort(e, property);
 
     return (
@@ -293,11 +293,13 @@ export default function MaterialTable({
                                 <TableCell>
                                     {parseInt(row.current_bid).toLocaleString()} 원
                                 </TableCell>
+
                                 {/*  88 순위밖, 99 - */}
                                 <TableCell>
-                                    {(row.current_rank !== 99 && row.current_rank !== 88) && row.current_rank}
-                                    {(row.current_rank === 99 && row.current_rank !== 88) && '스케줄 밖'}
-                                    {(row.current_rank === 88 && row.current_rank !== 99) && '순위 밖'}
+                                    {(row.current_rank !== 55 && row.current_rank !== 66 && row.current_rank !== 77) && row.current_rank}
+                                    {(row.current_rank === 55 && row.current_rank !== 66 && row.current_rank !== 77) && '순위 밖'}
+                                    {(row.current_rank === 66 && row.current_rank !== 55 && row.current_rank !== 77) && '실행 전'}
+                                    {(row.current_rank === 77 && row.current_rank !== 55 && row.current_rank !== 66) && '스케줄 밖'}
                                 </TableCell>
                                 <TableCell>
                                     {!!row.activate ? '활성화' : '비활성화'}

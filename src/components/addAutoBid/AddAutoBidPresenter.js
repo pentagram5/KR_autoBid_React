@@ -550,20 +550,21 @@ const AddAutoBidPresenter = ({
                                 onClick={onAddSchedule}
                             />
                         </ButtonGroup>
+
                         <Title>입찰 관리 스케줄 설정</Title>
                         <ScheduleCardBox>
                             {scheduleChips.map((chip, index) => (
                                 <ScheduleCard
-                                    key={index}
+                                    key={chip.id}
                                     bgColor={chip.bgColor}
                                     targetRank={chip.targetRank}
                                     maxBid={chip.maxBid}
                                     minBid={chip.minBid}
                                     active={chip.active}
-                                    onScheduleClick={() => onScheduleClick(index)}
+                                    onDeleteChips={() => onDeleteChips(chip.id)}
+                                    onScheduleClick={() => onScheduleClick(chip.id)}
                                 />
                             ))}
-
                         </ScheduleCardBox>
 
 
@@ -596,8 +597,8 @@ const AddAutoBidPresenter = ({
                                 <option value="">종료 시간</option>
                                 {[...Array(24)].map((none, index) => {
                                     return (
-                                        <option key={index < 9 ? `0${index + 1}` : index + 1}
-                                                value={index < 9 ? `0${index + 1}` : index + 1}>{index < 9 ? `0${index + 1}` : index + 1}시</option>
+                                        <option key={index < 9 ? `0${index}` : index}
+                                                value={index < 9 ? `0${index}` : index}>{index < 9 ? `0${index + 1}` : index + 1}시</option>
                                     )
                                 })}
                             </SelectBox>
@@ -647,7 +648,6 @@ const AddAutoBidPresenter = ({
                             <Row>
                                 <Cell width="150px">월요일</Cell>
 
-
                                 {[...Array(24)].map((none, index) => {
                                     let schedule = scheduleChips.map((a, rankIdx) => {
                                         return {
@@ -663,84 +663,113 @@ const AddAutoBidPresenter = ({
                                     });
                                     return <Cell key={index} bgColor={cell ? cell.bgColor : undefined} />
                                 })}
-
-
-                                {/*{[...Array(24)].map((none, index) => {
-                                    if ((!!scheduleChips[index] && scheduleChips[index].mon && scheduleChips[index].mon.find(time => (time === index)) !== undefined)) {
-                                        console.info('색 :  ', scheduleChips[index].bgColor);
-                                        return <Cell key={index}
-                                                     bgColor={scheduleChips[index].bgColor && colors.pink}/>;
-                                    } else {
-                                        console.info('false :  ');
-                                        return <Cell key={index}/>;
-                                    }
-                                })}*/}
-                                {/*{[...Array(24)].map((none, index) => {
-                                    if (selections.mon.find(time => (time === index)) !== undefined) {
-                                        return <Cell key={index} active={index + 1}  />;
-                                    } else {
-                                        return <Cell key={index}/>;
-                                    }
-                                })}*/}
                             </Row>
                             <Row>
                                 <Cell width="150px">화요일</Cell>
                                 {[...Array(24)].map((none, index) => {
-                                    if (selections.tue.find(time => (time === index)) !== undefined) {
-                                        return <Cell key={index} active={index + 1}/>;
-                                    } else {
-                                        return <Cell key={index}/>;
-                                    }
+                                    let schedule = scheduleChips.map((a, rankIdx) => {
+                                        return {
+                                            rank: rankIdx + 1, bgColor: a.bgColor, time: a['tue'].find((b) => {
+                                                if (b === index)
+                                                    return true;
+                                            })
+                                        }
+                                    });
+                                    let cell = schedule.find(c => {
+                                        if (c.time === index)
+                                            return true;
+                                    });
+                                    return <Cell key={index} bgColor={cell ? cell.bgColor : undefined} />
                                 })}
                             </Row>
                             <Row>
                                 <Cell width="150px">수요일</Cell>
                                 {[...Array(24)].map((none, index) => {
-                                    if (selections.wed.find(time => (time === index)) !== undefined) {
-                                        return <Cell key={index} active={index + 1}/>;
-                                    } else {
-                                        return <Cell key={index}/>;
-                                    }
+                                    let schedule = scheduleChips.map((a, rankIdx) => {
+                                        return {
+                                            rank: rankIdx + 1, bgColor: a.bgColor, time: a['wed'].find((b) => {
+                                                if (b === index)
+                                                    return true;
+                                            })
+                                        }
+                                    });
+                                    let cell = schedule.find(c => {
+                                        if (c.time === index)
+                                            return true;
+                                    });
+                                    return <Cell key={index} bgColor={cell ? cell.bgColor : undefined} />
                                 })}
                             </Row>
                             <Row>
                                 <Cell width="150px">목요일</Cell>
                                 {[...Array(24)].map((none, index) => {
-                                    if (selections.thu.find(time => (time === index)) !== undefined) {
-                                        return <Cell key={index} active={index + 1}/>;
-                                    } else {
-                                        return <Cell key={index}/>;
-                                    }
+                                    let schedule = scheduleChips.map((a, rankIdx) => {
+                                        return {
+                                            rank: rankIdx + 1, bgColor: a.bgColor, time: a['thu'].find((b) => {
+                                                if (b === index)
+                                                    return true;
+                                            })
+                                        }
+                                    });
+                                    let cell = schedule.find(c => {
+                                        if (c.time === index)
+                                            return true;
+                                    });
+                                    return <Cell key={index} bgColor={cell ? cell.bgColor : undefined} />
                                 })}
                             </Row>
                             <Row>
                                 <Cell width="150px">금요일</Cell>
                                 {[...Array(24)].map((none, index) => {
-                                    if (selections.fri.find(time => (time === index)) !== undefined) {
-                                        return <Cell key={index} active={index + 1}/>;
-                                    } else {
-                                        return <Cell key={index}/>;
-                                    }
+                                    let schedule = scheduleChips.map((a, rankIdx) => {
+                                        return {
+                                            rank: rankIdx + 1, bgColor: a.bgColor, time: a['fri'].find((b) => {
+                                                if (b === index)
+                                                    return true;
+                                            })
+                                        }
+                                    });
+                                    let cell = schedule.find(c => {
+                                        if (c.time === index)
+                                            return true;
+                                    });
+                                    return <Cell key={index} bgColor={cell ? cell.bgColor : undefined} />
                                 })}
                             </Row>
                             <Row>
                                 <Cell width="150px">토요일</Cell>
                                 {[...Array(24)].map((none, index) => {
-                                    if (selections.sat.find(time => (time === index)) !== undefined) {
-                                        return <Cell key={index} active={index + 1}/>;
-                                    } else {
-                                        return <Cell key={index}/>;
-                                    }
+                                    let schedule = scheduleChips.map((a, rankIdx) => {
+                                        return {
+                                            rank: rankIdx + 1, bgColor: a.bgColor, time: a['sat'].find((b) => {
+                                                if (b === index)
+                                                    return true;
+                                            })
+                                        }
+                                    });
+                                    let cell = schedule.find(c => {
+                                        if (c.time === index)
+                                            return true;
+                                    });
+                                    return <Cell key={index} bgColor={cell ? cell.bgColor : undefined} />
                                 })}
                             </Row>
                             <Row>
                                 <Cell width="150px">일요일</Cell>
                                 {[...Array(24)].map((none, index) => {
-                                    if (selections.sun.find(time => (time === index)) !== undefined) {
-                                        return <Cell key={index} active={index + 1}/>;
-                                    } else {
-                                        return <Cell key={index}/>;
-                                    }
+                                    let schedule = scheduleChips.map((a, rankIdx) => {
+                                        return {
+                                            rank: rankIdx + 1, bgColor: a.bgColor, time: a['sun'].find((b) => {
+                                                if (b === index)
+                                                    return true;
+                                            })
+                                        }
+                                    });
+                                    let cell = schedule.find(c => {
+                                        if (c.time === index)
+                                            return true;
+                                    });
+                                    return <Cell key={index} bgColor={cell ? cell.bgColor : undefined} />
                                 })}
                             </Row>
                         </ScheduleGraphBox>

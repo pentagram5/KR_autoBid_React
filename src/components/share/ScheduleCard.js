@@ -12,6 +12,7 @@ const Wrapper = styled.div`
   border: 1px solid ${colors.lightBorderColor};
   transition: 0.2s;
   cursor: pointer;
+  position: relative;
   
   & + & {
     margin-left: 20px;
@@ -29,9 +30,6 @@ const Wrapper = styled.div`
 `;
 const Top = styled.div`
   height: 36px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
   padding: 8px 10px 8px 20px;
   border-radius: 4px 4px 0 0;
   background-color: ${({bgColor}) => bgColor};
@@ -47,6 +45,9 @@ const Text = styled.div`
 const DeleteButton = styled.div`
   width: 18px;
   height: 18px;
+  position: absolute;
+  top: 10px;
+  right: 10px;
 `;
 const Image = styled.img`
   width: 100%;
@@ -82,14 +83,14 @@ const ScheduleCard = ({
                           onScheduleClick
                       }) => {
     return (
-        <Wrapper active={active} onClick={onScheduleClick}>
-            <Top bgColor={bgColor}>
+        <Wrapper active={active}>
+            <DeleteButton onClick={onDeleteChips}>
+                <Image src={chipDelete}/>
+            </DeleteButton>
+            <Top bgColor={bgColor} onClick={onScheduleClick}>
                 <Text>{targetRank} 위</Text>
-                <DeleteButton onClick={onDeleteChips}>
-                    <Image src={chipDelete}/>
-                </DeleteButton>
             </Top>
-            <Body>
+            <Body onClick={onScheduleClick}>
                 <Row>
                     <Box>
                         <Text marginRight={6}>최대</Text>

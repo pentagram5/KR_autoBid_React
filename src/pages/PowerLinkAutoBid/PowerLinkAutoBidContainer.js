@@ -50,6 +50,26 @@ const PowerLinkAutoBidContainer = () => {
             bid_adj_amount: 0,
         }
     });
+    const [highKeywordOption, setHighKeywordOption] = useState([]);
+
+    useEffect(() => {
+        if (radioState.simpleHigh === 1) {
+            setKeywordOption({
+               ...keywordOption,
+               setting: {
+                   ...keywordOption.setting,
+                   mon: '0',
+                   tue: '0',
+                   wed: '0',
+                   thu: '0',
+                   fri: '0',
+                   sat: '0',
+                   sun: '0',
+               }
+            });
+        }
+    }, [radioState]);
+
 
     // 간편 설정 요일, 시간 설정
     const handleSimpleScheduleSetting = useCallback((e, type) => {
@@ -266,11 +286,6 @@ const PowerLinkAutoBidContainer = () => {
         sun: [],
     });
 
-    // 나중에 보낼때
-    let mondaySelectionFlag = 0;
-    selections.mon.forEach((x, i) => mondaySelectionFlag += Math.pow(2, x));
-    // console.info("monday2 ", mondaySelectionFlag2);
-
     // 입찰 관리 스케줄 고급 설정
     const [highSchedule, setHighSchedule] = useState({
         week: '',
@@ -296,13 +311,12 @@ const PowerLinkAutoBidContainer = () => {
     // 스케줄 중복 data finder
     const sameScheduleFinder = schedules => schedules.find(list => keywordOption.setting.target_Rank === list.targetRank && keywordOption.setting.max_bid === list.maxBid && keywordOption.setting.min_bid === list.minBid);
 
-    useEffect(() => {
-        console.info('keywordOption ::: ', keywordOption.setting);
-    }, [keywordOption]);
-
     // 스케줄 추가
     const onAddSchedule = () => {
-        if (scheduleChips.length > 4) {
+        if (keywordOption.keyword_info.length === 0) {
+            alert('등록하실 키워드를 추가해주세요.');
+            return;
+        } else if (scheduleChips.length > 4) {
             alert('스케줄은 한번에 최대 5개까지 설정할 수 있습니다.');
             return;
         } else if (keywordOption.setting.target_Rank < 1) {
@@ -314,6 +328,7 @@ const PowerLinkAutoBidContainer = () => {
         }
 
         let chip = {
+            id: keywordOption.setting.target_Rank + '-' + keywordOption.setting.max_bid + '-' + keywordOption.setting.min_bid,
             targetRank: keywordOption.setting.target_Rank,
             maxBid: keywordOption.setting.max_bid,
             minBid: keywordOption.setting.min_bid,
@@ -331,19 +346,21 @@ const PowerLinkAutoBidContainer = () => {
     }
 
     // 스케줄 click
-    const onScheduleClick = index => setScheduleChips(scheduleChips.map((chip, idx) => index === idx ? {
+    const onScheduleClick = id => setScheduleChips(scheduleChips.map(chip => id === chip.id ? {
         ...chip,
         active: !chip.active
     } : {...chip, active: false}));
 
-
-    useEffect(() => {
-        console.info('scheduleChips : ', scheduleChips)
-    }, [scheduleChips]);
-
     // 시간 설정
     const onAddChips = () => {
-        if (week === '' || start === '' || finish === '') {
+        let tmp;
+        let weekKor = '';
+        let copyChips = scheduleChips.find(item => item.active && item);
+
+        if (!copyChips || copyChips.length < 1) {
+            alert('추가하신 스케줄을 눌러 선택해주세요.');
+            return;
+        } else if (week === '' || start === '' || finish === '') {
             alert('요일 및 시간을 설정해주세요.');
             return;
         } else if (parseInt(start) > parseInt(finish)) {
@@ -351,22 +368,10 @@ const PowerLinkAutoBidContainer = () => {
             return false;
         }
 
-        let tmp;
-        let weekKor = '';
-        let copyChips = scheduleChips.find(item => item.active && item);
-
-        console.info(copyChips);
-
-        if (!copyChips || copyChips.length < 1) {
-            alert('추가하신 스케줄을 눌러 선택해주세요.');
-            return;
-        }
-
-
         switch (week) {
             case 'mon':
             case 'tue':
-            case 'web':
+            case 'wed':
             case 'thu':
             case 'fri':
             case 'sat':
@@ -378,7 +383,8 @@ const PowerLinkAutoBidContainer = () => {
             case 'weekDays':
                 let tmpWeekDays = [];
                 for (let i = parseInt(start); i <= parseInt(finish); i++) tmpWeekDays.push(i);
-                setSelections({
+                copyChips = {
+                    ...copyChips,
                     mon: [...copyChips.mon, tmpWeekDays],
                     tue: [...copyChips.tue, tmpWeekDays],
                     wed: [...copyChips.wed, tmpWeekDays],
@@ -386,12 +392,12 @@ const PowerLinkAutoBidContainer = () => {
                     fri: [...copyChips.fri, tmpWeekDays],
                     sat: [...copyChips.sat, tmpWeekDays],
                     sun: [...copyChips.sun, tmpWeekDays],
-                });
+                };
                 break;
             case 'weekend':
                 let tmpWeekend = [];
                 for (let i = parseInt(start); i <= parseInt(finish); i++) tmpWeekend.push(i);
-                setSelections({
+                copyChips = {
                     mon: [...copyChips.mon],
                     tue: [...copyChips.tue],
                     wed: [...copyChips.wed],
@@ -399,12 +405,12 @@ const PowerLinkAutoBidContainer = () => {
                     fri: [...copyChips.fri],
                     sat: [...copyChips.sat, tmpWeekend],
                     sun: [...copyChips.sun, tmpWeekend],
-                });
+                };
                 break;
             case 'all':
                 let tmpAll = [];
                 for (let i = parseInt(start); i <= parseInt(finish); i++) tmpAll.push(i);
-                setSelections({
+                copyChips = {
                     mon: [...copyChips.mon, tmpAll],
                     tue: [...copyChips.tue, tmpAll],
                     wed: [...copyChips.wed, tmpAll],
@@ -412,64 +418,98 @@ const PowerLinkAutoBidContainer = () => {
                     fri: [...copyChips.fri, tmpAll],
                     sat: [...copyChips.sat, tmpAll],
                     sun: [...copyChips.sun, tmpAll],
-                });
+                };
                 break;
             default:
                 weekKor = '';
         }
 
+        console.info(':::: ', copyChips);
 
-        let selectedValue = copyChips[week].find(time => {
+        // 중복체크
+        let weekAllSchedule = [];
+        scheduleChips.map(item => item[week].forEach(time => !!time && weekAllSchedule.push(time)));
+        let weekDuplicateChecker = weekAllSchedule.find(time => {
             if (time >= parseInt(start) && time <= parseInt(finish))
                 return time;
             else
                 return false;
         });
 
-        if (selectedValue) {
-            alert(`[${weekKor}요일] ${selectedValue}시는 이미 선택하셨습니다.`);
+        if (weekDuplicateChecker) {
+            alert(`[${weekKor}요일] ${weekDuplicateChecker}시는 이미 선택하셨습니다.`);
             return;
         }
 
         copyChips = {...copyChips, [week]: tmp};
 
-        // for (let i = parseInt(start); i <= parseInt(finish); i++) {
-        //     console.info('for 문 내부 ::: ', i);
-        //     tmp.push(i);
-        // }
-        // setSelections({...selections, [week]: tmp});
+        let schedules = scheduleChips.map(item => item.active === copyChips.active ? copyChips : item );
+        setScheduleChips(schedules);
 
-        setScheduleChips(scheduleChips.map(item => item.active === copyChips.active ? copyChips : item ));
-    }
 
-    const onDeleteChips = (item) => {
-        // setScheduleChips(scheduleChips.filter(chip => chip !== item));
-        scheduleChips.map(chip => {
-            console.info('chip ::: ', chip);
+        // 보낼 양식 데이터 상태에 저장
+        let finalArray = [];
+        let finalData = {};
+
+        const getCalculatedValue = (item, weekday) => {
+            let rtn = 0;
+            item[weekday].map( a => {
+                rtn += Math.pow(2, a );
+            });
+            return rtn;
+        };
+
+        schedules.forEach(item => {
+            finalData = {
+                keyword_info: keywordOption.keyword_info,
+                device: keywordOption.device,
+                bid_cycle: keywordOption.bid_cycle,
+                setting: {
+                    mon: getCalculatedValue(item, 'mon').toString(),
+                    tue: getCalculatedValue(item, 'tue').toString(),
+                    wed: getCalculatedValue(item, 'wed').toString(),
+                    thu: getCalculatedValue(item, 'thu').toString(),
+                    fri: getCalculatedValue(item, 'fri').toString(),
+                    sat: getCalculatedValue(item, 'sat').toString(),
+                    sun: getCalculatedValue(item, 'sun').toString(),
+                    target_Rank: item.targetRank,
+                    max_bid: item.maxBid,
+                    min_bid: item.minBid,
+                    bid_adj_amount: '0', // item.bidAdjAount,
+                }
+            }
+            finalArray.push(finalData);
         });
+        setHighKeywordOption(finalArray);
     }
 
+    // 스케줄카드 삭제
+    const onDeleteChips = id => setScheduleChips(scheduleChips.filter(chip => id !== chip.id));
+
+    // 취소
     const onCancel = () => {
         window.location.reload();
     }
 
+
+    // 자동입찰 등록
     const onAddAutoBid = async () => {
-        if (keywordOption.keyword_info.length === 0) {
-            alert('등록하실 키워드를 추가해주세요.');
-            return;
-        } else if (!keywordOption.setting.target_Rank) {
+        if (!keywordOption.setting.target_Rank) {
             alert('희망 순위를 설정해주세요.');
             return;
         }
-
         setLoading(true);
+
         try {
-            const response = await SendRequest().post(`${serverPROTOCOL}${serverURL}/autobid/powerlink?CUSTOMER_ID=${customer["CUSTOMER_ID"]}`, [keywordOption]);
+            const response = await SendRequest().post(`${serverPROTOCOL}${serverURL}/autobid/powerlink?CUSTOMER_ID=${customer["CUSTOMER_ID"]}`, radioState.simpleHigh === 0 ? [keywordOption] : highKeywordOption);
 
             console.info(response);
             if (response.status === 200) {
                 setLoading(false);
 
+                setKeywordList([]);
+                setSettingList([]);
+                setScheduleChips([]);
                 setKeywordOption({
                     keyword_info: [],
                     device: "PC",
@@ -488,13 +528,15 @@ const PowerLinkAutoBidContainer = () => {
                         bid_adj_amount: 0,
                     }
                 });
-                setKeywordList([]);
             }
-
         } catch (e) {
             throw new Error(e);
         }
     }
+
+    useEffect(() => {
+        console.info('keywordList ? ::: ', keywordList);
+    }, [keywordList]);
 
     useEffect(() => {
         setKeywordOption({
