@@ -1,8 +1,9 @@
 import React, {useEffect, useState, useReducer, useCallback, useRef} from 'react';
 import KeywordPresenter from "../../components/keyword/KeywordPresenter";
-import * as constants from "../../utils/constants";
 import {toast} from "react-toastify";
 import SendRequest from "../../utils/SendRequest";
+import * as constants from "../../utils/constants";
+import {useNavigate} from "react-router-dom";
 
 const serverPROTOCOL = constants.config.PROTOCOL;
 const serverURL = constants.config.URL;
@@ -41,14 +42,15 @@ function reducer(state, action) {
     }
 }
 
-const ShoppingADKeywordContainer = () => {
+const PowerLinkKeywordContainer = () => {
+    const navigator = useNavigate();
     const filterRef = useRef(null);
     const [state, dispatch] = useReducer(reducer, {
         loading: true,
         data: null,
         error: false
     });
-    const { loading, data, error } = state;
+    const {loading, data, error} = state;
     const [customer, setCustomer] = useState({});
     const [customerList, setCustomerList] = useState([]);
     const [checked, setChecked] = useState([]);
@@ -71,7 +73,8 @@ const ShoppingADKeywordContainer = () => {
 
     // 조회 필터 input 값
     const onFilterChange = e => {
-        const { name, value } = e.target;
+        let { name, value } = e.target;
+        if (name === "maxBid") value = value.replace(/[^-0-9]/g,'');
         setSearchFilter({
             ...searchFilter,
             [name]: value
@@ -79,7 +82,7 @@ const ShoppingADKeywordContainer = () => {
     }
 
     // 초기화
-    const onRefresh = () => {
+    const onFilterReset = () => {
         setSearchFilter({
             campaignName: "",
             adgroupName: "",
@@ -97,7 +100,7 @@ const ShoppingADKeywordContainer = () => {
         const { campaignName, adgroupName, keyword, device, activate, targetRank, maxBid, bidCycle } = searchFilter;
 
         try {
-            const res = await SendRequest().post(`${serverPROTOCOL}${serverURL}/autobid/shopping_ad/filter?CUSTOMER_ID=${customer["CUSTOMER_ID"]}`, {
+            const res = await SendRequest().post(`${serverPROTOCOL}${serverURL}/autobid/powerlink/filter?CUSTOMER_ID=${customer["CUSTOMER_ID"]}`, {
                 Campaign_name: campaignName,
                 Adgroup_name: adgroupName,
                 Keyword: keyword,
@@ -108,8 +111,13 @@ const ShoppingADKeywordContainer = () => {
                 bid_cycle: bidCycle
             });
 
+            if (res.data.keywords.length === 0) {
+                toast.error('검색 결과가 없습니다.');
+                return;
+            }
+
             dispatch({ type: "RE_REQUEST", data: res.data.keywords });
-            onRefresh();
+            onFilterReset();
             setSearchFilterOpen(false);
         } catch(e) {
             throw new Error(e);
@@ -134,11 +142,13 @@ const ShoppingADKeywordContainer = () => {
     // 입찰 주기 변경 모달 close
     const handleModalClose = () => setCycleChangeOpen(false);
 
+    // 페이징
     const handleChangePage = (e, newPage) => {
         setPage(newPage);
         setChecked([]);
     }
 
+    // 페이지 row
     const handleChangeRowsPerPage = e => {
         setRowsPerPage(parseInt(e.target.value, 10));
         setPage(0);
@@ -153,73 +163,108 @@ const ShoppingADKeywordContainer = () => {
 
     const handleAllChecked = e => {
         if (e.target.checked) {
-            const newChecked = data.keywords.map(list => list.nccKeywordId);
+            const newChecked = (rowsPerPage > 0 ? data.keywords.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage) : data.keywords).map(list => list.nccKeywordId);
             setChecked(newChecked);
             return;
         }
         setChecked([]);
     }
 
+    // 체크박스 체크
     const handleChecked = (e, id) => {
         const checkedIndex = checked.indexOf(id);
         let newChecked = [];
 
         if (checkedIndex === -1) newChecked = newChecked.concat(checked, id)
         else if (checkedIndex === 0) newChecked = newChecked.concat(checked.slice(1));
-        else if (checkedIndex === checked.length -1) newChecked = newChecked.concat(checked.slice(0, -1));
+        else if (checkedIndex === checked.length - 1) newChecked = newChecked.concat(checked.slice(0, -1));
         else if (checkedIndex > 0) newChecked = newChecked.concat(checked.slice(0, checkedIndex), checked.slice(checkedIndex + 1));
 
         setChecked(newChecked);
     }
 
+    // 자동입찰 활성화 / 비활성화
     const handleAutoBidActive = async (type) => {
-        if (checked.length === 0 ) {
+        if (checked.length === 0) {
             toast.error(`${type === "active" ? "활성화" : "비활성화"} 할 키워드를 선택해주세요.`);
             return;
         }
         try {
-            const { data } = await SendRequest().put(`${serverPROTOCOL}${serverURL}/autobid/shopping_ad/activate?CUSTOMER_ID=${customer["CUSTOMER_ID"]}&activate=${(type === "active")}`, nccKeywordId);
-            dispatch({ type: 'RE_REQUEST', data: data.keywords });
+            const {data} = await SendRequest().put(`${serverPROTOCOL}${serverURL}/autobid/powerlink/activate?CUSTOMER_ID=${customer["CUSTOMER_ID"]}&activate=${(type === "active")}`, nccKeywordId);
+            dispatch({type: 'RE_REQUEST', data: data.keywords});
 
             if (data.done) {
                 toast.info(`선택하신 키워드가 ${type === "active" ? "활성화" : "비활성화"} 되었습니다.`);
+            }
+        } catch (e) {
+            throw new Error(e);
+        }
+    }
+
+    // 자동입찰 설정 - 수정 페이지로 이동
+    const handleUpdateAutoBid = () => {
+        navigator('/powerLinkUpdate');
+        localStorage.setItem("checked", checked);
+    }
+
+    // 자동입찰 삭제
+    const handleDeleteAutoBid = async () => {
+        if (checked.length === 0) {
+            toast.error('삭제할 키워드를 선택해주세요.');
+            return;
+        }
+        if (window.confirm("정말 삭제하시겠습니까?")) {
+            try {
+                const res = await SendRequest().delete(`${serverPROTOCOL}${serverURL}/autobid/powerlink/delete?CUSTOMER_ID=${customer["CUSTOMER_ID"]}`, {data: nccKeywordId});
+                if (res.status === 200) {
+                    dispatch({type: 'SUCCESS', data: res.data});
+                    toast.info('선택한 키워드를 삭제하였습니다.');
+                }
+            } catch (e) {
+                throw new Error(e);
+            }
+        }
+    }
+
+    const onAutoBidCycleChange = useCallback(e => setAutoBidCycle(e.target.value), []);
+
+    // 입찰 주기 변경
+    const handleChangeAutoBidCycle = async () => {
+        try {
+            const { data } = await SendRequest().put(`${serverPROTOCOL}${serverURL}/autobid/powerlink/cycle?CUSTOMER_ID=${customer["CUSTOMER_ID"]}&cycle=${autoBidCycle}`, nccKeywordId);
+
+            if (!!data) {
+                toast.info('선택한 키워드의 주기를 변경하였습니다.');
+                dispatch({ type: 'SUCCESS', data: data });
+                setCycleChangeOpen(false);
+                setAutoBidCycle(5);
+                setChecked([]);
             }
         } catch(e) {
             throw new Error(e);
         }
     }
 
-    const handleDeleteAutoBid = async () => {
-        if (checked.length === 0 ) {
-            toast.error('삭제할 키워드를 선택해주세요.');
-            return;
-        }
-        if (window.confirm("정말 삭제하시겠습니까?")) {
-            try {
-                const res = await SendRequest().delete(`${serverPROTOCOL}${serverURL}/autobid/shopping_ad/delete?CUSTOMER_ID=${customer["CUSTOMER_ID"]}`, {data: nccKeywordId});
-                console.info('res', res);
-                if (res.status === 200) {
-                    dispatch({ type: 'SUCCESS', data: res.data });
-                    toast.info('선택한 키워드를 삭제하였습니다.');
-                }
-            } catch(e) {
-                throw new Error(e);
-            }
-        }
-    }
-
+    // 다운로드
     const handleDownload = async () => {
-        const config = {
-            responseType: "blob",
-        }
         try {
-            const res = await SendRequest().get(`${serverPROTOCOL}${serverURL}/autobid/shopping_ad/download?CUSTOMER_ID=${customer["CUSTOMER_ID"]}`, config);
-            const url = window.URL.createObjectURL(new Blob([res.data]));
+            const res = await SendRequest().get(`${serverPROTOCOL}${serverURL}/autobid/powerlink/download?CUSTOMER_ID=${customer["CUSTOMER_ID"]}`, {
+                responseType: "blob",
+            });
+            const url = window.URL.createObjectURL(new Blob([res.data], {
+                type: res.headers['content-type'],
+            }));
 
-            console.info('res', res);
-            console.info('url', url);
+            const fileName = res.headers["content-disposition"].split("=")[1];
+            let link = document.createElement('a');
 
-        } catch(e) {
+            link.href = url;
+            link.download = fileName;
+            link.target = '_blank';
+            link.click();
+            window.URL.revokeObjectURL(link);
+            link.remove();
+        } catch (e) {
             throw new Error(e);
         }
     }
@@ -228,18 +273,18 @@ const ShoppingADKeywordContainer = () => {
     const isChecked = id => checked.indexOf(id) !== -1;
 
     // data fetching
-    const fetchShoppingADData = async customerId => {
-        dispatch({ type: 'LOADING' });
+    const fetchPowerLinkData = async customerId => {
+        dispatch({type: 'LOADING'});
 
         try {
-            const shopping_adResponse = await SendRequest().get(`${serverPROTOCOL}${serverURL}/autobid/shopping_ad?CUSTOMER_ID=${customerId}`);
+            const powerLinkResponse = await SendRequest().get(`${serverPROTOCOL}${serverURL}/autobid/powerlink?CUSTOMER_ID=${customerId}`);
             const customerResponse = await SendRequest().get(`${serverPROTOCOL}${serverURL}/autobid/id`);
 
-            dispatch({ type: 'SUCCESS', data: shopping_adResponse.data });
+            dispatch({type: 'SUCCESS', data: powerLinkResponse.data});
             setCustomerList(customerResponse.data.id_info);
 
-        } catch(e) {
-            dispatch({ type: 'ERROR' });
+        } catch (e) {
+            dispatch({type: 'ERROR'});
         }
     }
 
@@ -284,13 +329,21 @@ const ShoppingADKeywordContainer = () => {
     }, [checked]);
 
     useEffect(() => {
-        if (!!customer["CUSTOMER_ID"]) fetchShoppingADData(customer["CUSTOMER_ID"]);
+        if (!!customer["CUSTOMER_ID"]) fetchPowerLinkData(customer["CUSTOMER_ID"]);
     }, [customer]);
 
+    useEffect(() => {
+        window.addEventListener('click', handleFilterClose);
+        return () => window.removeEventListener('click', handleFilterClose);
+    }, [searchFilterOpen]);
+
+    useEffect(() => {
+        console.info('체크박스 : ', checked);
+    }, [checked]);
 
     return (
         <KeywordPresenter
-            title="쇼핑광고 자동입찰관리"
+            title="파워링크 자동입찰관리"
             loading={loading}
             error={error}
             data={data && data}
@@ -298,15 +351,44 @@ const ShoppingADKeywordContainer = () => {
             customerList={customerList}
             handleCustomerChange={handleCustomerChange}
             handleAutoBidActive={handleAutoBidActive}
+            handleUpdateAutoBid={handleUpdateAutoBid}
             handleDeleteAutoBid={handleDeleteAutoBid}
             checked={checked}
             isChecked={isChecked}
             handleChecked={handleChecked}
             handleAllChecked={handleAllChecked}
             handleDownload={handleDownload}
+
+            orderBy={orderBy}
+            order={order}
+            handleRequestSort={handleRequestSort}
+            getComparator={getComparator}
+
+            page={page}
+            rowsPerPage={rowsPerPage}
+            handleChangePage={handleChangePage}
+            handleChangeRowsPerPage={handleChangeRowsPerPage}
+
+            cycleChangeOpen={cycleChangeOpen}
+            handleModalOpen={handleModalOpen}
+            handleModalClose={handleModalClose}
+
+            autoBidCycle={autoBidCycle}
+            onAutoBidCycleChange={onAutoBidCycleChange}
+            handleChangeAutoBidCycle={handleChangeAutoBidCycle}
+            nccKeywordId={nccKeywordId}
+
+            filterRef={filterRef}
+            searchFilterOpen={searchFilterOpen}
+            handleFilterOpen={handleFilterOpen}
+            handleFilterClose={handleFilterClose}
+            searchFilter={searchFilter}
+            onFilterChange={onFilterChange}
+            onFilterReset={onFilterReset}
+            onSearchFilter={onSearchFilter}
         />
     )
 }
 
-export default ShoppingADKeywordContainer;
+export default PowerLinkKeywordContainer;
 

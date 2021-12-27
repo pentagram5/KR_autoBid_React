@@ -140,6 +140,7 @@ const KeywordPresenter = ({
                               customerList,
                               handleCustomerChange,
                               handleAutoBidActive,
+                              handleUpdateAutoBid,
                               handleDeleteAutoBid,
                               checked,
                               isChecked,
@@ -172,7 +173,7 @@ const KeywordPresenter = ({
                               handleFilterClose,
                               searchFilter,
                               onFilterChange,
-                              onRefresh,
+                              onFilterReset,
                               onSearchFilter
                           }) => {
 
@@ -197,25 +198,25 @@ const KeywordPresenter = ({
                         <InfoBox padding="10px 25px 10px 0">
                             <Text fontSize={24} fontWeight={700}>5분</Text>&nbsp;&nbsp;
                             <Text fontSize={18} fontColor={colors.darkGray}>
-                                ({cycle_count._5} 개)
+                                ({cycle_count._5 ? cycle_count._5 : 0} 개)
                             </Text>
                         </InfoBox>
                         <InfoBox>
                             <Text fontSize={24} fontWeight={700}>10분</Text>&nbsp;&nbsp;
                             <Text fontSize={18} fontColor={colors.darkGray}>
-                                ({cycle_count._10} 개)
+                                ({cycle_count._10 ? cycle_count._10 : 0} 개)
                             </Text>
                         </InfoBox>
                         <InfoBox>
                             <Text fontSize={24} fontWeight={700}>30분</Text>&nbsp;&nbsp;
                             <Text fontSize={18} fontColor={colors.darkGray}>
-                                ({cycle_count._30} 개)
+                                ({cycle_count._30 ? cycle_count._30 : 0} 개)
                             </Text>
                         </InfoBox>
                         <InfoBox>
                             <Text fontSize={24} fontWeight={700}>60분</Text>&nbsp;&nbsp;
                             <Text fontSize={18} fontColor={colors.darkGray}>
-                                ({cycle_count._60} 개)
+                                ({cycle_count._60 ? cycle_count._60 : 0} 개)
                             </Text>
                         </InfoBox>
                     </InfoList>
@@ -258,6 +259,7 @@ const KeywordPresenter = ({
                             bgColor={colors.white}
                             imgSrc={gear}
                             height={29}
+                            onClick={handleUpdateAutoBid}
                         />
                         <ImageButton
                             title="삭제"
@@ -390,7 +392,7 @@ const KeywordPresenter = ({
                                         imgSrc={refresh}
                                         fontColor={colors.white}
                                         fontSize={16}
-                                        onClick={onRefresh}
+                                        onClick={onFilterReset}
                                     />
                                     <StyledButton
                                         title="조회하기"

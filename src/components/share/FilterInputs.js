@@ -60,7 +60,7 @@ const FilterInput = ({title, name, onChange, value, input, select, options}) => 
                     name={name}
                     value={value}
                     onChange={onChange}
-                    placeholder="캠페인 명을 입력하세요."
+                    placeholder={`${title}${title === "최대 입찰가" ? "를" : "을"} 입력하세요.`}
                 />
             </InputBox>
             }

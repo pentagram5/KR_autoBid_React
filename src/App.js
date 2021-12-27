@@ -18,6 +18,7 @@ function App() {
     const [isLoggedIn, setIsLoggedIn] = useState(null);
     const [customerList, setCustomerList] = useState([]);
     const navigate = useNavigate();
+
     const previousLoading = async () => {
         try {
             const token = await localStorage.getItem("KR_Marketing_token");
@@ -26,7 +27,7 @@ function App() {
                 const {data: {id_info}} = await SendRequest().get(`${serverPROTOCOL}${serverURL}/autobid/id`);
                 setIsLoggedIn(true);
                 setCustomerList(id_info);
-                navigate('/powerLinkKeyword');
+                // navigate('/powerLinkKeyword');
             } else {
                 setIsLoggedIn(false);
             }

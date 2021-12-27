@@ -41,7 +41,7 @@ function reducer(state, action) {
     }
 }
 
-const PowerLinkKeywordContainer = () => {
+const PowerContentsKeywordContainer = () => {
     const filterRef = useRef(null);
     const [state, dispatch] = useReducer(reducer, {
         loading: true,
@@ -71,7 +71,8 @@ const PowerLinkKeywordContainer = () => {
 
     // 조회 필터 input 값
     const onFilterChange = e => {
-        const { name, value } = e.target;
+        let { name, value } = e.target;
+        if (name === "maxBid") value = value.replace(/[^-0-9]/g,'');
         setSearchFilter({
             ...searchFilter,
             [name]: value
@@ -79,7 +80,7 @@ const PowerLinkKeywordContainer = () => {
     }
 
     // 초기화
-    const onRefresh = () => {
+    const onFilterReset = () => {
         setSearchFilter({
             campaignName: "",
             adgroupName: "",
@@ -97,7 +98,7 @@ const PowerLinkKeywordContainer = () => {
         const { campaignName, adgroupName, keyword, device, activate, targetRank, maxBid, bidCycle } = searchFilter;
 
         try {
-            const res = await SendRequest().post(`${serverPROTOCOL}${serverURL}/autobid/powerlink/filter?CUSTOMER_ID=${customer["CUSTOMER_ID"]}`, {
+            const res = await SendRequest().post(`${serverPROTOCOL}${serverURL}/autobid/powercontents/filter?CUSTOMER_ID=${customer["CUSTOMER_ID"]}`, {
                 Campaign_name: campaignName,
                 Adgroup_name: adgroupName,
                 Keyword: keyword,
@@ -111,7 +112,7 @@ const PowerLinkKeywordContainer = () => {
             console.info('?????/**/', res.data.keywords);
 
             dispatch({ type: "RE_REQUEST", data: res.data.keywords });
-            onRefresh();
+            onFilterReset();
             setSearchFilterOpen(false);
         } catch(e) {
             throw new Error(e);
@@ -184,7 +185,7 @@ const PowerLinkKeywordContainer = () => {
             return;
         }
         try {
-            const {data} = await SendRequest().put(`${serverPROTOCOL}${serverURL}/autobid/powerlink/activate?CUSTOMER_ID=${customer["CUSTOMER_ID"]}&activate=${(type === "active")}`, nccKeywordId);
+            const {data} = await SendRequest().put(`${serverPROTOCOL}${serverURL}/autobid/powercontents/activate?CUSTOMER_ID=${customer["CUSTOMER_ID"]}&activate=${(type === "active")}`, nccKeywordId);
             dispatch({type: 'RE_REQUEST', data: data.keywords});
 
             if (data.done) {
@@ -203,7 +204,7 @@ const PowerLinkKeywordContainer = () => {
         }
         if (window.confirm("정말 삭제하시겠습니까?")) {
             try {
-                const res = await SendRequest().delete(`${serverPROTOCOL}${serverURL}/autobid/powerlink/delete?CUSTOMER_ID=${customer["CUSTOMER_ID"]}`, {data: nccKeywordId});
+                const res = await SendRequest().delete(`${serverPROTOCOL}${serverURL}/autobid/powercontents/delete?CUSTOMER_ID=${customer["CUSTOMER_ID"]}`, {data: nccKeywordId});
                 if (res.status === 200) {
                     dispatch({type: 'SUCCESS', data: res.data});
                     toast.info('선택한 키워드를 삭제하였습니다.');
@@ -219,7 +220,7 @@ const PowerLinkKeywordContainer = () => {
     // 입찰 주기 변경
     const handleChangeAutoBidCycle = async () => {
         try {
-            const { data } = await SendRequest().put(`${serverPROTOCOL}${serverURL}/autobid/powerlink/cycle?CUSTOMER_ID=${customer["CUSTOMER_ID"]}&cycle=${autoBidCycle}`, nccKeywordId);
+            const { data } = await SendRequest().put(`${serverPROTOCOL}${serverURL}/autobid/powercontents/cycle?CUSTOMER_ID=${customer["CUSTOMER_ID"]}&cycle=${autoBidCycle}`, nccKeywordId);
 
             if (!!data) {
                 toast.info('선택한 키워드의 주기를 변경하였습니다.');
@@ -233,18 +234,23 @@ const PowerLinkKeywordContainer = () => {
         }
     }
 
+    // 다운로드
     const handleDownload = async () => {
         try {
-            const res = await SendRequest().get(`${serverPROTOCOL}${serverURL}/autobid/powerlink/download?CUSTOMER_ID=${customer["CUSTOMER_ID"]}`, {
+            const res = await SendRequest().get(`${serverPROTOCOL}${serverURL}/autobid/powercontents/download?CUSTOMER_ID=${customer["CUSTOMER_ID"]}`, {
                 responseType: "blob",
             });
             const url = window.URL.createObjectURL(new Blob([res.data], {
                 type: res.headers['content-type'],
+                encoding: 'UTF-8'
             }));
+
+            const fileName = res.headers["content-disposition"].split("=")[1];
 
             let link = document.createElement('a');
 
             link.href = url;
+            link.download = fileName;
             link.target = '_blank';
             link.click();
             window.URL.revokeObjectURL(link);
@@ -262,7 +268,7 @@ const PowerLinkKeywordContainer = () => {
         dispatch({type: 'LOADING'});
 
         try {
-            const powerLinkResponse = await SendRequest().get(`${serverPROTOCOL}${serverURL}/autobid/powerlink?CUSTOMER_ID=${customerId}`);
+            const powerLinkResponse = await SendRequest().get(`${serverPROTOCOL}${serverURL}/autobid/powercontents?CUSTOMER_ID=${customerId}`);
             const customerResponse = await SendRequest().get(`${serverPROTOCOL}${serverURL}/autobid/id`);
 
             dispatch({type: 'SUCCESS', data: powerLinkResponse.data});
@@ -328,7 +334,7 @@ const PowerLinkKeywordContainer = () => {
 
     return (
         <KeywordPresenter
-            title="파워링크 자동입찰관리"
+            title="파워컨텐츠 자동입찰관리"
             loading={loading}
             error={error}
             data={data && data}
@@ -368,11 +374,13 @@ const PowerLinkKeywordContainer = () => {
             handleFilterClose={handleFilterClose}
             searchFilter={searchFilter}
             onFilterChange={onFilterChange}
-            onRefresh={onRefresh}
+            onFilterReset={onFilterReset}
             onSearchFilter={onSearchFilter}
         />
     )
 }
 
-export default PowerLinkKeywordContainer;
+export default PowerContentsKeywordContainer;
+
+
 

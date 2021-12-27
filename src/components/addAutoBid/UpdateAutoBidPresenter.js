@@ -203,20 +203,14 @@ const ProgressBox = styled.div`
   opacity: 0.4;
 `;
 
-const AddAutoBidPresenter = ({
+const UpdateAutoBidPresenter = ({
                                  title,
                                  handleCustomerChange,
-                                 handleKeywordSelected,
                                  customer,
                                  customerList,
-                                 campaignList,
-                                 adGroupList,
+
                                  keywordList,
-                                 checked,
-                                 isChecked,
-                                 handleChecked,
-                                 handleAllChecked,
-                                 onAddSettingBox,
+
                                  settingList,
                                  onDeleteKeyword,
                                  keywordOption,
@@ -231,13 +225,14 @@ const AddAutoBidPresenter = ({
                                  onScheduleClick,
                                  onAddChips,
                                  onDeleteChips,
-                                 selections,
+
                                  onCancel,
                                  onAddAutoBid,
                                  loading,
                                  setSettingList,
                                  setKeywordList,
                              }) => {
+
     const {device, bid_cycle, bid_adj_amount, max_bid, min_bid} = keywordOption;
 
     return (
@@ -257,85 +252,23 @@ const AddAutoBidPresenter = ({
                         setKeywordList={setKeywordList}
                     />
 
-                    <Title>입찰 키워드 설정</Title>
-                    <SelectForm>
-                        <SelectBox
-                            width={240}
-                            bgImg={selectArrow2}
-                            onChange={e => handleKeywordSelected(e, "nccCampaignId")}
-                        >
-                            <option value="">캠페인명 설정</option>
-                            {campaignList.map(list => (
-                                <option key={list.nccCampaignId} value={list.nccCampaignId}>{list.name}</option>
-                            ))}
-                        </SelectBox>
-                        <RightArrowBox>
-                            <Image src={rightArrow}/>
-                        </RightArrowBox>
-                        <SelectBox
-                            width={260}
-                            bgImg={selectArrow2}
-                            onChange={e => handleKeywordSelected(e, "nccAdgroupId")}
-                        >
-                            <option value="">광고그룹명 설정</option>
-                            {adGroupList.map(list => <option key={list.nccAdgroupId}
-                                                             value={list.nccAdgroupId}>{list.name}</option>)}
-                        </SelectBox>
-                    </SelectForm>
+
                     <TableBox>
                         <KeywordTable>
                             <TableRow height={50} borderColor={colors.gray}>
-                                <TableCell fontColor={colors.darkBlack}>
-                                    <Checkbox
-                                        onChange={handleAllChecked}
-                                        checked={keywordList.length > 0 && checked.length === keywordList.length}
-                                    />
-                                </TableCell>
                                 <TableCell width={80} fontColor={colors.darkBlack}>키워드</TableCell>
                                 <TableCell width={220} fontColor={colors.darkBlack}>키워드 아이디</TableCell>
-                            </TableRow>
-
-                            {keywordList && keywordList.map(list => {
-                                const isListChecked = isChecked(list.nccKeywordId);
-
-                                return (
-                                    <TableRow key={list.nccKeywordId} borderColor={colors.lightBorderColor}>
-                                        <TableCell onClick={e => handleChecked(e, list.nccKeywordId)}>
-                                            <Checkbox checked={isListChecked}/>
-                                        </TableCell>
-                                        <TableCell width={80}>{list.Keyword}</TableCell>
-                                        <TableCell width={220}>{list.nccKeywordId}</TableCell>
-                                    </TableRow>
-                                )
-                            })}
-
-                        </KeywordTable>
-
-                        <StyledButton
-                            title={<Image src={rightLeftArrow}/>}
-                            margin="0 50px"
-                            width={70}
-                            height={400}
-                            bgColor={colors.gray}
-                            fontColor={colors.white}
-                            borderRadius={5}
-                            onClick={onAddSettingBox}
-                        />
-
-                        <KeywordTable>
-                            <TableRow height={50} borderColor={colors.gray}>
-                                <TableCell width={150} fontColor={colors.darkBlack}>키워드</TableCell>
-                                <TableCell width={200} fontColor={colors.darkBlack}>키워드 아이디</TableCell>
                                 <TableCell fontColor={colors.darkBlack}>
                                     삭제
                                 </TableCell>
                             </TableRow>
 
-                            {settingList && settingList.map(list => {
+                            {keywordList && keywordList.map(list => {
+
                                 return (
                                     <TableRow key={list.nccKeywordId} borderColor={colors.lightBorderColor}>
-                                        <TableCell width={150}>{list.Keyword}</TableCell>
-                                        <TableCell width={200}>{list.nccKeywordId}</TableCell>
+                                        <TableCell width={80}>{list.Keyword}</TableCell>
+                                        <TableCell width={220}>{list.nccKeywordId}</TableCell>
                                         <TableCell>
                                             <Image src={delete_2} cursor="pointer"
                                                    onClick={() => onDeleteKeyword(list.nccKeywordId)}/>
@@ -343,7 +276,9 @@ const AddAutoBidPresenter = ({
                                     </TableRow>
                                 )
                             })}
+
                         </KeywordTable>
+
                     </TableBox>
 
                     <Title>입찰 전략 설정</Title>
@@ -757,4 +692,4 @@ const AddAutoBidPresenter = ({
     )
 }
 
-export default AddAutoBidPresenter;
+export default UpdateAutoBidPresenter;
