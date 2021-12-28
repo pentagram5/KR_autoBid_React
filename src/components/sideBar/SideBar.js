@@ -106,7 +106,10 @@ const SideBar = () => {
                 active={
                     pathname === "/powerLinkKeyword" ||
                     pathname === "/shoppingADKeyword" ||
-                    pathname === "/powerContentsKeyword"
+                    pathname === "/powerContentsKeyword" ||
+                    pathname === "/powerLinkUpdate" ||
+                    pathname === "/shoppingADUpdate" ||
+                    pathname === "/powerContentsUpdate"
                 }
                 onClick={() => navigate("/powerLinkKeyword")}
             >
@@ -116,7 +119,10 @@ const SideBar = () => {
                     fontColor={
                         pathname === "/powerLinkKeyword" ||
                         pathname === "/shoppingADKeyword" ||
-                        pathname === "/powerContentsKeyword"
+                        pathname === "/powerContentsKeyword" ||
+                        pathname === "/powerLinkUpdate" ||
+                        pathname === "/shoppingADUpdate" ||
+                        pathname === "/powerContentsUpdate"
                             ? colors.blue : colors.white
                     }
                 >
@@ -127,7 +133,10 @@ const SideBar = () => {
                         <path d="M12 16.5L6 10.5H18L12 16.5Z"
                               fill={pathname === "/powerLinkKeyword" ||
                               pathname === "/shoppingADKeyword" ||
-                              pathname === "/powerContentsKeyword"
+                              pathname === "/powerContentsKeyword" ||
+                              pathname === "/powerLinkUpdate" ||
+                              pathname === "/shoppingADUpdate" ||
+                              pathname === "/powerContentsUpdate"
                                   ? colors.blue : colors.white}
                         />
                     </svg>
@@ -137,7 +146,10 @@ const SideBar = () => {
                 active={
                     pathname === "/powerLinkKeyword" ||
                     pathname === "/shoppingADKeyword" ||
-                    pathname === "/powerContentsKeyword"
+                    pathname === "/powerContentsKeyword" ||
+                    pathname === "/powerLinkUpdate" ||
+                    pathname === "/shoppingADUpdate" ||
+                    pathname === "/powerContentsUpdate"
                 }
             >
                 <Link to="/powerLinkKeyword">
