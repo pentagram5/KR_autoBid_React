@@ -2,8 +2,8 @@ import React, {useEffect, useState, useReducer, useCallback, useRef} from 'react
 import KeywordPresenter from "../../components/keyword/KeywordPresenter";
 import {toast} from "react-toastify";
 import SendRequest from "../../utils/SendRequest";
-import * as constants from "../../utils/constants";
 import {useNavigate} from "react-router-dom";
+import * as constants from "../../utils/constants";
 
 const serverPROTOCOL = constants.config.PROTOCOL;
 const serverURL = constants.config.URL;
@@ -161,9 +161,13 @@ const PowerLinkKeywordContainer = () => {
         localStorage.setItem("customer", JSON.stringify(list));
     }, [customerList]);
 
+    // 체크박스 선택 checked
+    const isChecked = id => checked.indexOf(id) !== -1;
+
+    // 체크박스 전체 선택
     const handleAllChecked = e => {
         if (e.target.checked) {
-            const newChecked = (rowsPerPage > 0 ? data.keywords.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage) : data.keywords).map(list => list.nccKeywordId);
+            const newChecked = data.keywords.map(list => list.nccKeywordId);
             setChecked(newChecked);
             return;
         }
@@ -268,9 +272,6 @@ const PowerLinkKeywordContainer = () => {
             throw new Error(e);
         }
     }
-
-    // 체크박스 선택 checked
-    const isChecked = id => checked.indexOf(id) !== -1;
 
     // data fetching
     const fetchPowerLinkData = async customerId => {

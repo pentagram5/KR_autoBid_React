@@ -1,20 +1,20 @@
 import React from 'react';
 import styled, {css} from "styled-components";
 import colors from "../../styles/colors";
-import Checkbox from '@mui/material/Checkbox';
 import Radio from '@mui/material/Radio';
 import RadioGroup from '@mui/material/RadioGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import CircularProgress from '@mui/material/CircularProgress';
 import StyledButton from "../share/StyledButton";
-import selectArrow2 from "../../assets/selectArrow2.svg";
 import selectArrow3 from "../../assets/selectArrow3.svg";
-import rightArrow from "../../assets/rightArrow.svg";
-import rightLeftArrow from "../../assets/rightLeftArrow.svg";
 import delete_2 from "../../assets/delete_2.svg";
 import clock from "../../assets/clock.svg";
 import Header from "../share/Header";
 import ScheduleCard from "../share/ScheduleCard";
+// import Checkbox from '@mui/material/Checkbox';
+// import selectArrow2 from "../../assets/selectArrow2.svg";
+// import rightArrow from "../../assets/rightArrow.svg";
+// import rightLeftArrow from "../../assets/rightLeftArrow.svg";
 
 const View = styled.div`
   width: calc(100vw - 300px);
@@ -44,9 +44,9 @@ const SelectBox = styled.select`
     margin: 0 10px;
   }
 `;
-const RightArrowBox = styled.div`
-  margin: 0 15px;
-`;
+// const RightArrowBox = styled.div`
+//   margin: 0 15px;
+// `;
 const Image = styled.img`
   ${({cursor}) => cursor && css`
     cursor: ${cursor};
@@ -206,12 +206,9 @@ const ProgressBox = styled.div`
 const UpdateAutoBidPresenter = ({
                                  title,
                                  handleCustomerChange,
-                                 customer,
-                                 customerList,
 
                                  keywordList,
 
-                                 settingList,
                                  onDeleteKeyword,
                                  keywordOption,
                                  radioState,
@@ -229,8 +226,7 @@ const UpdateAutoBidPresenter = ({
                                  onCancel,
                                  onAddAutoBid,
                                  loading,
-                                 setSettingList,
-                                 setKeywordList,
+
                              }) => {
 
     const {device, bid_cycle, bid_adj_amount, max_bid, min_bid} = keywordOption;
@@ -246,10 +242,7 @@ const UpdateAutoBidPresenter = ({
                     <Header
                         title={title}
                         handleCustomerChange={handleCustomerChange}
-                        customer={customer}
-                        customerList={customerList}
-                        setSettingList={setSettingList}
-                        setKeywordList={setKeywordList}
+                        update
                     />
 
 
@@ -290,7 +283,7 @@ const UpdateAutoBidPresenter = ({
                                     대상 키워드
                                 </td>
                                 <td>
-                                    {settingList[0] && (settingList.length === 1 ? `${settingList[0].Keyword}` : `${settingList[0].Keyword} 외 ${settingList.length - 1}건`)}
+                                    {keywordList[0] && (keywordList.length === 1 ? `${keywordList[0].Keyword}` : `${keywordList[0].Keyword} 외 ${keywordList.length - 1}건`)}
                                 </td>
                                 <td>
                                     디바이스
@@ -432,7 +425,7 @@ const UpdateAutoBidPresenter = ({
                                 <td>시간 설정</td>
                                 <td>
                                     <RadioGroup row onChange={e => handleSimpleScheduleSetting(e, 'time')}>
-                                        <FormControlLabel value="0~23" control={<Radio/>} label="00시~23시"
+                                        <FormControlLabel value="0~23" control={<Radio/>} label="00시~24시"
                                                           checked={simpleSchedule.time === '0~23'}/>
                                         <FormControlLabel value="9~18" control={<Radio/>} label="09시~18시"/>
                                     </RadioGroup>

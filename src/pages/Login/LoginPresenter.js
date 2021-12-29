@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from "styled-components";
-import KR_Logo from "../../assets/kr_logo.png"
+import KR_Logo from "../../assets/kr_logo.svg"
 import colors from "../../styles/colors";
 import StyledButton from "../../components/share/StyledButton";
 
@@ -43,8 +43,15 @@ const Inputs = styled.input`
     color: ${colors.borderColor};
   }
 `;
+const SignUp = styled.div`
+  font-size: 20px;
+  font-weight: 700;
+  color: ${colors.blue};
+  border-bottom: 1px solid ${colors.blue}
+  cursor: pointer;
+`;
 
-const LoginPresenter = ({ id, passwd, onInputChange, handleLogin }) => {
+const LoginPresenter = ({ id, passwd, onInputChange, handleLogin, goSignUp }) => {
     return (
         <View>
             <LoginForm>
@@ -75,6 +82,9 @@ const LoginPresenter = ({ id, passwd, onInputChange, handleLogin }) => {
                     fontColor={colors.white}
                     onClick={handleLogin}
                 />
+                <SignUp onClick={goSignUp}>
+                    회원 등록
+                </SignUp>
             </LoginForm>
         </View>
     )

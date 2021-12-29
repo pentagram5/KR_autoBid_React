@@ -3,8 +3,10 @@ import LoginPresenter from "./LoginPresenter";
 import {toast} from "react-toastify";
 import {AuthContext} from "../../utils/AuthContext";
 import SendRequest from "../../utils/SendRequest";
+import {useNavigate} from "react-router-dom";
 
 const LoginContainer = () => {
+    const navigate = useNavigate();
     const { userLogin } = useContext(AuthContext);
 
     const [inputs, setInputs] = useState({
@@ -42,12 +44,15 @@ const LoginContainer = () => {
         }
     }
 
+    const goSignUp = () => navigate('/signUp');
+
     return (
         <LoginPresenter
             id={id}
             passwd={passwd}
             onInputChange={onInputChange}
             handleLogin={handleLogin}
+            goSignUp={goSignUp}
         />
     )
 }

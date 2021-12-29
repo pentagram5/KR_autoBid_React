@@ -3,7 +3,7 @@ import styled, {css} from "styled-components";
 import {Link, useLocation, useNavigate} from "react-router-dom";
 import {AuthContext} from "../../utils/AuthContext";
 import colors from "../../styles/colors";
-import KR_Logo from "../../assets/kr_logo_sideBar.png";
+import KR_Logo from "../../assets/kr_logo_sideBar.svg";
 import logoutGear from "../../assets/logout_gear.svg";
 
 const View = styled.div`
@@ -102,6 +102,7 @@ const SideBar = () => {
                     <Image src={KR_Logo}/>
                 </KRLogo>
             </KRLogoBox>
+            {/* 자동입찰관리 */}
             <MenuBox
                 active={
                     pathname === "/powerLinkKeyword" ||
@@ -156,7 +157,7 @@ const SideBar = () => {
                     <SubMenu>
                         <Text
                             fontSize={16}
-                            fontColor={pathname === "/powerLinkKeyword" ? colors.black : colors.gray}
+                            fontColor={pathname === "/powerLinkKeyword" || pathname === "/powerLinkUpdate" ? colors.black : colors.gray}
                         >
                             - 파워링크 입찰 등록 키워드
                         </Text>
@@ -166,7 +167,7 @@ const SideBar = () => {
                     <SubMenu>
                         <Text
                             fontSize={16}
-                            fontColor={pathname === "/shoppingADKeyword" ? colors.black : colors.gray}>
+                            fontColor={pathname === "/shoppingADKeyword" || pathname === "/shoppingADUpdate"? colors.black : colors.gray}>
                             - 쇼핑광고 입찰 등록 키워드
                         </Text>
                     </SubMenu>
@@ -175,13 +176,15 @@ const SideBar = () => {
                     <SubMenu>
                         <Text
                             fontSize={16}
-                            fontColor={pathname === "/powerContentsKeyword" ? colors.black : colors.gray}
+                            fontColor={pathname === "/powerContentsKeyword" || pathname === "/powerContentsUpdate" ? colors.black : colors.gray}
                         >
                             - 파워컨텐츠 입찰 등록 키워드
                         </Text>
                     </SubMenu>
                 </Link>
             </SubMenuBox>
+
+            {/* 자동입찰등록 */}
             <MenuBox
                 active={
                     pathname === "/powerLinkAutoBid" ||
@@ -252,6 +255,28 @@ const SideBar = () => {
                     </SubMenu>
                 </Link>
             </SubMenuBox>
+
+            {/* 광고주 등록 */}
+            <MenuBox
+                active={pathname === "/advertiser"}
+                onClick={() => navigate("/advertiser")}
+            >
+                <Text
+                    fontSize={18}
+                    fontWeight={600}
+                    fontColor={pathname === "/advertiser" ? colors.blue : colors.white}
+                >
+                    광고주 등록
+                </Text>
+                <BottomArrow>
+                    <svg width="24" height="25" viewBox="0 0 24 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 16.5L6 10.5H18L12 16.5Z"
+                              fill={pathname === "/advertiser" ? colors.blue : colors.white}
+                        />
+                    </svg>
+                </BottomArrow>
+            </MenuBox>
+
 
 
             <LogoutBox onClick={userLogout}>

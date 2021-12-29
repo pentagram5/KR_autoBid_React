@@ -9,6 +9,8 @@ import ShoppingAAutoBid from "./pages/ShoppingAD/ShoppingADAutoBidContainer";
 import PowerContentsKeyword from "./pages/PowerContents/PowerContentsKeywordContainer";
 import PowerContentsAutoBid from "./pages/PowerContents/PowerContentsAutoBidContainer";
 import PowerLinkUpdate from "./pages/PowerLink/PowerLinkUpdateContainer";
+import SignUpContainer from "./pages/SignUp";
+import AddAdvertiserContainer from "./pages/AddAdvertiser/AddAdvertiserContainer";
 
 const ComponentBox = styled.div`
   padding-left: 300px;
@@ -26,12 +28,16 @@ const LoggedInRoutes = () => (
         <Route path="/powerContentsAutoBid" element={<PowerContentsAutoBid/>}/>
         {/* 수정 */}
         <Route path="/powerLinkUpdate" element={<PowerLinkUpdate />}/>
+
+        {/* 광고주 등록 */}
+        <Route path="/advertiser" element={<AddAdvertiserContainer />}/>
     </Routes>
 )
 
 const LoggedOutRoutes = () => (
     <Routes>
         <Route path="/" element={<Login/>}/>
+        <Route path="/signUp" element={<SignUpContainer />} />
     </Routes>
 )
 

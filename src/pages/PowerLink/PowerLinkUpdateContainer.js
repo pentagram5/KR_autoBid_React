@@ -1,24 +1,25 @@
 import React, {useState, useContext, useEffect, useCallback} from 'react';
 import {AuthContext} from "../../utils/AuthContext";
 import SendRequest from "../../utils/SendRequest";
-import * as constants from "../../utils/constants";
 import colors from "../../styles/colors";
 import {korWeekChange} from "../../utils/common";
 import UpdateAutoBidPresenter from "../../components/addAutoBid/UpdateAutoBidPresenter";
+import {useNavigate} from "react-router-dom";
+import {toast} from "react-toastify";
+import * as constants from "../../utils/constants";
 
 const serverPROTOCOL = constants.config.PROTOCOL;
 const serverURL = constants.config.URL;
 
 const PowerLinkAutoBidContainer = () => {
+    const navigate = useNavigate();
     const {customerList} = useContext(AuthContext);
 
     const [loading, setLoading] = useState(false);
     const [customer, setCustomer] = useState({});
     const [checked, setChecked] = useState([]);
 
-
     const [keywordList, setKeywordList] = useState([]);
-    const [settingList, setSettingList] = useState([]);
 
     const [radioState, setRadioState] = useState({
         simpleHigh: 0,
@@ -114,8 +115,8 @@ const PowerLinkAutoBidContainer = () => {
 
     // SettingList keyword 삭제
     const onDeleteKeyword = useCallback(nccKeywordId => {
-        setSettingList(settingList.filter(list => list.nccKeywordId !== nccKeywordId));
-    }, [settingList]);
+        setKeywordList(keywordList.filter(list => list.nccKeywordId !== nccKeywordId));
+    }, [keywordList]);
 
 
     // 요일, 시간 select box onChange
@@ -136,10 +137,7 @@ const PowerLinkAutoBidContainer = () => {
 
     // 스케줄 추가
     const onAddSchedule = () => {
-        if (keywordOption.keyword_info.length === 0) {
-            alert('등록하실 키워드를 추가해주세요.');
-            return;
-        } else if (scheduleChips.length > 4) {
+        if (scheduleChips.length > 4) {
             alert('스케줄은 한번에 최대 5개까지 설정할 수 있습니다.');
             return;
         } else if (keywordOption.setting.target_Rank < 1) {
@@ -312,7 +310,6 @@ const PowerLinkAutoBidContainer = () => {
             finalArray.push(finalData);
         });
         setHighKeywordOption(finalArray);
-
     }
 
     useEffect(() => {
@@ -334,14 +331,16 @@ const PowerLinkAutoBidContainer = () => {
         setLoading(true);
 
         try {
-            const response = await SendRequest().post(`${serverPROTOCOL}${serverURL}/autobid/powerlink?CUSTOMER_ID=${customer["CUSTOMER_ID"]}`, radioState.simpleHigh === 0 ? [keywordOption] : highKeywordOption);
+            const response = await SendRequest().post(`${serverPROTOCOL}${serverURL}/autobid/powerlink/update?CUSTOMER_ID=${customer["CUSTOMER_ID"]}`, radioState.simpleHigh === 0 ? [keywordOption] : highKeywordOption);
 
             console.info(response);
+
             if (response.status === 200) {
+                toast.info('키워드를 수정했습니다.')
                 setLoading(false);
 
                 setKeywordList([]);
-                setSettingList([]);
+
                 setScheduleChips([]);
                 setKeywordOption({
                     keyword_info: [],
@@ -361,6 +360,8 @@ const PowerLinkAutoBidContainer = () => {
                         bid_adj_amount: 0,
                     }
                 });
+
+                navigate('/powerLinkKeyword');
             }
         } catch (e) {
             throw new Error(e);
@@ -391,14 +392,6 @@ const PowerLinkAutoBidContainer = () => {
         setCustomer(JSON.parse(localStorage.getItem("customer")));
         return () => setLoading(false);
     }, []);
-
-    // 설정할 keywordOption 상태에 담기
-    useEffect(() => {
-        setKeywordOption({
-            ...keywordOption,
-            keyword_info: settingList.map(list => list.nccKeywordId)
-        });
-    }, [settingList]);
 
     // 간편 설정 요일 및 시간 보내기용 데이터로 변환
     useEffect(() => {
@@ -451,9 +444,9 @@ const PowerLinkAutoBidContainer = () => {
     const fetchingData = async customerId => {
         console.info(checked);
         try {
-            const res = await SendRequest().post(`${serverPROTOCOL}${serverURL}/autobid/powerlink/update_info?CUSTOMER_ID=${customerId}`, checked);
+            const { data } = await SendRequest().post(`${serverPROTOCOL}${serverURL}/autobid/powerlink/update_info?CUSTOMER_ID=${customerId}`, checked);
 
-            console.info( res);
+            setKeywordList(data);
         } catch(e) {
             throw new Error(e);
         }
@@ -464,8 +457,14 @@ const PowerLinkAutoBidContainer = () => {
         setCustomer(JSON.parse(localStorage.getItem("customer")));
         if (arr) {
             setChecked(arr.split(','));
-            localStorage.removeItem("checked");
+        } else {
+            toast.info('수정할 키워드가 없습니다.', {
+                autoClose: 1000
+            });
+            navigate('/powerLinkKeyword');
         }
+
+        return () => localStorage.removeItem("checked");
     }, []);
 
     useEffect(() => {
@@ -477,8 +476,15 @@ const PowerLinkAutoBidContainer = () => {
 
 
     useEffect(() => {
-        console.info('checked', checked);
-    }, [checked]);
+        setKeywordOption({
+            ...keywordOption,
+            keyword_info: keywordList.map(list => list.nccKeywordId)
+        });
+    }, [keywordList]);
+
+    useEffect(() => {
+        console.info('keywordOption', keywordOption);
+    }, [keywordOption]);
 
     return (
         <UpdateAutoBidPresenter
@@ -488,7 +494,7 @@ const PowerLinkAutoBidContainer = () => {
 
             keywordList={keywordList}
             checked={checked}
-            settingList={settingList}
+            onDeleteKeyword={onDeleteKeyword}
 
 
             keywordOption={keywordOption}

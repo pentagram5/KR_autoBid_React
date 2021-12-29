@@ -497,7 +497,7 @@ const AddAutoBidPresenter = ({
                                 <td>시간 설정</td>
                                 <td>
                                     <RadioGroup row onChange={e => handleSimpleScheduleSetting(e, 'time')}>
-                                        <FormControlLabel value="0~23" control={<Radio/>} label="00시~23시"
+                                        <FormControlLabel value="0~23" control={<Radio/>} label="00시~24시"
                                                           checked={simpleSchedule.time === '0~23'}/>
                                         <FormControlLabel value="9~18" control={<Radio/>} label="09시~18시"/>
                                     </RadioGroup>

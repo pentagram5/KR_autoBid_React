@@ -43,22 +43,25 @@ const Header = ({
                     title,
                     handleCustomerChange,
                     customer,
-                    customerList
+                    customerList,
+                    update,
 }) => {
     return (
         <View>
             <Title>{title}</Title>
-            <AdvertiserSelector>
-                <Text>광고주</Text>
-                <SelectBox
-                    onChange={handleCustomerChange}
-                    value={customer.CUSTOMER_ID}
-                >
-                    {customerList.map(list => (
-                        <option key={list.CUSTOMER_ID} value={list.CUSTOMER_ID}>{list.show_login}</option>
-                    ))}
-                </SelectBox>
-            </AdvertiserSelector>
+            {!update &&
+                <AdvertiserSelector>
+                    <Text>광고주</Text>
+                    <SelectBox
+                        onChange={handleCustomerChange}
+                        value={customer.CUSTOMER_ID}
+                    >
+                        {customerList.map(list => (
+                            <option key={list.CUSTOMER_ID} value={list.CUSTOMER_ID}>{list.show_login}</option>
+                        ))}
+                    </SelectBox>
+                </AdvertiserSelector>
+            }
         </View>
     )
 }
