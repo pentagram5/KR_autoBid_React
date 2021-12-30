@@ -2,11 +2,13 @@ import React, {useCallback, useEffect, useState} from 'react';
 import AddAdvertiserPresenter from "./AddAdvertiserPresenter";
 import SendRequest from "../../utils/SendRequest";
 import * as constants from "../../utils/constants";
+import {toast} from "react-toastify";
 
 const serverPROTOCOL = constants.config.PROTOCOL;
 const serverURL = constants.config.URL;
 
 const AddAdvertiserContainer = () => {
+    const [searchTerm, setSearchTerm] = useState("");
     const [customer, setCustomer] = useState({});
     const [customerList, setCustomerList] = useState([]);
     const [customerDataList, setCustomerDataList] = useState([]);
@@ -79,6 +81,43 @@ const AddAdvertiserContainer = () => {
         }
     }
 
+    // 광고주 등록
+    const handleAdvertiserRegister = async value => {
+        try {
+            const { data } = await SendRequest().post(`${serverPROTOCOL}${serverURL}/autobid/id/register`, {
+                id_info: checked,
+                Autobid_ac: value
+            });
+
+            console.info('data', data);
+            if (data.done) {
+                toast.info(`선택하신 광고주를 ${!!value ? "등록" : "미등록"} 하였습니다.`);
+                setCustomerDataList(data.id_info);
+            }
+        } catch(e) {
+            throw new Error(e);
+        }
+    }
+
+    // 광고주 검색
+    const handleSearchAdvertiser = async e => {
+        const { target: { value }} = e;
+        setSearchTerm(value);
+        try {
+            const { data } = await SendRequest().post(`${serverPROTOCOL}${serverURL}/autobid/id/register/search`, {
+                word: value
+            });
+
+            if (data.done) {
+                setCustomerDataList(data.id_info);
+            }
+        } catch(e) {
+            throw new Error(e);
+        }
+    }
+
+
+
     useEffect(() => {
         setCustomer(JSON.parse(localStorage.getItem("customer")));
     }, []);
@@ -89,8 +128,8 @@ const AddAdvertiserContainer = () => {
     }, [customer]);
 
     useEffect(() => {
-        console.info('customerDataList', customerDataList)
-    }, [customerDataList]);
+        console.info('customerList', customerList)
+    }, [customerList]);
 
 
     return (
@@ -108,6 +147,9 @@ const AddAdvertiserContainer = () => {
             isChecked={isChecked}
             handleAllChecked={handleAllChecked}
             handleChecked={handleChecked}
+            handleAdvertiserRegister={handleAdvertiserRegister}
+            searchTerm={searchTerm}
+            handleSearchAdvertiser={handleSearchAdvertiser}
         />
     )
 }

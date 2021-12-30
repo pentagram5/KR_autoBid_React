@@ -89,7 +89,7 @@ const Progress = styled.div`
 `;
 const FilterWrapper = styled.div`
   width: 720px;
-  height: 490px;
+  height: 560px;
   padding: 30px 0 105px;
   display: flex;
   justify-content: center;
@@ -177,7 +177,7 @@ const KeywordPresenter = ({
                               onSearchFilter
                           }) => {
 
-    const { campaignName, adgroupName, keyword, device, activate, targetRank, maxBid, bidCycle } = searchFilter;
+    const { campaignName, adgroupName, keyword, device, activate, targetRank, maxBid, bidCycle, opt } = searchFilter;
 
     if (error) return null;
     if (loading || !data || customerList.length === 0) return <Progress><CircularProgress/></Progress>
@@ -301,6 +301,13 @@ const KeywordPresenter = ({
                                 </CloseButton>
                                 <FilterBox>
                                     <FilterInput
+                                        radio
+                                        title="조회필터"
+                                        name="opt"
+                                        value={opt}
+                                        onChange={onFilterChange}
+                                    />
+                                    <FilterInput
                                         input
                                         title="캠페인명"
                                         name="campaignName"
@@ -323,6 +330,8 @@ const KeywordPresenter = ({
                                         onChange={onFilterChange}
 
                                     />
+                                </FilterBox>
+                                <FilterBox>
                                     <FilterInput
                                         select
                                         title="디바이스"
@@ -340,8 +349,6 @@ const KeywordPresenter = ({
                                             }
                                         ]}
                                     />
-                                </FilterBox>
-                                <FilterBox>
                                     <FilterInput
                                         select
                                         title="자동입찰 사용 여부"

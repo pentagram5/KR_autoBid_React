@@ -68,13 +68,15 @@ const PowerLinkKeywordContainer = () => {
         activate: "",
         targetRank: "",
         maxBid: "",
-        bidCycle: ""
+        bidCycle: "",
+        opt: 0
     });
 
     // 조회 필터 input 값
     const onFilterChange = e => {
         let { name, value } = e.target;
         if (name === "maxBid") value = value.replace(/[^-0-9]/g,'');
+        if (name === "opt") value = parseInt(value);
         setSearchFilter({
             ...searchFilter,
             [name]: value
@@ -91,13 +93,14 @@ const PowerLinkKeywordContainer = () => {
             activate: "",
             targetRank: "",
             maxBid: "",
-            bidCycle: ""
+            bidCycle: "",
+            opt: 0
         });
     }
 
     // 조회필터 검색
     const onSearchFilter = async () => {
-        const { campaignName, adgroupName, keyword, device, activate, targetRank, maxBid, bidCycle } = searchFilter;
+        const { campaignName, adgroupName, keyword, device, activate, targetRank, maxBid, bidCycle, opt } = searchFilter;
 
         try {
             const res = await SendRequest().post(`${serverPROTOCOL}${serverURL}/autobid/powerlink/filter?CUSTOMER_ID=${customer["CUSTOMER_ID"]}`, {
@@ -108,7 +111,8 @@ const PowerLinkKeywordContainer = () => {
                 activate: activate,
                 target_Rank: targetRank,
                 max_bid: maxBid,
-                bid_cycle: bidCycle
+                bid_cycle: bidCycle,
+                opt: opt
             });
 
             if (res.data.keywords.length === 0) {

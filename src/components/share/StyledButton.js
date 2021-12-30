@@ -1,6 +1,5 @@
 import React from 'react';
 import styled, {css} from "styled-components";
-import colors from "../../styles/colors";
 
 const Button = styled.button`
   font-size: ${({fontSize}) => fontSize ? fontSize : 18}px;

@@ -9,6 +9,8 @@ import {korWeekChange} from "../../utils/common";
 const serverPROTOCOL = constants.config.PROTOCOL;
 const serverURL = constants.config.URL;
 
+const scheduleBgColor = [colors.pastelRed, colors.pastelYellow, colors.pastelGreen, colors.pastelBlue, colors.pastelPurple];
+
 const PowerContentsAutoBidContainer = () => {
     const {customerList} = useContext(AuthContext);
     const [loading, setLoading] = useState(false);
@@ -203,18 +205,6 @@ const PowerContentsAutoBidContainer = () => {
         }
     }, [customer]);
 
-
-    // 고급 설정
-    const [selections, setSelections] = useState({
-        mon: [],
-        tue: [],
-        wed: [],
-        thu: [],
-        fri: [],
-        sat: [],
-        sun: [],
-    });
-
     // 요일, 시간 select box onChange
     const handleHighScheduleSetting = e => {
         const {name, value} = e.target;
@@ -225,7 +215,7 @@ const PowerContentsAutoBidContainer = () => {
         });
     }
 
-    const scheduleBgColor = [colors.pastelRed, colors.pastelYellow, colors.pastelGreen, colors.pastelBlue, colors.pastelPurple];
+
     const {week, start, finish} = highSchedule;
 
     // 스케줄 중복 data finder
@@ -253,7 +243,7 @@ const PowerContentsAutoBidContainer = () => {
             maxBid: keywordOption.setting.max_bid,
             minBid: keywordOption.setting.min_bid,
             active: false,
-            bgColor: scheduleBgColor[scheduleChips.length],
+            bgColor: scheduleBgColor.shift(),
             mon: [],
             tue: [],
             wed: [],
@@ -351,11 +341,6 @@ const PowerContentsAutoBidContainer = () => {
 
         // 중복체크
         if (week !== "weekDays" && week !== "weekend" && week !== "all") {
-
-
-            console.info('!!!!!!!!!!!!!!!!!!!', week);
-
-
             let weekAllSchedule = [];
             scheduleChips.map(item => item[week].forEach(time => !!time && weekAllSchedule.push(time)));
             let weekDuplicateChecker = weekAllSchedule.find(time => {
@@ -367,6 +352,31 @@ const PowerContentsAutoBidContainer = () => {
 
             if (weekDuplicateChecker) {
                 alert(`[${weekKor}요일] ${weekDuplicateChecker}시는 이미 선택하셨습니다.`);
+                return;
+            }
+        } else {
+            let weekAllSchedule = [];
+            // eslint-disable-next-line array-callback-return
+            scheduleChips.map(item => {
+                item.mon.forEach(time => !!time && weekAllSchedule.push(time));
+                item.tue.forEach(time => !!time && weekAllSchedule.push(time));
+                item.wed.forEach(time => !!time && weekAllSchedule.push(time));
+                item.thu.forEach(time => !!time && weekAllSchedule.push(time));
+                item.fri.forEach(time => !!time && weekAllSchedule.push(time));
+                item.sat.forEach(time => !!time && weekAllSchedule.push(time));
+                item.sun.forEach(time => !!time && weekAllSchedule.push(time));
+            });
+            let weekDuplicateChecker = weekAllSchedule.find(time => {
+                if (time >= parseInt(start) && time <= parseInt(finish))
+                    return time;
+                else
+                    return false;
+            });
+
+            weekAllSchedule = weekAllSchedule.filter((time, index) => weekAllSchedule.indexOf(time) === index);
+
+            if (weekDuplicateChecker) {
+                alert(`${week === "weekDays" ? "주중" : week === "weekend" ? "주말" : "전체 요일 중"} ${weekDuplicateChecker}시는 이미 선택하셨습니다.`);
                 return;
             }
         }
@@ -416,7 +426,10 @@ const PowerContentsAutoBidContainer = () => {
     }
 
     // 스케줄 카드 삭제
-    const onDeleteChips = id => setScheduleChips(scheduleChips.filter(chip => id !== chip.id));
+    const onDeleteChips = id => {
+        scheduleBgColor.push(scheduleChips.filter(chip => id === chip.id)[0].bgColor);
+        setScheduleChips(scheduleChips.filter(chip => id !== chip.id));
+    }
 
     // 취소
     const onCancel = () => window.location.reload();
@@ -582,7 +595,6 @@ const PowerContentsAutoBidContainer = () => {
             onScheduleClick={onScheduleClick}
             onAddChips={onAddChips}
             onDeleteChips={onDeleteChips}
-            selections={selections}
             onCancel={onCancel}
             onAddAutoBid={onAddAutoBid}
             loading={loading}

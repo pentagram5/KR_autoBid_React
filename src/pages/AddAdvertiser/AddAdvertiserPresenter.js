@@ -59,40 +59,12 @@ function TablePaginationActions(props) {
 
 const CustomTable = styled(Table)`
   thead th {
-    text-align: center;
-    background: ${colors.ultraLightGray};
-
+     text-align: center;
+     background: ${colors.ultraLightGray};
   }
-
-  td:first-child {
-    padding-left: 4px;
-  }
-
   td {
     padding: 6px 0;
     text-align: center;
-  }
-
-  .css-hbtnrh-MuiTableCell-root {
-    max-width: 40px;
-  }
-
-  .css-1ex1afd-MuiTableCell-root:nth-child(2),
-  .css-1ex1afd-MuiTableCell-root:nth-child(3),
-  .css-1ex1afd-MuiTableCell-root:nth-child(4) {
-    min-width: 200px !important;
-    white-space: pre;
-  }
-
-  .css-1ex1afd-MuiTableCell-root:nth-child(5),
-  .css-1ex1afd-MuiTableCell-root:nth-child(6),
-  .css-1ex1afd-MuiTableCell-root:nth-child(7),
-  .css-1ex1afd-MuiTableCell-root:nth-child(8),
-  .css-1ex1afd-MuiTableCell-root:nth-child(9),
-  .css-1ex1afd-MuiTableCell-root:nth-child(10),
-  .css-1ex1afd-MuiTableCell-root:nth-child(11),
-  .css-1ex1afd-MuiTableCell-root:nth-child(12) {
-    width: 50px;
   }
 `;
 
@@ -127,6 +99,11 @@ const Input = styled.input`
     font-size: 16px;
   }
 `;
+const ButtonGroup = styled.div`
+  text-align: center;
+  margin: 100px 0 200px;
+`;
+
 
 const AddAdvertiserPresenter = ({
                                     title,
@@ -142,6 +119,9 @@ const AddAdvertiserPresenter = ({
                                     isChecked,
                                     handleAllChecked,
                                     handleChecked,
+                                    handleAdvertiserRegister,
+                                    searchTerm,
+                                    handleSearchAdvertiser
                                 }) => {
 
     return (
@@ -157,17 +137,12 @@ const AddAdvertiserPresenter = ({
                     <Text fontWeight={700}>광고주 로그인 ID</Text>
                     <InputBox>
                         <Input
+                            value={searchTerm}
+                            onChange={handleSearchAdvertiser}
                             placeholder="광고주 로그인 ID를 입력하세요."
                         />
                     </InputBox>
-                    <StyledButton
-                        title="검색"
-                        width={116}
-                        height={50}
-                        bgColor={colors.blue}
-                        fontColor={colors.white}
-                        borderRadius={1}
-                    />
+
                 </AdvertiserSearch>
 
                 <TableContainer component={Paper}>
@@ -177,16 +152,16 @@ const AddAdvertiserPresenter = ({
                                 <TableCell padding="checkbox">
                                     <Checkbox
                                         onChange={handleAllChecked}
-                                        checked={customerList.length > 0 && (rowsPerPage > 0 ? checked.length === rowsPerPage : checked.length === customerList.length)}
+                                        checked={customerDataList.length > 0 && (rowsPerPage > 0 ? (checked.length === rowsPerPage || checked.length === customerDataList.length) : checked.length === customerDataList.length)}
                                     />
                                 </TableCell>
-                                <TableCell padding="checkbox">
+                                <TableCell>
                                     광고주 로그인 ID
                                 </TableCell>
-                                <TableCell padding="checkbox">
+                                <TableCell>
                                     광고주 등록 여부
                                 </TableCell>
-                                <TableCell padding="checkbox">
+                                <TableCell>
                                     최종 동기화 시간
                                 </TableCell>
                             </TableRow>
@@ -243,6 +218,29 @@ const AddAdvertiserPresenter = ({
                         </TableFooter>
                     </CustomTable>
                 </TableContainer>
+
+                <ButtonGroup>
+                    <StyledButton
+                        title="미 등 록"
+                        width={200}
+                        height={65}
+                        border={`1px solid  ${colors.blue}`}
+                        bgColor={colors.white}
+                        fontColor={colors.blue}
+                        borderRadius={1}
+                        margin="0 12px 0 0"
+                        onClick={() => handleAdvertiserRegister(0)}
+                    />
+                    <StyledButton
+                        title="등 록"
+                        width={200}
+                        height={65}
+                        bgColor={colors.blue}
+                        fontColor={colors.white}
+                        borderRadius={1}
+                        onClick={() => handleAdvertiserRegister(1)}
+                    />
+                </ButtonGroup>
             </Wrapper>
         </>
     )

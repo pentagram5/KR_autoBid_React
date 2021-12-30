@@ -2,6 +2,9 @@ import React from 'react';
 import styled from "styled-components";
 import colors from "../../styles/colors";
 import selectArrow3 from "../../assets/selectArrow3.svg";
+import Radio from '@mui/material/Radio';
+import RadioGroup from '@mui/material/RadioGroup';
+import FormControlLabel from '@mui/material/FormControlLabel';
 
 const Wrapper = styled.div`
   width: 300px;
@@ -50,10 +53,16 @@ const Select = styled.select`
   }
 `;
 
-const FilterInput = ({title, name, onChange, value, input, select, options}) => {
+const FilterInput = ({title, name, onChange, value, radio, input, select, options}) => {
     return (
         <Wrapper>
             <Title>{title}</Title>
+            {radio &&
+            <RadioGroup row name={name} onChange={onChange} value={value}>
+                <FormControlLabel value={0} control={<Radio />} label="포함" />
+                <FormControlLabel value={1} control={<Radio />} label="일치" />
+            </RadioGroup>
+            }
             {input &&
             <InputBox>
                 <Input
