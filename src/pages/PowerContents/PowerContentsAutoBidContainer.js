@@ -569,6 +569,7 @@ const PowerContentsAutoBidContainer = () => {
     return (
         <AddAutoBidPresenter
             title="파워컨텐츠 자동입찰등록"
+            POWER_CONTENTS
             handleCustomerChange={handleCustomerChange}
             handleKeywordSelected={handleKeywordSelected}
             customerList={customerList}

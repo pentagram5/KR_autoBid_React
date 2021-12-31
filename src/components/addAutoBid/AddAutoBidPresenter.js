@@ -19,6 +19,7 @@ import ScheduleCard from "../share/ScheduleCard";
 const View = styled.div`
   width: calc(100vw - 300px);
   padding: 30px 50px 400px;
+  max-width: 1920px;
 `;
 const Title = styled.div`
   font-size: 18px;
@@ -204,6 +205,8 @@ const ProgressBox = styled.div`
 `;
 
 const AddAutoBidPresenter = ({
+                                 SHOPPING_AD,
+                                 POWER_CONTENTS,
                                  title,
                                  handleCustomerChange,
                                  handleKeywordSelected,
@@ -211,11 +214,13 @@ const AddAutoBidPresenter = ({
                                  customerList,
                                  campaignList,
                                  adGroupList,
+                                 adsList,
                                  keywordList,
                                  checked,
                                  isChecked,
                                  handleChecked,
                                  handleAllChecked,
+                                 keywordId,
                                  onAddSettingBox,
                                  settingList,
                                  onDeleteKeyword,
@@ -231,7 +236,6 @@ const AddAutoBidPresenter = ({
                                  onScheduleClick,
                                  onAddChips,
                                  onDeleteChips,
-                                 selections,
                                  onCancel,
                                  onAddAutoBid,
                                  loading,
@@ -281,6 +285,22 @@ const AddAutoBidPresenter = ({
                             {adGroupList.map(list => <option key={list.nccAdgroupId}
                                                              value={list.nccAdgroupId}>{list.name}</option>)}
                         </SelectBox>
+                        {SHOPPING_AD && (
+                            <>
+                                <RightArrowBox>
+                                    <Image src={rightArrow}/>
+                                </RightArrowBox>
+                                <SelectBox
+                                    width={260}
+                                    bgImg={selectArrow2}
+                                    onChange={e => handleKeywordSelected(e, "nccAdId")}
+                                >
+                                    <option value="">소재명 설정</option>
+                                    {adsList.map(list => <option key={list.nccAdId}
+                                                                 value={list.nccAdId}>{list.productTitle}</option>)}
+                                </SelectBox>
+                            </>
+                        )}
                     </SelectForm>
                     <TableBox>
                         <KeywordTable>
@@ -292,24 +312,50 @@ const AddAutoBidPresenter = ({
                                     />
                                 </TableCell>
                                 <TableCell width={80} fontColor={colors.darkBlack}>키워드</TableCell>
-                                <TableCell width={220} fontColor={colors.darkBlack}>키워드 아이디</TableCell>
+                                {SHOPPING_AD ?
+                                    <>
+                                        <TableCell width={80} fontColor={colors.darkBlack}>노출수</TableCell>
+                                        <TableCell width={80} fontColor={colors.darkBlack}>클릭수</TableCell>
+                                        <TableCell width={80} fontColor={colors.darkBlack}>총비용</TableCell>
+                                        <TableCell width={80} fontColor={colors.darkBlack}>직접전환율</TableCell>
+                                    </>
+                                    :
+                                    <TableCell width={220} fontColor={colors.darkBlack}>키워드 아이디</TableCell>
+                                }
+
                             </TableRow>
-
                             {keywordList && keywordList.map(list => {
-                                const isListChecked = isChecked(list.nccKeywordId);
+                                let isListChecked;
 
-                                return (
-                                    <TableRow key={list.nccKeywordId} borderColor={colors.lightBorderColor}>
-                                        <TableCell onClick={e => handleChecked(e, list.nccKeywordId)}>
-                                            <Checkbox checked={isListChecked}/>
-                                        </TableCell>
-                                        <TableCell width={80}>{list.Keyword}</TableCell>
-                                        <TableCell width={220}>{list.nccKeywordId}</TableCell>
-                                    </TableRow>
-                                )
+                                if (SHOPPING_AD) {
+                                    isListChecked = isChecked(list.id);
+                                    return (
+                                        <TableRow key={list.schKeyword} borderColor={colors.lightBorderColor}>
+                                            <TableCell onClick={e => handleChecked(e, list.id)}>
+                                                <Checkbox checked={isListChecked}/>
+                                            </TableCell>
+                                            <TableCell width={80}>{list.schKeyword}</TableCell>
+                                            <TableCell width={80}>{list.impCnt}</TableCell>
+                                            <TableCell width={80}>{list.clkCnt}</TableCell>
+                                            <TableCell width={80}>{list.salesAmt}</TableCell>
+                                            <TableCell width={80}>{list.drtCrto}</TableCell>
+                                        </TableRow>
+                                    )
+                                } else {
+                                    isListChecked = isChecked(list.nccKeywordId);
+                                    return (
+                                        <TableRow key={list.nccKeywordId} borderColor={colors.lightBorderColor}>
+                                            <TableCell onClick={e => handleChecked(e, list.nccKeywordId)}>
+                                                <Checkbox checked={isListChecked}/>
+                                            </TableCell>
+                                            <TableCell width={80}>{list.Keyword}</TableCell>
+                                            <TableCell width={220}>{list.nccKeywordId}</TableCell>
+                                        </TableRow>
+                                    )
+                                }
                             })}
-
                         </KeywordTable>
+
 
                         <StyledButton
                             title={<Image src={rightLeftArrow}/>}
@@ -325,23 +371,41 @@ const AddAutoBidPresenter = ({
                         <KeywordTable>
                             <TableRow height={50} borderColor={colors.gray}>
                                 <TableCell width={150} fontColor={colors.darkBlack}>키워드</TableCell>
-                                <TableCell width={200} fontColor={colors.darkBlack}>키워드 아이디</TableCell>
+                                {SHOPPING_AD ?
+                                    <TableCell width={80} fontColor={colors.darkBlack}>소재</TableCell>
+                                    :
+                                    <TableCell width={220} fontColor={colors.darkBlack}>키워드 아이디</TableCell>
+                                }
                                 <TableCell fontColor={colors.darkBlack}>
                                     삭제
                                 </TableCell>
                             </TableRow>
 
                             {settingList && settingList.map(list => {
-                                return (
-                                    <TableRow key={list.nccKeywordId} borderColor={colors.lightBorderColor}>
-                                        <TableCell width={150}>{list.Keyword}</TableCell>
-                                        <TableCell width={200}>{list.nccKeywordId}</TableCell>
-                                        <TableCell>
-                                            <Image src={delete_2} cursor="pointer"
-                                                   onClick={() => onDeleteKeyword(list.nccKeywordId)}/>
-                                        </TableCell>
-                                    </TableRow>
-                                )
+                                if (SHOPPING_AD) {
+                                    return (
+                                        <TableRow key={list.id} borderColor={colors.lightBorderColor}>
+                                            <TableCell width={150}>{list.schKeyword}</TableCell>
+                                            <TableCell width={150}>{list.title}</TableCell>
+
+                                            <TableCell>
+                                                <Image src={delete_2} cursor="pointer"
+                                                       onClick={() => onDeleteKeyword(list.id)}/>
+                                            </TableCell>
+                                        </TableRow>
+                                    )
+                                } else {
+                                    return (
+                                        <TableRow key={list.nccKeywordId} borderColor={colors.lightBorderColor}>
+                                            <TableCell width={150}>{list.Keyword}</TableCell>
+                                            <TableCell width={200}>{list.nccKeywordId}</TableCell>
+                                            <TableCell>
+                                                <Image src={delete_2} cursor="pointer"
+                                                       onClick={() => onDeleteKeyword(list.nccKeywordId)}/>
+                                            </TableCell>
+                                        </TableRow>
+                                    )
+                                }
                             })}
                         </KeywordTable>
                     </TableBox>
@@ -355,7 +419,11 @@ const AddAutoBidPresenter = ({
                                     대상 키워드
                                 </td>
                                 <td>
-                                    {settingList[0] && (settingList.length === 1 ? `${settingList[0].Keyword}` : `${settingList[0].Keyword} 외 ${settingList.length - 1}건`)}
+                                    {SHOPPING_AD ?
+                                        settingList[0] && (settingList.length === 1 ? `${settingList[0].schKeyword}` : `${settingList[0].schKeyword} 외 ${settingList.length - 1}건`)
+                                        :
+                                        settingList[0] && (settingList.length === 1 ? `${settingList[0].Keyword}` : `${settingList[0].Keyword} 외 ${settingList.length - 1}건`)
+                                    }
                                 </td>
                                 <td>
                                     디바이스
@@ -468,15 +536,18 @@ const AddAutoBidPresenter = ({
                                         <option value={1}>1 위</option>
                                         <option value={2}>2 위</option>
                                         <option value={3}>3 위</option>
-                                        <option value={4}>4 위</option>
-                                        <option value={5}>5 위</option>
-                                        {device === "PC" &&
+                                        {!POWER_CONTENTS &&
                                         <>
-                                            <option value={6}>6 위</option>
-                                            <option value={7}>7 위</option>
-                                            <option value={8}>8 위</option>
-                                            <option value={9}>9 위</option>
-                                            <option value={10}>10 위</option>
+                                            <option value={4}>4 위</option>
+                                            <option value={5}>5 위</option>
+                                            {device === "PC" &&
+                                            <>
+                                                <option value={6}>6 위</option>
+                                                <option value={7}>7 위</option>
+                                                <option value={8}>8 위</option>
+                                                <option value={9}>9 위</option>
+                                                <option value={10}>10 위</option>
+                                            </>}
                                         </>
                                         }
 

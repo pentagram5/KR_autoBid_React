@@ -70,6 +70,7 @@ const CustomTable = styled(Table)`
 
 const Wrapper = styled.div`
   width: calc(100vw - 300px);
+  max-width: 1920px;
   height: calc(100vh - 100px);
   padding: 30px 50px;
 `;

@@ -19,12 +19,14 @@ const ShoppingADAutoBidContainer = () => {
     const [checked, setChecked] = useState([]);
     const [campaignList, setCampaignList] = useState([]);
     const [adGroupList, setAdGroupList] = useState([]);
+    const [adsList, setAdsList] = useState([]);
     const [keywordList, setKeywordList] = useState([]);
     const [settingList, setSettingList] = useState([]);
     const [keywordId, setKeywordId] = useState({
         nccCampaignId: "캠페인명 설정",
         nccAdgroupId: "광고그룹명 설정",
-        nccKeywordId: "",
+        nccAdId: "소재명 설정",
+        schKeyword: "",
     });
     const [radioState, setRadioState] = useState({
         simpleHigh: 0,
@@ -61,6 +63,108 @@ const ShoppingADAutoBidContainer = () => {
     });
     // 스케줄 칩 상태
     const [scheduleChips, setScheduleChips] = useState([]);
+
+    // 광고주 select 선택
+    const handleCustomerChange = useCallback(e => {
+        const list = customerList.find(list => list.CUSTOMER_ID === e.target.value);
+        setCustomer(list);
+        localStorage.setItem("customer", JSON.stringify(list));
+        setKeywordList([]);
+        setAdGroupList([]);
+        setSettingList([]);
+    }, [customerList]);
+
+
+    // 체크된 keyword SettingList 박스에 추가
+    const onAddSettingBox = useCallback(() => {
+        if (checked.length === 0) {
+            alert('추가하실 항목을 선택해주세요.');
+            return;
+        }
+        let newSettingList = [...settingList];
+
+        keywordList.forEach(list => {
+            let title = adsList.map(list => list.nccAdId === list.nccAdId && list.productTitle);
+            checked.forEach(check => {
+                if (list.id === check) {
+                    list.title = title[0];
+                    newSettingList.push(list);
+                }
+            });
+        });
+
+        let newKeywordId = {};
+        let newKeywordInfo = [];
+        newSettingList.forEach((list, index) => {
+            newKeywordId = {...keywordId};
+            newKeywordInfo.push(newKeywordId);
+            for (let key in list) {
+                newKeywordId["schKeyword"] = list["schKeyword"]
+            }
+
+            console.info('정보 ::: ', newKeywordInfo);
+        });
+        setKeywordOption({
+            ...keywordOption,
+            keyword_info: newKeywordInfo
+        });
+
+        // 중복되는 값 제거
+        newSettingList = newSettingList.reduce((unique, item) => unique.includes(item) ? unique : [...unique, item], []);
+        setSettingList(newSettingList);
+        setChecked([]);
+    }, [checked, keywordList, settingList]);
+
+    useEffect(() => {
+        console.info('keywordOption', keywordOption);
+    }, [keywordOption]);
+
+
+    // SettingList keyword 삭제
+    const onDeleteKeyword = useCallback(id => {
+        setSettingList(settingList.filter(list => list.id !== id));
+    }, [settingList]);
+
+    // 입찰 키워드 select 선택
+    const handleKeywordSelected = useCallback(async (e, type) => {
+        const {value} = e.target;
+        let res;
+
+        if (value === "") return;
+        try {
+            switch (type) {
+                case "nccCampaignId":
+                    res = await SendRequest().get(`${serverPROTOCOL}${serverURL}/autobid/shopping_ad/adgroup?CUSTOMER_ID=${customer["CUSTOMER_ID"]}&nccCampaignId=${value}`);
+                    setAdGroupList(res.data.adgroup_list);
+                    break;
+                case "nccAdgroupId":
+                    res = await SendRequest().get(`${serverPROTOCOL}${serverURL}/autobid/shopping_ad/ads?CUSTOMER_ID=${customer["CUSTOMER_ID"]}&nccAdgroupId=${value}`);
+                    setAdsList(res.data.ads_list);
+                    break;
+                case "nccAdId":
+                    res = await SendRequest().get(`${serverPROTOCOL}${serverURL}/autobid/shopping_ad/keywords?CUSTOMER_ID=${customer["CUSTOMER_ID"]}&nccAdid=${value}`);
+                    setKeywordList(res.data.keywords_list);
+                    break;
+                default:
+                    return type;
+            }
+
+            setKeywordId({
+                ...keywordId,
+                [type]: value,
+            });
+        } catch (e) {
+            throw new Error(e);
+        }
+    }, [customer, keywordId]);
+
+    const fetchCampaignData = useCallback(async () => {
+        if (!!customer["CUSTOMER_ID"]) {
+            const {data} = await SendRequest().get(`${serverPROTOCOL}${serverURL}/autobid/shopping_ad/campaign?CUSTOMER_ID=${customer["CUSTOMER_ID"]}`);
+            setCampaignList(data.campaign_list);
+        }
+    }, [customer]);
+
 
     // 간편 설정 요일, 시간 설정
     const handleSimpleScheduleSetting = useCallback((e, type) => {
@@ -123,7 +227,7 @@ const ShoppingADAutoBidContainer = () => {
     // 체크박스 전체 선택
     const handleAllChecked = useCallback(e => {
         if (e.target.checked) {
-            const newChecked = keywordList.map(list => list.nccKeywordId);
+            const newChecked = keywordList.map(list => list.id);
             setChecked(newChecked);
             return;
         }
@@ -143,68 +247,6 @@ const ShoppingADAutoBidContainer = () => {
         setChecked(newChecked);
     }, [checked]);
 
-    // 광고주 select 선택
-    const handleCustomerChange = useCallback(e => {
-        const list = customerList.find(list => list.CUSTOMER_ID === e.target.value);
-        setCustomer(list);
-        localStorage.setItem("customer", JSON.stringify(list));
-        setKeywordList([]);
-        setAdGroupList([]);
-        setSettingList([]);
-    }, [customerList]);
-
-
-    // 체크된 keyword SettingList 박스에 추가
-    const onAddSettingBox = useCallback(() => {
-        if (checked.length === 0) {
-            alert('추가하실 항목을 선택해주세요.');
-            return;
-        }
-        let newSettingList = [...settingList];
-
-        keywordList.forEach((list, index) => {
-            checked.forEach(check => {
-                if (list.nccKeywordId === check) {
-                    newSettingList.push(list);
-                }
-            });
-        });
-
-        newSettingList = newSettingList.reduce((unique, item) => unique.includes(item) ? unique : [...unique, item], []);
-        setSettingList(newSettingList);
-        setChecked([]);
-    }, [checked, keywordList, settingList]);
-
-    // SettingList keyword 삭제
-    const onDeleteKeyword = useCallback(nccKeywordId => {
-        setSettingList(settingList.filter(list => list.nccKeywordId !== nccKeywordId));
-    }, [settingList]);
-
-    // 입찰 키워드 select 선택
-    const handleKeywordSelected = useCallback(async (e, type) => {
-        const {value} = e.target;
-        if (value === "") return;
-        try {
-            const {data} = await SendRequest().get(`${serverPROTOCOL}${serverURL}/autobid/shopping_ad/${type === "nccCampaignId" ? "adgroup" : "keywords"}?CUSTOMER_ID=${customer["CUSTOMER_ID"]}&${type}=${value}`);
-
-            setKeywordId({
-                ...keywordId,
-                [type]: value,
-            });
-
-            if (type === "nccCampaignId") setAdGroupList(data.adgroup_list);
-            else setKeywordList(data.keywords_list);
-        } catch (e) {
-            throw new Error(e);
-        }
-    }, [customer, keywordId]);
-
-    const fetchCampaignData = useCallback(async () => {
-        if (!!customer["CUSTOMER_ID"]) {
-            const {data} = await SendRequest().get(`${serverPROTOCOL}${serverURL}/autobid/shopping_ad/campaign?CUSTOMER_ID=${customer["CUSTOMER_ID"]}`);
-            setCampaignList(data.campaign_list);
-        }
-    }, [customer]);
 
     // 요일, 시간 select box onChange
     const handleHighScheduleSetting = e => {
@@ -435,6 +477,11 @@ const ShoppingADAutoBidContainer = () => {
     // 취소
     const onCancel = () => window.location.reload();
 
+
+    useEffect(() => {
+        console.info(keywordOption)
+    }, [keywordOption]);
+
     // 자동입찰 등록
     const onAddAutoBid = async () => {
         if (!keywordOption.setting.target_Rank) {
@@ -447,6 +494,7 @@ const ShoppingADAutoBidContainer = () => {
             const response = await SendRequest().post(`${serverPROTOCOL}${serverURL}/autobid/shopping_ad?CUSTOMER_ID=${customer["CUSTOMER_ID"]}`, radioState.simpleHigh === 0 ? [keywordOption] : highKeywordOption);
 
             console.info(response);
+
             if (response.status === 200) {
                 setLoading(false);
 
@@ -508,12 +556,12 @@ const ShoppingADAutoBidContainer = () => {
     }, []);
 
     // 설정할 keywordOption 상태에 담기
-    useEffect(() => {
-        setKeywordOption({
-            ...keywordOption,
-            keyword_info: settingList.map(list => list.nccKeywordId)
-        });
-    }, [settingList]);
+    // useEffect(() => {
+    //     setKeywordOption({
+    //         ...keywordOption,
+    //         keyword_info: settingList.map(list => list.id)
+    //     });
+    // }, [settingList]);
 
     // 간편 설정 요일 및 시간 보내기용 데이터로 변환
     useEffect(() => {
@@ -563,12 +611,9 @@ const ShoppingADAutoBidContainer = () => {
         }
     }, [simpleSchedule]);
 
-    useEffect(() => {
-        console.info('keywordList ? ::: ', keywordList);
-    }, [keywordList]);
-
     return (
         <AddAutoBidPresenter
+            SHOPPING_AD
             title="쇼핑광고 자동입찰등록"
             handleCustomerChange={handleCustomerChange}
             handleKeywordSelected={handleKeywordSelected}
@@ -576,10 +621,12 @@ const ShoppingADAutoBidContainer = () => {
             customer={customer}
             campaignList={campaignList}
             adGroupList={adGroupList}
+            adsList={adsList}
             keywordList={keywordList}
             checked={checked}
             isChecked={isChecked}
             handleAllChecked={handleAllChecked}
+            keywordId={keywordId}
             handleChecked={handleChecked}
             settingList={settingList}
             onAddSettingBox={onAddSettingBox}

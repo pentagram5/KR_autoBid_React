@@ -19,6 +19,7 @@ import ScheduleCard from "../share/ScheduleCard";
 const View = styled.div`
   width: calc(100vw - 300px);
   padding: 30px 50px 400px;
+  max-width: 1920px;
 `;
 const Title = styled.div`
   font-size: 18px;

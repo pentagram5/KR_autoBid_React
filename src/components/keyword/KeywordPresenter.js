@@ -21,6 +21,7 @@ import close from "../../assets/close.svg";
 const Wrapper = styled.div`
   width: calc(100vw - 300px);
   height: calc(100vh - 100px);
+  max-width: 1920px;
   padding: 30px 50px;
 `;
 const Text = styled.span`
@@ -29,7 +30,6 @@ const Text = styled.span`
   color: ${({fontColor}) => fontColor ? fontColor : colors.lightBlack};
 `;
 const KeywordInfoBox = styled.div`
-  width: 90%;
   height: 113px;
   margin: 30px 0 62px;
   padding: 22px 33px;
