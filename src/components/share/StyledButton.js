@@ -9,6 +9,7 @@ const Button = styled.button`
   color: ${({fontColor}) => fontColor};
   border: ${({border}) => border ? border : "none"};
   height: ${({height}) => height}px;
+  line-height: 1.5;
   background-color: ${({bgColor}) => bgColor};
   border-radius: ${({borderRadius}) => borderRadius ? borderRadius : 4}px;
   

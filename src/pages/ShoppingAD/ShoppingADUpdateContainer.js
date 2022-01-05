@@ -1,17 +1,20 @@
-import React, {useState, useContext, useEffect, useCallback} from 'react';
+import React, {useCallback, useContext, useEffect, useState} from 'react';
 import {AuthContext} from "../../utils/AuthContext";
 import SendRequest from "../../utils/SendRequest";
+import * as constants from "../../utils/constants";
 import colors from "../../styles/colors";
 import {korWeekChange} from "../../utils/common";
 import UpdateAutoBidPresenter from "../../components/addAutoBid/UpdateAutoBidPresenter";
 import {useNavigate} from "react-router-dom";
 import {toast} from "react-toastify";
-import * as constants from "../../utils/constants";
 
 const serverPROTOCOL = constants.config.PROTOCOL;
 const serverURL = constants.config.URL;
 
-const PowerLinkAutoBidContainer = () => {
+const scheduleBgColor = [colors.pastelRed, colors.pastelYellow, colors.pastelGreen, colors.pastelBlue, colors.pastelPurple];
+
+
+const ShoppingADUpdateContainer = () => {
     const navigate = useNavigate();
     const {customerList} = useContext(AuthContext);
 
@@ -56,6 +59,25 @@ const PowerLinkAutoBidContainer = () => {
     });
     // 스케줄 칩 상태
     const [scheduleChips, setScheduleChips] = useState([]);
+
+    // 광고주 select 선택
+    const handleCustomerChange = useCallback(e => {
+        const list = customerList.find(list => list.CUSTOMER_ID === e.target.value);
+        setCustomer(list);
+        localStorage.setItem("customer", JSON.stringify(list));
+        setKeywordList([]);
+    }, [customerList]);
+
+
+    // SettingList keyword 삭제
+    const onDeleteKeyword = useCallback((nccKeywordId, schKeyword) => {
+        setKeywordList(keywordList.filter(list => list.nccKeywordId !== nccKeywordId && list.Keyword !== schKeyword));
+        setKeywordOption({
+            ...keywordOption,
+            keyword_info: keywordList.filter(list => list.nccKeywordId !== nccKeywordId && list.Keyword !== schKeyword)
+        });
+    }, [keywordList]);
+
 
     // 간편 설정 요일, 시간 설정
     const handleSimpleScheduleSetting = useCallback((e, type) => {
@@ -113,12 +135,6 @@ const PowerLinkAutoBidContainer = () => {
     }, [keywordOption]);
 
 
-    // SettingList keyword 삭제
-    const onDeleteKeyword = useCallback(nccKeywordId => {
-        setKeywordList(keywordList.filter(list => list.nccKeywordId !== nccKeywordId));
-    }, [keywordList]);
-
-
     // 요일, 시간 select box onChange
     const handleHighScheduleSetting = e => {
         const {name, value} = e.target;
@@ -129,7 +145,6 @@ const PowerLinkAutoBidContainer = () => {
         });
     }
 
-    const scheduleBgColor = [colors.pastelRed, colors.pastelYellow, colors.pastelGreen, colors.pastelBlue, colors.pastelPurple];
     const {week, start, finish} = highSchedule;
 
     // 스케줄 중복 data finder
@@ -154,7 +169,7 @@ const PowerLinkAutoBidContainer = () => {
             maxBid: keywordOption.setting.max_bid,
             minBid: keywordOption.setting.min_bid,
             active: false,
-            bgColor: scheduleBgColor[scheduleChips.length],
+            bgColor: scheduleBgColor.shift(),
             mon: [],
             tue: [],
             wed: [],
@@ -204,7 +219,6 @@ const PowerLinkAutoBidContainer = () => {
             case 'weekDays':
                 let tmpWeekDays = [];
                 for (let i = parseInt(start); i <= parseInt(finish); i++) tmpWeekDays.push(i);
-
                 copyChips = {
                     ...copyChips,
                     mon: [...tmpWeekDays],
@@ -248,10 +262,13 @@ const PowerLinkAutoBidContainer = () => {
                 weekKor = '';
         }
 
+
+
         // 중복체크
         if (week !== "weekDays" && week !== "weekend" && week !== "all") {
             let weekAllSchedule = [];
             scheduleChips.map(item => item[week].forEach(time => !!time && weekAllSchedule.push(time)));
+
             let weekDuplicateChecker = weekAllSchedule.find(time => {
                 if (time >= parseInt(start) && time <= parseInt(finish))
                     return time;
@@ -263,27 +280,100 @@ const PowerLinkAutoBidContainer = () => {
                 alert(`[${weekKor}요일] ${weekDuplicateChecker}시는 이미 선택하셨습니다.`);
                 return;
             }
+        } else {
+            let tmpWeekDays = [];
+            let tmpWeekend = [];
+            let tmpAll = [];
+
+            switch (week) {
+                case 'weekDays':
+                    scheduleChips.forEach(item => {
+                        item.mon.forEach(time => !!time && tmpWeekDays.push(time));
+                        item.tue.forEach(time => !!time && tmpWeekDays.push(time));
+                        item.wed.forEach(time => !!time && tmpWeekDays.push(time));
+                        item.thu.forEach(time => !!time && tmpWeekDays.push(time));
+                        item.fri.forEach(time => !!time && tmpWeekDays.push(time));
+                    });
+                    let weekDuplicateChecker = tmpWeekDays.find(time => {
+                        if (time >= parseInt(start) && time <= parseInt(finish))
+                            return time;
+                        else
+                            return false;
+                    });
+
+                    if (weekDuplicateChecker) {
+                        alert(`주중 ${weekDuplicateChecker}시는 이미 선택하셨습니다.`);
+                        return;
+                    }
+                    break;
+                case 'weekend':
+                    scheduleChips.forEach(item => {
+                        item.sat.forEach(time => !!time && tmpWeekend.push(time));
+                        item.sun.forEach(time => !!time && tmpWeekend.push(time));
+                    });
+
+                    let weekendDuplicateChecker = tmpWeekDays.find(time => {
+                        if (time >= parseInt(start) && time <= parseInt(finish))
+                            return time;
+                        else
+                            return false;
+                    });
+
+                    if (weekendDuplicateChecker) {
+                        alert(`주말 ${weekendDuplicateChecker}시는 이미 선택하셨습니다.`);
+                        return;
+                    }
+                    break;
+                case 'all':
+                    scheduleChips.forEach(item => {
+                        item.mon.forEach(time => !!time && tmpAll.push(time));
+                        item.tue.forEach(time => !!time && tmpAll.push(time));
+                        item.wed.forEach(time => !!time && tmpAll.push(time));
+                        item.thu.forEach(time => !!time && tmpAll.push(time));
+                        item.fri.forEach(time => !!time && tmpAll.push(time));
+                        item.sat.forEach(time => !!time && tmpAll.push(time));
+                        item.sun.forEach(time => !!time && tmpAll.push(time));
+                    });
+
+                    let allDuplicateChecker = tmpWeekDays.find(time => {
+                        if (time >= parseInt(start) && time <= parseInt(finish))
+                            return time;
+                        else
+                            return false;
+                    });
+
+                    if (allDuplicateChecker) {
+                        alert(`전체 중 ${allDuplicateChecker}시는 이미 선택하셨습니다.`);
+                        return;
+                    }
+                    break;
+                default:
+                    return;
+            }
         }
+
 
         copyChips = {...copyChips, [week]: tmp};
 
-        let schedules = scheduleChips.map(item => item.active === copyChips.active ? copyChips : item );
+        let schedules = scheduleChips.map(item => item.active === copyChips.active ? copyChips : item);
         setScheduleChips(schedules);
+
 
 
         // 보낼 양식 데이터 상태에 저장
         let finalArray = [];
         let finalData = {};
 
+        // 2진수 변환
         const getCalculatedValue = (item, weekday) => {
             let rtn = 0;
-            item[weekday].map(x => rtn += Math.pow(2, x));
+            item[weekday].map(n => rtn += Math.pow(2, n));
             return rtn;
         };
 
         schedules.forEach(item => {
             finalData = {
-                keyword_info: keywordOption.keyword_info,
+                keyword_info: keywordList,
                 device: keywordOption.device,
                 bid_cycle: keywordOption.bid_cycle,
                 setting: {
@@ -297,7 +387,7 @@ const PowerLinkAutoBidContainer = () => {
                     target_Rank: item.targetRank,
                     max_bid: item.maxBid,
                     min_bid: item.minBid,
-                    bid_adj_amount: '0', // item.bidAdjAmount,
+                    bid_adj_amount: keywordOption.setting.bid_adj_amount
                 }
             }
             finalArray.push(finalData);
@@ -305,11 +395,26 @@ const PowerLinkAutoBidContainer = () => {
         setHighKeywordOption(finalArray);
     }
 
+    useEffect(() => {
+        console.info('고급설정 : ', highKeywordOption);
+    }, [highKeywordOption]);
+
+    useEffect(() => {
+        console.info('간편설정 :', keywordOption);
+    }, [keywordOption]);
+    useEffect(() => {
+        console.info('keywordList :', keywordList);
+    }, [keywordList]);
+
     // 스케줄 카드 삭제
-    const onDeleteChips = id => setScheduleChips(scheduleChips.filter(chip => id !== chip.id));
+    const onDeleteChips = id => {
+        scheduleBgColor.push(scheduleChips.filter(chip => id === chip.id)[0].bgColor);
+        setScheduleChips(scheduleChips.filter(chip => id !== chip.id));
+    }
 
     // 취소
     const onCancel = () => window.location.reload();
+
 
     // 자동입찰 등록
     const onAddAutoBid = async () => {
@@ -320,14 +425,18 @@ const PowerLinkAutoBidContainer = () => {
         setLoading(true);
 
         try {
-            const response = await SendRequest().post(`${serverPROTOCOL}${serverURL}/autobid/powerlink/update?CUSTOMER_ID=${customer["CUSTOMER_ID"]}`, radioState.simpleHigh === 0 ? [keywordOption] : highKeywordOption);
+            const response = await SendRequest().post(`${serverPROTOCOL}${serverURL}/autobid/shopping_ad/update?CUSTOMER_ID=${customer["CUSTOMER_ID"]}`,
+                radioState.simpleHigh === 0
+                    ? [keywordOption]
+                    : highKeywordOption
+            );
+
+            console.info(response);
 
             if (response.status === 200) {
-                toast.info('키워드를 수정했습니다.')
                 setLoading(false);
 
                 setKeywordList([]);
-
                 setScheduleChips([]);
                 setKeywordOption({
                     keyword_info: [],
@@ -348,7 +457,7 @@ const PowerLinkAutoBidContainer = () => {
                     }
                 });
 
-                navigate('/powerLinkKeyword');
+                // navigate('/shoppingAdKeyword');
             }
         } catch (e) {
             throw new Error(e);
@@ -372,13 +481,58 @@ const PowerLinkAutoBidContainer = () => {
                 }
             });
         }
+        // eslint-disable-next-line
     }, [radioState]);
+
+    const fetchingData = async customerId => {
+        try {
+            const { data } = await SendRequest().post(`${serverPROTOCOL}${serverURL}/autobid/shopping_ad/update_info?CUSTOMER_ID=${customerId}`, checked);
+
+            setKeywordList(data);
+            setKeywordOption({
+                ...keywordOption,
+                keyword_info: data
+            });
+        } catch(e) {
+            throw new Error(e);
+        }
+    }
+
+    // 초기 data 불러오기
+    useEffect(() => {
+        if (!!customer["CUSTOMER_ID"] && checked.length !== 0) {
+            fetchingData(customer["CUSTOMER_ID"]);
+        }
+    }, [customer, checked]);
 
     // localStorage 광고주 id 가져오기
     useEffect(() => {
         setCustomer(JSON.parse(localStorage.getItem("customer")));
         return () => setLoading(false);
     }, []);
+
+    useEffect(() => {
+        const arr = localStorage.getItem("checked");
+        setCustomer(JSON.parse(localStorage.getItem("customer")));
+        if (arr) {
+            setChecked(arr.split(','));
+        } else {
+            toast.info('수정할 키워드가 없습니다.', {
+                autoClose: 1000
+            });
+            navigate('/shoppingADKeyword');
+
+        }
+        return () => localStorage.removeItem("checked");
+    }, []);
+
+    useEffect(() => {
+        console.info('keywordList', keywordList);
+    }, [keywordList]);
+
+    useEffect(() => {
+        console.info('checked', checked);
+    }, [checked]);
 
     // 간편 설정 요일 및 시간 보내기용 데이터로 변환
     useEffect(() => {
@@ -426,60 +580,20 @@ const PowerLinkAutoBidContainer = () => {
                 }
             });
         }
+        // eslint-disable-next-line
     }, [simpleSchedule]);
-
-    const fetchingData = async customerId => {
-
-        try {
-            const { data } = await SendRequest().post(`${serverPROTOCOL}${serverURL}/autobid/powerlink/update_info?CUSTOMER_ID=${customerId}`, checked);
-
-            setKeywordList(data);
-        } catch(e) {
-            throw new Error(e);
-        }
-    }
-
-    useEffect(() => {
-        const arr = localStorage.getItem("checked");
-        setCustomer(JSON.parse(localStorage.getItem("customer")));
-        if (arr) {
-            setChecked(arr.split(','));
-        } else {
-            toast.info('수정할 키워드가 없습니다.', {
-                autoClose: 1000
-            });
-            navigate('/powerLinkKeyword');
-        }
-
-        return () => localStorage.removeItem("checked");
-    }, []);
-
-    useEffect(() => {
-        if (!!customer["CUSTOMER_ID"] && checked.length !== 0) {
-            fetchingData(customer["CUSTOMER_ID"]);
-        }
-    }, [customer, checked]);
-
-
-    useEffect(() => {
-        setKeywordOption({
-            ...keywordOption,
-            keyword_info: keywordList.map(list => list.nccKeywordId)
-        });
-    }, [keywordList]);
-
 
     return (
         <UpdateAutoBidPresenter
-            title="파워링크 자동입찰수정"
+            SHOPPING_AD
+            title="쇼핑광고 자동입찰수정"
+            handleCustomerChange={handleCustomerChange}
             customerList={customerList}
             customer={customer}
-
             keywordList={keywordList}
             checked={checked}
+
             onDeleteKeyword={onDeleteKeyword}
-
-
             keywordOption={keywordOption}
             radioState={radioState}
             handleRadioTab={handleRadioTab}
@@ -492,7 +606,6 @@ const PowerLinkAutoBidContainer = () => {
             onScheduleClick={onScheduleClick}
             onAddChips={onAddChips}
             onDeleteChips={onDeleteChips}
-
             onCancel={onCancel}
             onAddAutoBid={onAddAutoBid}
             loading={loading}
@@ -500,4 +613,5 @@ const PowerLinkAutoBidContainer = () => {
     )
 }
 
-export default React.memo(PowerLinkAutoBidContainer);
+export default ShoppingADUpdateContainer;
+

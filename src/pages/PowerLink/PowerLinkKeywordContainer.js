@@ -171,7 +171,7 @@ const PowerLinkKeywordContainer = () => {
     // 체크박스 전체 선택
     const handleAllChecked = e => {
         if (e.target.checked) {
-            const newChecked = data.keywords.map(list => list.nccKeywordId);
+            const newChecked = data.keywords.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map(list => list.nccKeywordId);
             setChecked(newChecked);
             return;
         }
@@ -341,10 +341,6 @@ const PowerLinkKeywordContainer = () => {
         window.addEventListener('click', handleFilterClose);
         return () => window.removeEventListener('click', handleFilterClose);
     }, [searchFilterOpen]);
-
-    useEffect(() => {
-        console.info('체크박스 : ', checked);
-    }, [checked]);
 
     return (
         <KeywordPresenter

@@ -91,7 +91,7 @@ const TableRow = styled.div`
   height: ${({height}) => height ? height : 70}px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: space-around;
   border-bottom: 1px solid ${({borderColor}) => borderColor};
 `;
 const TableCell = styled.div`
@@ -205,30 +205,31 @@ const ProgressBox = styled.div`
 `;
 
 const UpdateAutoBidPresenter = ({
-                                 title,
-                                 handleCustomerChange,
+                                    SHOPPING_AD,
+                                    title,
+                                    handleCustomerChange,
 
-                                 keywordList,
+                                    keywordList,
 
-                                 onDeleteKeyword,
-                                 keywordOption,
-                                 radioState,
-                                 handleRadioTab,
-                                 onAutoBidChange,
-                                 simpleSchedule,
-                                 handleSimpleScheduleSetting,
-                                 handleHighScheduleSetting,
-                                 scheduleChips,
-                                 onAddSchedule,
-                                 onScheduleClick,
-                                 onAddChips,
-                                 onDeleteChips,
+                                    onDeleteKeyword,
+                                    keywordOption,
+                                    radioState,
+                                    handleRadioTab,
+                                    onAutoBidChange,
+                                    simpleSchedule,
+                                    handleSimpleScheduleSetting,
+                                    handleHighScheduleSetting,
+                                    scheduleChips,
+                                    onAddSchedule,
+                                    onScheduleClick,
+                                    onAddChips,
+                                    onDeleteChips,
 
-                                 onCancel,
-                                 onAddAutoBid,
-                                 loading,
+                                    onCancel,
+                                    onAddAutoBid,
+                                    loading,
 
-                             }) => {
+                                }) => {
 
     const {device, bid_cycle, bid_adj_amount, max_bid, min_bid} = keywordOption;
 
@@ -250,25 +251,42 @@ const UpdateAutoBidPresenter = ({
                     <TableBox>
                         <KeywordTable>
                             <TableRow height={50} borderColor={colors.gray}>
-                                <TableCell width={80} fontColor={colors.darkBlack}>키워드</TableCell>
-                                <TableCell width={220} fontColor={colors.darkBlack}>키워드 아이디</TableCell>
+                                <TableCell width={100} fontColor={colors.darkBlack}>키워드</TableCell>
+                                {SHOPPING_AD ?
+                                    <TableCell width={200} fontColor={colors.darkBlack}>소재</TableCell>
+                                    :
+                                    <TableCell width={200} fontColor={colors.darkBlack}>키워드 아이디</TableCell>
+                                }
                                 <TableCell fontColor={colors.darkBlack}>
                                     삭제
                                 </TableCell>
                             </TableRow>
 
                             {keywordList && keywordList.map(list => {
+                                if (SHOPPING_AD) {
+                                    return (
+                                        <TableRow key={list.nccKeywordId} borderColor={colors.lightBorderColor}>
+                                            <TableCell width={100}>{list.schKeyword}</TableCell>
+                                            <TableCell width={200}>{list.nccKeywordId}</TableCell>
 
-                                return (
-                                    <TableRow key={list.nccKeywordId} borderColor={colors.lightBorderColor}>
-                                        <TableCell width={80}>{list.Keyword}</TableCell>
-                                        <TableCell width={220}>{list.nccKeywordId}</TableCell>
-                                        <TableCell>
-                                            <Image src={delete_2} cursor="pointer"
-                                                   onClick={() => onDeleteKeyword(list.nccKeywordId)}/>
-                                        </TableCell>
-                                    </TableRow>
-                                )
+                                            <TableCell>
+                                                <Image src={delete_2} cursor="pointer"
+                                                       onClick={() => onDeleteKeyword(list.nccKeywordId, list.schKeyword)}/>
+                                            </TableCell>
+                                        </TableRow>
+                                    )
+                                } else {
+                                    return (
+                                        <TableRow key={list.nccKeywordId} borderColor={colors.lightBorderColor}>
+                                            <TableCell width={100}>{list.Keyword}</TableCell>
+                                            <TableCell width={200}>{list.nccKeywordId}</TableCell>
+                                            <TableCell>
+                                                <Image src={delete_2} cursor="pointer"
+                                                       onClick={() => onDeleteKeyword(list.nccKeywordId)}/>
+                                            </TableCell>
+                                        </TableRow>
+                                    )
+                                }
                             })}
 
                         </KeywordTable>
@@ -284,7 +302,11 @@ const UpdateAutoBidPresenter = ({
                                     대상 키워드
                                 </td>
                                 <td>
-                                    {keywordList[0] && (keywordList.length === 1 ? `${keywordList[0].Keyword}` : `${keywordList[0].Keyword} 외 ${keywordList.length - 1}건`)}
+                                    {SHOPPING_AD ?
+                                        keywordList[0] && (keywordList.length === 1 ? `${keywordList[0].schKeyword}` : `${keywordList[0].schKeyword} 외 ${keywordList.length - 1}건`)
+                                        :
+                                        keywordList[0] && (keywordList.length === 1 ? `${keywordList[0].Keyword}` : `${keywordList[0].Keyword} 외 ${keywordList.length - 1}건`)
+                                    }
                                 </td>
                                 <td>
                                     디바이스

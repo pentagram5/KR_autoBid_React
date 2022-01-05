@@ -57,11 +57,18 @@ function TablePaginationActions(props) {
     );
 }
 
+const TableWrapper = styled.div`
+  position: relative;
+
+  .css-11xur9t-MuiPaper-root-MuiTableContainer-root {
+    height: calc(100vh - 498px);
+  }
+`;
+
 const CustomTable = styled(Table)`
   thead th {
     text-align: center;
     background: ${colors.ultraLightGray};
-    
   }
 
   td:first-child {
@@ -72,7 +79,7 @@ const CustomTable = styled(Table)`
     padding: 6px 0;
     text-align: center;
   }
-
+  
   .css-hbtnrh-MuiTableCell-root {
     max-width: 40px;
   }
@@ -94,7 +101,25 @@ const CustomTable = styled(Table)`
   .css-1ex1afd-MuiTableCell-root:nth-child(12) {
     width: 50px;
   }
+
+  .css-1qgma8u-MuiButtonBase-root-MuiTableSortLabel-root {
+    display: flex;
+    justify-content: center;
+    position: relative;
+    left: 12px;
+  }
 `;
+const BottomTableBox = styled.div`
+  width: 100%;
+  border-top: 1px solid rgba(224, 224, 224, 1);
+  background-color: ${colors.white};
+  position: absolute;
+  bottom: 0;
+  table {
+    width: 100%;
+  }
+`;
+
 
 export default function MaterialTable({
                                           tableLists,
@@ -120,223 +145,234 @@ export default function MaterialTable({
     const createSortHandler = property => e => handleRequestSort(e, property);
 
     return (
-        <TableContainer component={Paper}>
-            <CustomTable>
-                <TableHead>
-                    <TableRow>
-                        <TableCell padding="checkbox">
-                            <Checkbox
-                                onChange={handleAllChecked}
-                                checked={tableLists.length > 0 && checked.length === tableLists.length}
-                            />
-                        </TableCell>
-                        <TableCell
-                            sortDirection={orderBy === 'Campaign_name' ? order : false}
-                        >
-                            <TableSortLabel
-                                active={orderBy === 'Campaign_name'}
-                                direction={orderBy === 'Campaign_name' ? order : 'asc'}
-                                onClick={createSortHandler('Campaign_name')}
+        <TableWrapper>
+            <TableContainer component={Paper}>
+                <CustomTable>
+                    <TableHead>
+                        <TableRow>
+                            <TableCell padding="checkbox">
+                                <Checkbox
+                                    onChange={handleAllChecked}
+                                    checked={tableLists.length > 0 && checked.length === tableLists.slice(page * rowsPerPage,  page * rowsPerPage + rowsPerPage).length}
+                                />
+                            </TableCell>
+                            <TableCell
+                                sortDirection={orderBy === 'Campaign_name' ? order : false}
                             >
-                                캠페인
-                            </TableSortLabel>
-                        </TableCell>
-                        <TableCell
-                            sortDirection={orderBy === 'Adgroup_name' ? order : false}
-                        >
-                            <TableSortLabel
-                                active={orderBy === 'Adgroup_name'}
-                                direction={orderBy === 'Adgroup_name' ? order : 'asc'}
-                                onClick={createSortHandler('Adgroup_name')}
+                                <TableSortLabel
+                                    active={orderBy === 'Campaign_name'}
+                                    direction={orderBy === 'Campaign_name' ? order : 'asc'}
+                                    onClick={createSortHandler('Campaign_name')}
+                                >
+                                    캠페인
+                                </TableSortLabel>
+                            </TableCell>
+                            <TableCell
+                                sortDirection={orderBy === 'Adgroup_name' ? order : false}
                             >
-                                광고그룹
-                            </TableSortLabel>
-                        </TableCell>
-                        <TableCell
-                            sortDirection={orderBy === 'Keyword' ? order : false}
-                        >
-                            <TableSortLabel
-                                active={orderBy === 'Keyword'}
-                                direction={orderBy === 'Keyword' ? order : 'asc'}
-                                onClick={createSortHandler('Keyword')}
+                                <TableSortLabel
+                                    active={orderBy === 'Adgroup_name'}
+                                    direction={orderBy === 'Adgroup_name' ? order : 'asc'}
+                                    onClick={createSortHandler('Adgroup_name')}
+                                >
+                                    광고그룹
+                                </TableSortLabel>
+                            </TableCell>
+                            <TableCell
+                                sortDirection={orderBy === 'Keyword' ? order : false}
                             >
-                                키워드
-                            </TableSortLabel>
-                        </TableCell>
-                        <TableCell
-                            sortDirection={orderBy === 'device' ? order : false}
-                        >
-                            <TableSortLabel
-                                active={orderBy === 'device'}
-                                direction={orderBy === 'device' ? order : 'asc'}
-                                onClick={createSortHandler('device')}
+                                <TableSortLabel
+                                    active={orderBy === 'Keyword'}
+                                    direction={orderBy === 'Keyword' ? order : 'asc'}
+                                    onClick={createSortHandler('Keyword')}
+                                >
+                                    키워드
+                                </TableSortLabel>
+                            </TableCell>
+                            <TableCell
+                                sortDirection={orderBy === 'device' ? order : false}
                             >
-                                디바이스
-                            </TableSortLabel>
-                        </TableCell>
-                        <TableCell
-                            sortDirection={orderBy === 'min_bid' ? order : false}
-                        >
-                            <TableSortLabel
-                                active={orderBy === 'min_bid'}
-                                direction={orderBy === 'min_bid' ? order : 'asc'}
-                                onClick={createSortHandler('min_bid')}
+                                <TableSortLabel
+                                    active={orderBy === 'device'}
+                                    direction={orderBy === 'device' ? order : 'asc'}
+                                    onClick={createSortHandler('device')}
+                                >
+                                    디바이스
+                                </TableSortLabel>
+                            </TableCell>
+                            <TableCell
+                                sortDirection={orderBy === 'min_bid' ? order : false}
                             >
-                                최소입찰가
-                            </TableSortLabel>
-                        </TableCell>
-                        <TableCell
-                            sortDirection={orderBy === 'max_bid' ? order : false}
-                        >
-                            <TableSortLabel
-                                active={orderBy === 'max_bid'}
-                                direction={orderBy === 'max_bid' ? order : 'asc'}
-                                onClick={createSortHandler('max_bid')}
+                                <TableSortLabel
+                                    active={orderBy === 'min_bid'}
+                                    direction={orderBy === 'min_bid' ? order : 'asc'}
+                                    onClick={createSortHandler('min_bid')}
+                                >
+                                    최소입찰가
+                                </TableSortLabel>
+                            </TableCell>
+                            <TableCell
+                                sortDirection={orderBy === 'max_bid' ? order : false}
                             >
-                                최대입찰가
-                            </TableSortLabel>
-                        </TableCell>
-                        <TableCell
-                            sortDirection={orderBy === 'target_Rank' ? order : false}
-                        >
-                            <TableSortLabel
-                                active={orderBy === 'target_Rank'}
-                                direction={orderBy === 'target_Rank' ? order : 'asc'}
-                                onClick={createSortHandler('target_Rank')}
+                                <TableSortLabel
+                                    active={orderBy === 'max_bid'}
+                                    direction={orderBy === 'max_bid' ? order : 'asc'}
+                                    onClick={createSortHandler('max_bid')}
+                                >
+                                    최대입찰가
+                                </TableSortLabel>
+                            </TableCell>
+                            <TableCell
+                                sortDirection={orderBy === 'target_Rank' ? order : false}
                             >
-                                목표순위
-                            </TableSortLabel>
-                        </TableCell>
-                        <TableCell
-                            sortDirection={orderBy === 'current_bid' ? order : false}
-                        >
-                            <TableSortLabel
-                                active={orderBy === 'current_bid'}
-                                direction={orderBy === 'current_bid' ? order : 'asc'}
-                                onClick={createSortHandler('current_bid')}
+                                <TableSortLabel
+                                    active={orderBy === 'target_Rank'}
+                                    direction={orderBy === 'target_Rank' ? order : 'asc'}
+                                    onClick={createSortHandler('target_Rank')}
+                                >
+                                    목표순위
+                                </TableSortLabel>
+                            </TableCell>
+                            <TableCell
+                                sortDirection={orderBy === 'current_bid' ? order : false}
                             >
-                                현재입찰가
-                            </TableSortLabel>
-                        </TableCell>
-                        <TableCell
-                            sortDirection={orderBy === 'current_rank' ? order : false}
-                        >
-                            <TableSortLabel
-                                active={orderBy === 'current_rank'}
-                                direction={orderBy === 'current_rank' ? order : 'asc'}
-                                onClick={createSortHandler('current_rank')}
+                                <TableSortLabel
+                                    active={orderBy === 'current_bid'}
+                                    direction={orderBy === 'current_bid' ? order : 'asc'}
+                                    onClick={createSortHandler('current_bid')}
+                                >
+                                    현재입찰가
+                                </TableSortLabel>
+                            </TableCell>
+                            <TableCell
+                                sortDirection={orderBy === 'current_rank' ? order : false}
                             >
-                                현재순위
-                            </TableSortLabel>
-                        </TableCell>
-                        <TableCell
-                            sortDirection={orderBy === 'activate' ? order : false}
-                        >
-                            <TableSortLabel
-                                active={orderBy === 'activate'}
-                                direction={orderBy === 'activate' ? order : 'asc'}
-                                onClick={createSortHandler('activate')}
+                                <TableSortLabel
+                                    active={orderBy === 'current_rank'}
+                                    direction={orderBy === 'current_rank' ? order : 'asc'}
+                                    onClick={createSortHandler('current_rank')}
+                                >
+                                    현재순위
+                                </TableSortLabel>
+                            </TableCell>
+                            <TableCell
+                                sortDirection={orderBy === 'activate' ? order : false}
                             >
-                                자동입찰활성화
-                            </TableSortLabel>
-                        </TableCell>
-                        <TableCell
-                            sortDirection={orderBy === 'bid_cycle' ? order : false}
-                        >
-                            <TableSortLabel
-                                active={orderBy === 'bid_cycle'}
-                                direction={orderBy === 'bid_cycle' ? order : 'asc'}
-                                onClick={createSortHandler('bid_cycle')}
+                                <TableSortLabel
+                                    active={orderBy === 'activate'}
+                                    direction={orderBy === 'activate' ? order : 'asc'}
+                                    onClick={createSortHandler('activate')}
+                                >
+                                    자동입찰활성화
+                                </TableSortLabel>
+                            </TableCell>
+                            <TableCell
+                                sortDirection={orderBy === 'bid_cycle' ? order : false}
                             >
-                                입찰주기
-                            </TableSortLabel>
-                        </TableCell>
-                    </TableRow>
-                </TableHead>
-                <TableBody>
-                    {tableLists &&
-                    (rowsPerPage > 0
-                            ? tableLists.sort(getComparator(order, orderBy)).slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                            : tableLists
-                    ).map(row => {
-                        const isListChecked = isChecked(row.nccKeywordId);
-
-                        return (
-                            <TableRow key={row.nccKeywordId}>
-                                <TableCell padding="checkbox" onClick={e => handleChecked(e, row.nccKeywordId)}>
-                                    <Checkbox
-                                        checked={isListChecked}
-                                    />
-                                </TableCell>
-                                <TableCell>
-                                    {row.Campaign_name}
-                                </TableCell>
-                                <TableCell>
-                                    {row.Adgroup_name}
-                                </TableCell>
-                                <TableCell>
-                                    {row.Keyword}
-                                </TableCell>
-                                <TableCell>
-                                    {row.device}
-                                </TableCell>
-                                <TableCell>
-                                    {!!row.min_bid ? `${parseInt(row.min_bid).toLocaleString()} 원` : '-'}
-                                </TableCell>
-                                <TableCell>
-                                    {!!row.max_bid ? `${parseInt(row.max_bid).toLocaleString()} 원` : '-'}
-                                </TableCell>
-                                <TableCell>
-                                    {row.target_Rank}
-                                </TableCell>
-                                <TableCell>
-                                    {parseInt(row.current_bid).toLocaleString()} 원
-                                </TableCell>
-
-                                {/*  88 순위밖, 99 - */}
-                                <TableCell>
-                                    {(row.current_rank !== 55 && row.current_rank !== 66 && row.current_rank !== 77) && row.current_rank}
-                                    {(row.current_rank === 55 && row.current_rank !== 66 && row.current_rank !== 77) && '순위 밖'}
-                                    {(row.current_rank === 66 && row.current_rank !== 55 && row.current_rank !== 77) && '실행 전'}
-                                    {(row.current_rank === 77 && row.current_rank !== 55 && row.current_rank !== 66) && '스케줄 밖'}
-                                </TableCell>
-                                <TableCell>
-                                    {!!row.activate ? '활성화' : '비활성화'}
-                                </TableCell>
-                                <TableCell>
-                                    {row.bid_cycle} 분
-                                </TableCell>
-                            </TableRow>
-                        )
-                    })}
-                    {emptyRows > 0 && (
-                        <TableRow style={{height: 53 * emptyRows}}>
-                            <TableCell colSpan={6}/>
+                                <TableSortLabel
+                                    active={orderBy === 'bid_cycle'}
+                                    direction={orderBy === 'bid_cycle' ? order : 'asc'}
+                                    onClick={createSortHandler('bid_cycle')}
+                                >
+                                    입찰주기
+                                </TableSortLabel>
+                            </TableCell>
                         </TableRow>
-                    )}
-                </TableBody>
-                <TableFooter>
-                    <TableRow>
-                        <TablePagination
-                            // rowsPerPageOptions={[10, 20, 30, {label: 'All', value: -1}]}
-                            rowsPerPageOptions={[10, 30, 50, 100]}
-                            colSpan={11}
-                            count={tableLists.length}
-                            rowsPerPage={rowsPerPage}
-                            page={page}
-                            SelectProps={{
-                                inputProps: {
-                                    'aria-label': 'rows per page',
-                                },
-                                native: true,
-                            }}
-                            onPageChange={handleChangePage}
-                            onRowsPerPageChange={handleChangeRowsPerPage}
-                            ActionsComponent={TablePaginationActions}
-                        />
-                    </TableRow>
-                </TableFooter>
-            </CustomTable>
-        </TableContainer>
+                    </TableHead>
+                    <TableBody>
+                        {tableLists &&
+                        (rowsPerPage > 0
+                                ? tableLists.sort(getComparator(order, orderBy)).slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                                : tableLists
+                        ).map(row => {
+                            const isListChecked = isChecked(row.nccKeywordId);
+
+                            return (
+                                <TableRow key={row.nccKeywordId}>
+                                    <TableCell padding="checkbox" onClick={e => handleChecked(e, row.nccKeywordId)}>
+                                        <Checkbox
+                                            checked={isListChecked}
+                                        />
+                                    </TableCell>
+                                    <TableCell>
+                                        {row.Campaign_name}
+                                    </TableCell>
+                                    <TableCell>
+                                        {row.Adgroup_name}
+                                    </TableCell>
+                                    <TableCell>
+                                        {row.Keyword}
+                                    </TableCell>
+                                    <TableCell>
+                                        {row.device}
+                                    </TableCell>
+                                    <TableCell>
+                                        {!!row.min_bid ? `${parseInt(row.min_bid).toLocaleString()} 원` : '-'}
+                                    </TableCell>
+                                    <TableCell>
+                                        {!!row.max_bid ? `${parseInt(row.max_bid).toLocaleString()} 원` : '-'}
+                                    </TableCell>
+                                    <TableCell>
+                                        {row.target_Rank}
+                                    </TableCell>
+                                    <TableCell>
+                                        {parseInt(row.current_bid).toLocaleString()} 원
+                                    </TableCell>
+
+                                    {/*  88 순위밖, 99 - */}
+                                    <TableCell>
+                                        {(row.current_rank !== 55 && row.current_rank !== 66 && row.current_rank !== 77) && row.current_rank}
+                                        {(row.current_rank === 55 && row.current_rank !== 66 && row.current_rank !== 77) && '순위 밖'}
+                                        {(row.current_rank === 66 && row.current_rank !== 55 && row.current_rank !== 77) && '실행 전'}
+                                        {(row.current_rank === 77 && row.current_rank !== 55 && row.current_rank !== 66) && '스케줄 밖'}
+                                    </TableCell>
+                                    <TableCell>
+                                        {!!row.activate ? '활성화' : '비활성화'}
+                                    </TableCell>
+                                    <TableCell>
+                                        {row.bid_cycle} 분
+                                    </TableCell>
+                                </TableRow>
+                            )
+                        })}
+                        {emptyRows > 0 && (
+                            <TableRow style={{height: 53 * emptyRows}}>
+                                <TableCell colSpan={6}/>
+                            </TableRow>
+                        )}
+                    </TableBody>
+                    {/*<TableFooter>
+                        <TableRow>*/}
+                    {/*</TableRow>
+                    </TableFooter>*/}
+                </CustomTable>
+
+                <BottomTableBox>
+                    <table>
+                        <tbody>
+                            <tr>
+                                <TablePagination
+                                    // rowsPerPageOptions={[10, 20, 30, {label: 'All', value: -1}]}
+                                    rowsPerPageOptions={[10, 30, 50, 100]}
+                                    colSpan={11}
+                                    count={tableLists.length}
+                                    rowsPerPage={rowsPerPage}
+                                    page={page}
+                                    SelectProps={{
+                                        inputProps: {
+                                            'aria-label': 'rows per page',
+                                        },
+                                        native: true,
+                                    }}
+                                    onPageChange={handleChangePage}
+                                    onRowsPerPageChange={handleChangeRowsPerPage}
+                                    ActionsComponent={TablePaginationActions}
+                                />
+                            </tr>
+                        </tbody>
+                    </table>
+                </BottomTableBox>
+            </TableContainer>
+        </TableWrapper>
     )
 }

@@ -89,7 +89,6 @@ const AddAdvertiserContainer = () => {
                 Autobid_ac: value
             });
 
-            console.info('data', data);
             if (data.done) {
                 toast.info(`선택하신 광고주를 ${!!value ? "등록" : "미등록"} 하였습니다.`);
                 setCustomerDataList(data.id_info);
@@ -127,9 +126,6 @@ const AddAdvertiserContainer = () => {
         fetchCustomerData();
     }, [customer]);
 
-    useEffect(() => {
-        console.info('customerList', customerList)
-    }, [customerList]);
 
 
     return (

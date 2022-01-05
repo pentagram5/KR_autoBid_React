@@ -3,17 +3,17 @@ export const korWeekChange = engWeek => {
         case 'mon':
             return '월';
         case 'tue':
-            return '월';
+            return '화';
         case 'wed':
-            return '월';
+            return '수';
         case 'thu':
-            return '월';
+            return '목';
         case 'fri':
-            return '월';
+            return '금';
         case 'sat':
-            return '월';
+            return '토';
         case 'sun':
-            return '월';
+            return '일';
         default:
             return engWeek;
     }

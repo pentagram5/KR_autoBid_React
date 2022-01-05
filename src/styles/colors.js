@@ -32,4 +32,5 @@ export default {
     lightBorderColor: "#cccccc",
     deepWhite: "#FCFCFC",
     ultraLightGray: "#EEEEEE",
+    scheduleShadowColor: "#dddddd",
 }

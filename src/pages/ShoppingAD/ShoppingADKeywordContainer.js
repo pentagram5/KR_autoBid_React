@@ -3,6 +3,7 @@ import KeywordPresenter from "../../components/keyword/KeywordPresenter";
 import {toast} from "react-toastify";
 import SendRequest from "../../utils/SendRequest";
 import * as constants from "../../utils/constants";
+import {useNavigate} from "react-router-dom";
 
 const serverPROTOCOL = constants.config.PROTOCOL;
 const serverURL = constants.config.URL;
@@ -42,6 +43,7 @@ function reducer(state, action) {
 }
 
 const ShoppingADKeywordContainer = () => {
+    const navigator = useNavigate();
     const filterRef = useRef(null);
     const [state, dispatch] = useReducer(reducer, {
         loading: true,
@@ -66,13 +68,15 @@ const ShoppingADKeywordContainer = () => {
         activate: "",
         targetRank: "",
         maxBid: "",
-        bidCycle: ""
+        bidCycle: "",
+        opt: 0
     });
 
     // 조회 필터 input 값
     const onFilterChange = e => {
         let { name, value } = e.target;
         if (name === "maxBid") value = value.replace(/[^-0-9]/g,'');
+        if (name === "opt") value = parseInt(value);
         setSearchFilter({
             ...searchFilter,
             [name]: value
@@ -89,13 +93,14 @@ const ShoppingADKeywordContainer = () => {
             activate: "",
             targetRank: "",
             maxBid: "",
-            bidCycle: ""
+            bidCycle: "",
+            opt: 0
         });
     }
 
     // 조회필터 검색
     const onSearchFilter = async () => {
-        const { campaignName, adgroupName, keyword, device, activate, targetRank, maxBid, bidCycle } = searchFilter;
+        const { campaignName, adgroupName, keyword, device, activate, targetRank, maxBid, bidCycle, opt } = searchFilter;
 
         try {
             const res = await SendRequest().post(`${serverPROTOCOL}${serverURL}/autobid/shopping_ad/filter?CUSTOMER_ID=${customer["CUSTOMER_ID"]}`, {
@@ -106,10 +111,10 @@ const ShoppingADKeywordContainer = () => {
                 activate: activate,
                 target_Rank: targetRank,
                 max_bid: maxBid,
-                bid_cycle: bidCycle
+                bid_cycle: bidCycle,
+                opt: opt
             });
 
-            console.info('?????/**/', res.data.keywords);
 
             dispatch({ type: "RE_REQUEST", data: res.data.keywords });
             onFilterReset();
@@ -156,6 +161,7 @@ const ShoppingADKeywordContainer = () => {
         localStorage.setItem("customer", JSON.stringify(list));
     }, [customerList]);
 
+    // 체크박스 전체 선택
     const handleAllChecked = e => {
         if (e.target.checked) {
             const newChecked = (rowsPerPage > 0 ? data.keywords.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage) : data.keywords).map(list => list.nccKeywordId);
@@ -198,6 +204,7 @@ const ShoppingADKeywordContainer = () => {
 
     // 자동입찰 삭제
     const handleDeleteAutoBid = async () => {
+
         if (checked.length === 0) {
             toast.error('삭제할 키워드를 선택해주세요.');
             return;
@@ -232,6 +239,12 @@ const ShoppingADKeywordContainer = () => {
         } catch(e) {
             throw new Error(e);
         }
+    }
+
+    // 자동입찰 설정 - 수정 페이지로 이동
+    const handleUpdateAutoBid = () => {
+        navigator('/shoppingAdUpdate');
+        localStorage.setItem("checked", checked);
     }
 
     // 다운로드
@@ -328,9 +341,6 @@ const ShoppingADKeywordContainer = () => {
         return () => window.removeEventListener('click', handleFilterClose);
     }, [searchFilterOpen]);
 
-    useEffect(() => {
-        console.info('data', data);
-    }, [data]);
 
     return (
         <KeywordPresenter
@@ -342,6 +352,7 @@ const ShoppingADKeywordContainer = () => {
             customerList={customerList}
             handleCustomerChange={handleCustomerChange}
             handleAutoBidActive={handleAutoBidActive}
+            handleUpdateAutoBid={handleUpdateAutoBid}
             handleDeleteAutoBid={handleDeleteAutoBid}
             checked={checked}
             isChecked={isChecked}

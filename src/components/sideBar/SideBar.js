@@ -109,7 +109,7 @@ const SideBar = () => {
                     pathname === "/shoppingADKeyword" ||
                     pathname === "/powerContentsKeyword" ||
                     pathname === "/powerLinkUpdate" ||
-                    pathname === "/shoppingADUpdate" ||
+                    pathname === "/shoppingAdUpdate" ||
                     pathname === "/powerContentsUpdate"
                 }
                 onClick={() => navigate("/powerLinkKeyword")}
@@ -122,7 +122,7 @@ const SideBar = () => {
                         pathname === "/shoppingADKeyword" ||
                         pathname === "/powerContentsKeyword" ||
                         pathname === "/powerLinkUpdate" ||
-                        pathname === "/shoppingADUpdate" ||
+                        pathname === "/shoppingAdUpdate" ||
                         pathname === "/powerContentsUpdate"
                             ? colors.blue : colors.white
                     }
@@ -136,7 +136,7 @@ const SideBar = () => {
                               pathname === "/shoppingADKeyword" ||
                               pathname === "/powerContentsKeyword" ||
                               pathname === "/powerLinkUpdate" ||
-                              pathname === "/shoppingADUpdate" ||
+                              pathname === "/shoppingAdUpdate" ||
                               pathname === "/powerContentsUpdate"
                                   ? colors.blue : colors.white}
                         />
@@ -149,7 +149,7 @@ const SideBar = () => {
                     pathname === "/shoppingADKeyword" ||
                     pathname === "/powerContentsKeyword" ||
                     pathname === "/powerLinkUpdate" ||
-                    pathname === "/shoppingADUpdate" ||
+                    pathname === "/shoppingAdUpdate" ||
                     pathname === "/powerContentsUpdate"
                 }
             >
@@ -167,7 +167,7 @@ const SideBar = () => {
                     <SubMenu>
                         <Text
                             fontSize={16}
-                            fontColor={pathname === "/shoppingADKeyword" || pathname === "/shoppingADUpdate"? colors.black : colors.gray}>
+                            fontColor={pathname === "/shoppingADKeyword" || pathname === "/shoppingAdUpdate"? colors.black : colors.gray}>
                             - 쇼핑광고 입찰 등록 키워드
                         </Text>
                     </SubMenu>

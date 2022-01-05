@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useContext} from 'react';
+import React, {useState, useContext} from 'react';
 import SignUpPresenter from "./SignUpPresenter";
 import SendRequest from "../../utils/SendRequest";
 import * as constants from "../../utils/constants";
@@ -31,7 +31,7 @@ const SignUpContainer = () => {
     const onSignUp = async () => {
         try {
             const { data } = await SendRequest().post(`${serverPROTOCOL}${serverURL}/User/register-id`, signUpInputs);
-            console.info('회원 등록 ::: ', data);
+
             if (data.done) {
                 userLogin(data);
             }  else {
@@ -42,9 +42,6 @@ const SignUpContainer = () => {
         }
     }
 
-    useEffect(() => {
-        console.info('signUpInputs', signUpInputs);
-    }, [signUpInputs]);
 
 
     return (

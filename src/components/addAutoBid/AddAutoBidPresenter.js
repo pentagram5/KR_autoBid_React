@@ -6,6 +6,12 @@ import Radio from '@mui/material/Radio';
 import RadioGroup from '@mui/material/RadioGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import CircularProgress from '@mui/material/CircularProgress';
+import DesktopDatePicker from '@mui/lab/DesktopDatePicker';
+import LocalizationProvider from '@mui/lab/LocalizationProvider';
+import AdapterDateFns from '@mui/lab/AdapterDateFns';
+import TextField from '@mui/material/TextField';
+import Switch from '@mui/material/Switch';
+
 import StyledButton from "../share/StyledButton";
 import selectArrow2 from "../../assets/selectArrow2.svg";
 import selectArrow3 from "../../assets/selectArrow3.svg";
@@ -145,12 +151,12 @@ const SettingTable = styled.table`
   }
 `;
 const InputBox = styled.div`
-  width: 180px;
+  width: ${({width}) => width ? width : 180}px;
   height: 40px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 10px;
+  padding: ${({padding}) => padding ? padding : "0 10px"};
   color: ${colors.gray};
   border: 1px solid ${colors.lightBorderColor};
 `;
@@ -203,6 +209,53 @@ const ProgressBox = styled.div`
   background: ${colors.black};
   opacity: 0.4;
 `;
+const SearchForm = styled.div`
+  display: flex;
+  margin: 30px 0 10px;
+`;
+const DateBox = styled.div`
+  display: flex;
+  align-items: center;
+  // Input Style
+  .css-nxo287-MuiInputBase-input-MuiOutlinedInput-input {
+    height: 40px;
+    padding: 0 10px;
+  }
+
+  .css-1u3bzj6-MuiFormControl-root-MuiTextField-root {
+    width: 175px;
+  }
+`;
+const StyledSwitch = styled(Switch)`
+  padding: 0;
+  margin-right: 20px;
+
+  .css-julti5-MuiSwitch-root {
+    padding: 4px;
+    border-radius: 50%;
+  }
+
+  & .MuiSwitch-track {
+    border-radius: 22 / 2;
+
+    &:before,
+    &:after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 16px;
+      height: 16px;
+    }
+
+    & .MuiSwitch-thumb {
+      box-Shadow: none;
+      width: 16px;
+      height: 16px;
+      margin: 2px;
+    }
+  }
+`;
 
 const AddAutoBidPresenter = ({
                                  SHOPPING_AD,
@@ -220,7 +273,6 @@ const AddAutoBidPresenter = ({
                                  isChecked,
                                  handleChecked,
                                  handleAllChecked,
-                                 keywordId,
                                  onAddSettingBox,
                                  settingList,
                                  onDeleteKeyword,
@@ -228,6 +280,7 @@ const AddAutoBidPresenter = ({
                                  radioState,
                                  handleRadioTab,
                                  onAutoBidChange,
+                                 onDateChange,
                                  simpleSchedule,
                                  handleSimpleScheduleSetting,
                                  handleHighScheduleSetting,
@@ -241,6 +294,12 @@ const AddAutoBidPresenter = ({
                                  loading,
                                  setSettingList,
                                  setKeywordList,
+                                 controlProps,
+
+                                 searchInput,
+                                 handleSearchReset,
+                                 handleSearchClick,
+                                 handleSearchInput,
                              }) => {
     const {device, bid_cycle, bid_adj_amount, max_bid, min_bid} = keywordOption;
 
@@ -293,7 +352,7 @@ const AddAutoBidPresenter = ({
                                 <SelectBox
                                     width={260}
                                     bgImg={selectArrow2}
-                                    onChange={e => handleKeywordSelected(e, "nccAdId")}
+                                    onChange={e => handleKeywordSelected(e, "nccKeywordId")}
                                 >
                                     <option value="">소재명 설정</option>
                                     {adsList.map(list => <option key={list.nccAdId}
@@ -302,20 +361,50 @@ const AddAutoBidPresenter = ({
                             </>
                         )}
                     </SelectForm>
+
+                    {/* 검색 */}
+                    <SearchForm>
+                        <InputBox width={350} padding="0 10px 0 20px">
+                            <Input
+                                value={searchInput}
+                                onChange={handleSearchInput}
+                                onKeyUp={e => e.key === "Enter" && handleSearchClick()}
+                                placeholder="검색할 키워드를 입력해주세요."
+                            />
+                            <Image src={delete_2} cursor="pointer" onClick={handleSearchReset}/>
+                        </InputBox>
+                        <StyledButton
+                            title="검색"
+                            margin="0 0 0 10px"
+                            width={80}
+                            height={40}
+                            fontColor={colors.white}
+                            bgColor={colors.black}
+                            borderRadius={1}
+                            onClick={handleSearchClick}
+                        />
+                    </SearchForm>
+
                     <TableBox>
                         <KeywordTable>
                             <TableRow height={50} borderColor={colors.gray}>
-                                <TableCell fontColor={colors.darkBlack}>
-                                    <Checkbox
-                                        onChange={handleAllChecked}
-                                        checked={keywordList.length > 0 && checked.length === keywordList.length}
-                                    />
-                                </TableCell>
+                                {SHOPPING_AD ?
+                                    <TableCell fontColor={colors.darkBlack}>
+
+                                    </TableCell>
+                                    :
+                                    <TableCell fontColor={colors.darkBlack}>
+                                        <Checkbox
+                                            onChange={handleAllChecked}
+                                            checked={keywordList.length > 0 && checked.length === keywordList.length}
+                                        />
+                                    </TableCell>
+                                }
                                 <TableCell width={80} fontColor={colors.darkBlack}>키워드</TableCell>
                                 {SHOPPING_AD ?
                                     <>
-                                        <TableCell width={80} fontColor={colors.darkBlack}>노출수</TableCell>
-                                        <TableCell width={80} fontColor={colors.darkBlack}>클릭수</TableCell>
+                                        <TableCell width={50} fontColor={colors.darkBlack}>노출수</TableCell>
+                                        <TableCell width={50} fontColor={colors.darkBlack}>클릭수</TableCell>
                                         <TableCell width={80} fontColor={colors.darkBlack}>총비용</TableCell>
                                         <TableCell width={80} fontColor={colors.darkBlack}>직접전환율</TableCell>
                                     </>
@@ -328,15 +417,14 @@ const AddAutoBidPresenter = ({
                                 let isListChecked;
 
                                 if (SHOPPING_AD) {
-                                    isListChecked = isChecked(list.id);
                                     return (
                                         <TableRow key={list.schKeyword} borderColor={colors.lightBorderColor}>
-                                            <TableCell onClick={e => handleChecked(e, list.id)}>
-                                                <Checkbox checked={isListChecked}/>
+                                            <TableCell width={50}>
+                                                <Radio {...controlProps(list.id)} />
                                             </TableCell>
                                             <TableCell width={80}>{list.schKeyword}</TableCell>
-                                            <TableCell width={80}>{list.impCnt}</TableCell>
-                                            <TableCell width={80}>{list.clkCnt}</TableCell>
+                                            <TableCell width={50}>{list.impCnt}</TableCell>
+                                            <TableCell width={50}>{list.clkCnt}</TableCell>
                                             <TableCell width={80}>{list.salesAmt}</TableCell>
                                             <TableCell width={80}>{list.drtCrto}</TableCell>
                                         </TableRow>
@@ -452,7 +540,7 @@ const AddAutoBidPresenter = ({
                                 <td>
                                     주기 설정
                                 </td>
-                                <td colSpan={3}>
+                                <td>
                                     <RadioGroup row onChange={e => onAutoBidChange(e, 'bid_cycle')}>
                                         <FormControlLabel
                                             label="5분"
@@ -485,8 +573,60 @@ const AddAutoBidPresenter = ({
                                         />
                                     </RadioGroup>
                                 </td>
+                                <td>
+                                    입찰 기간 설정
+                                </td>
+                                <td>
+                                    <DateBox>
+                                        <StyledSwitch
+                                            onChange={e => handleRadioTab(e, "usedDate")}
+                                        />
+
+                                        {!!radioState.usedDate && (
+                                            <>
+                                                <LocalizationProvider dateAdapter={AdapterDateFns}>
+                                                    <DesktopDatePicker
+                                                        label="시작날짜"
+                                                        name="start_Date"
+                                                        value={keywordOption.start_Date}
+                                                        // minDate={new Date('2017-01-01')}
+                                                        mask="____.__.__"
+                                                        inputFormat="yyyy.MM.dd"
+                                                        onChange={newValue => onDateChange(newValue, "start_Date")}
+                                                        renderInput={(params) => <TextField {...params} />}
+                                                    />
+                                                </LocalizationProvider>
+                                                &nbsp;~&nbsp;
+                                                <LocalizationProvider dateAdapter={AdapterDateFns}>
+                                                    <DesktopDatePicker
+                                                        label="종료날짜"
+                                                        name="end_Date"
+                                                        value={keywordOption.end_Date}
+                                                        mask="____.__.__"
+                                                        inputFormat="yyyy.MM.dd"
+                                                        // minDate={new Date('2017-01-01')}
+                                                        onChange={newValue => onDateChange(newValue, "end_Date")}
+                                                        renderInput={(params) => <TextField {...params} />}
+                                                    />
+                                                </LocalizationProvider>
+                                            </>
+                                        )}
+                                    </DateBox>
+                                </td>
                             </tr>
                             <tr>
+                                <td>
+                                    최저가 입찰 설정
+                                </td>
+                                <td>
+                                    <RadioGroup row onChange={e => onAutoBidChange(e, 'lowest_Bid_ac')}>
+                                        <FormControlLabel value={0} name="lowest_Bid_ac" control={<Radio/>}
+                                                          label="미사용"
+                                                          checked={keywordOption.lowest_Bid_ac === 0}/>
+                                        <FormControlLabel value={1} name="lowest_Bid_ac" control={<Radio/>}
+                                                          label="사용"/>
+                                    </RadioGroup>
+                                </td>
                                 <td>
                                     설정 구분
                                 </td>
@@ -828,4 +968,4 @@ const AddAutoBidPresenter = ({
     )
 }
 
-export default AddAutoBidPresenter;
+export default React.memo(AddAutoBidPresenter);

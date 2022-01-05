@@ -16,21 +16,26 @@ const ShoppingADAutoBidContainer = () => {
     const {customerList} = useContext(AuthContext);
     const [loading, setLoading] = useState(false);
     const [customer, setCustomer] = useState({});
-    const [checked, setChecked] = useState([]);
     const [campaignList, setCampaignList] = useState([]);
     const [adGroupList, setAdGroupList] = useState([]);
     const [adsList, setAdsList] = useState([]);
+    const [selectedKeyword, setSelectedKeyword] = useState("");
     const [keywordList, setKeywordList] = useState([]);
+
+    const [initialKeywordList, setInitialKeywordList] = useState([]);
+
     const [settingList, setSettingList] = useState([]);
+    const [searchInput, setSearchInput] = useState("");
     const [keywordId, setKeywordId] = useState({
         nccCampaignId: "캠페인명 설정",
         nccAdgroupId: "광고그룹명 설정",
-        nccAdId: "소재명 설정",
+        nccKeywordId: "소재명 설정",
         schKeyword: "",
     });
     const [radioState, setRadioState] = useState({
         simpleHigh: 0,
-        bid_adj_amount: 0
+        bid_adj_amount: 0,
+        usedDate: 0
     });
     const [simpleSchedule, setSimpleSchedule] = useState({
         week: 'all',
@@ -40,6 +45,9 @@ const ShoppingADAutoBidContainer = () => {
         keyword_info: [],
         device: "PC",
         bid_cycle: 5,
+        start_Date: null,
+        end_Date: null,
+        lowest_Bid_ac: 0,
         setting: {
             mon: '0~23',
             tue: '0~23',
@@ -74,49 +82,78 @@ const ShoppingADAutoBidContainer = () => {
         setSettingList([]);
     }, [customerList]);
 
+    // 검색 onChange
+    const handleSearchInput = e => setSearchInput(e.target.value);
+    // 검색 reset
+    const handleSearchClick = async () => {
+        try {
+            const { data } = await SendRequest().post(`${serverPROTOCOL}${serverURL}/autobid/shopping_ad/keywords/search?CUSTOMER_ID=${customer["CUSTOMER_ID"]}&nccAdgroupId=${keywordId.nccAdgroupId}`, {
+                word: searchInput
+            });
+            setKeywordList(data.keywords_list);
+        } catch(e) {
+            throw new Error(e);
+        }
+        setSearchInput("");
+    }
+
+    const handleSearchReset = () => {
+        setSearchInput("");
+        setKeywordList(initialKeywordList);
+    }
+
+    // 키워드 리스트 목록 선택 Radio 버튼
+    const handleChange = e => setSelectedKeyword(e.target.value);
+    const controlProps = (id) => {
+        return ({
+            checked: selectedKeyword === id,
+            onChange: handleChange,
+            value: id,
+            name: 'keyword-radio',
+            inputProps: {'aria-label': id},
+        });
+    }
 
     // 체크된 keyword SettingList 박스에 추가
     const onAddSettingBox = useCallback(() => {
-        if (checked.length === 0) {
+        if (selectedKeyword === "") {
             alert('추가하실 항목을 선택해주세요.');
             return;
+        } else if (settingList.length > 1) {
+            alert('쇼핑광고 키워드 설정은 하나씩 설정이 가능합니다.');
+            return;
         }
-        let newSettingList = [...settingList];
-
-        keywordList.forEach(list => {
-            let title = adsList.map(list => list.nccAdId === list.nccAdId && list.productTitle);
-            checked.forEach(check => {
-                if (list.id === check) {
-                    list.title = title[0];
-                    newSettingList.push(list);
-                }
-            });
-        });
 
         let newKeywordId = {};
         let newKeywordInfo = [];
-        newSettingList.forEach((list, index) => {
-            newKeywordId = {...keywordId};
-            newKeywordInfo.push(newKeywordId);
-            for (let key in list) {
-                newKeywordId["schKeyword"] = list["schKeyword"]
-            }
+        newKeywordId = {...keywordId};
+        newKeywordInfo.push(newKeywordId);
 
-            console.info('정보 ::: ', newKeywordInfo);
+        keywordList.forEach(list => {
+            let title = adsList.map(list => list.nccAdId === list.nccAdId && list.productTitle);
+
+            if (list.id === selectedKeyword) {
+                list.title = title[0];
+
+                setSettingList([list]);
+                for (let key in list) {
+                    newKeywordId["schKeyword"] = list["schKeyword"]
+                }
+            }
         });
+
         setKeywordOption({
             ...keywordOption,
             keyword_info: newKeywordInfo
         });
-
-        // 중복되는 값 제거
-        newSettingList = newSettingList.reduce((unique, item) => unique.includes(item) ? unique : [...unique, item], []);
-        setSettingList(newSettingList);
-        setChecked([]);
-    }, [checked, keywordList, settingList]);
+    }, [selectedKeyword, settingList, keywordList, keywordOption, adsList, keywordId]);
 
     useEffect(() => {
-        console.info('keywordOption', keywordOption);
+        console.info('keywordId', keywordId)
+    }, [keywordId]);
+
+    useEffect(() => {
+        console.info('keywordOption', keywordOption)
     }, [keywordOption]);
 
 
@@ -141,9 +178,10 @@ const ShoppingADAutoBidContainer = () => {
                     res = await SendRequest().get(`${serverPROTOCOL}${serverURL}/autobid/shopping_ad/ads?CUSTOMER_ID=${customer["CUSTOMER_ID"]}&nccAdgroupId=${value}`);
                     setAdsList(res.data.ads_list);
                     break;
-                case "nccAdId":
+                case "nccKeywordId":
                     res = await SendRequest().get(`${serverPROTOCOL}${serverURL}/autobid/shopping_ad/keywords?CUSTOMER_ID=${customer["CUSTOMER_ID"]}&nccAdid=${value}`);
                     setKeywordList(res.data.keywords_list);
+                    setInitialKeywordList(res.data.keywords_list);
                     break;
                 default:
                     return type;
@@ -165,7 +203,6 @@ const ShoppingADAutoBidContainer = () => {
         }
     }, [customer]);
 
-
     // 간편 설정 요일, 시간 설정
     const handleSimpleScheduleSetting = useCallback((e, type) => {
         const {value} = e.target;
@@ -177,11 +214,30 @@ const ShoppingADAutoBidContainer = () => {
 
     // 설정 구분, 입찰 조정 금액 Radio 상태
     const handleRadioTab = useCallback((e, type) => {
-        setRadioState({
-            ...radioState,
-            [type]: parseInt(e.target.value)
-        });
-    }, [radioState]);
+        let dt = new Date();
+        let year = dt.getFullYear();
+        let month = dt.getMonth() + 1;
+        let day = dt.getDate();
+
+        let toDay = year + '-' + month + '-' + day;
+
+        if (type === "usedDate") {
+            setRadioState({
+                ...radioState,
+                [type]: e.target.checked ? 1 : 0
+            });
+            setKeywordOption({
+                ...keywordOption,
+                start_Date: toDay,
+                end_Date: toDay
+            });
+        }  else {
+            setRadioState({
+                ...radioState,
+                [type]: parseInt(e.target.value)
+            });
+        }
+    }, [keywordOption, radioState]);
 
     // 입찰 전략 설정
     const onAutoBidChange = useCallback((e, type) => {
@@ -209,6 +265,7 @@ const ShoppingADAutoBidContainer = () => {
                 });
                 break;
             case 'bid_cycle':
+            case 'lowest_Bid_ac':
                 value = parseInt(value);
                 if (isNaN(value)) value = 0;
                 setKeywordOption({
@@ -221,32 +278,31 @@ const ShoppingADAutoBidContainer = () => {
         }
     }, [keywordOption]);
 
-    // 체크박스의 배열 중 체크된 리스트 확인
-    const isChecked = useCallback(id => checked.indexOf(id) !== -1, [checked]);
+    // 날짜 선택
+    const onDateChange = (value, type) => {
+        let dt = new Date(value);
+        let year = dt.getFullYear();
+        let month = dt.getMonth() + 1;
+        let day = dt.getDate();
 
-    // 체크박스 전체 선택
-    const handleAllChecked = useCallback(e => {
-        if (e.target.checked) {
-            const newChecked = keywordList.map(list => list.id);
-            setChecked(newChecked);
-            return;
+        let date = year + '-' + month + '-' + day;
+
+        switch (type) {
+            case 'start_Date':
+            case 'end_Date':
+                setKeywordOption({
+                    ...keywordOption,
+                    [type]: date
+                });
+                break;
+            default:
+                return;
         }
-        setChecked([]);
-    }, [keywordList]);
+    }
 
-    // 체크박스 선택
-    const handleChecked = useCallback((e, id) => {
-        const checkedIndex = checked.indexOf(id);
-        let newChecked = [];
-
-        if (checkedIndex === -1) newChecked = newChecked.concat(checked, id);
-        else if (checkedIndex === 0) newChecked = newChecked.concat(checked.slice(1));
-        else if (checkedIndex === checked.length - 1) newChecked = newChecked.concat(checked.slice(0, -1));
-        else if (checkedIndex === 0) newChecked = newChecked.concat(checked.slice(0, checkedIndex), checked.slice(checkedIndex + 1));
-
-        setChecked(newChecked);
-    }, [checked]);
-
+    useEffect(() => {
+        console.info("keyword option", keywordOption)
+    }, [keywordOption]);
 
     // 요일, 시간 select box onChange
     const handleHighScheduleSetting = e => {
@@ -336,7 +392,6 @@ const ShoppingADAutoBidContainer = () => {
             case 'weekDays':
                 let tmpWeekDays = [];
                 for (let i = parseInt(start); i <= parseInt(finish); i++) tmpWeekDays.push(i);
-                console.info('아추워 :: ', tmpWeekDays);
                 copyChips = {
                     ...copyChips,
                     mon: [...tmpWeekDays],
@@ -380,12 +435,11 @@ const ShoppingADAutoBidContainer = () => {
                 weekKor = '';
         }
 
-        console.info('copyChips', copyChips);
-
         // 중복체크
         if (week !== "weekDays" && week !== "weekend" && week !== "all") {
             let weekAllSchedule = [];
             scheduleChips.map(item => item[week].forEach(time => !!time && weekAllSchedule.push(time)));
+
             let weekDuplicateChecker = weekAllSchedule.find(time => {
                 if (time >= parseInt(start) && time <= parseInt(finish))
                     return time;
@@ -398,49 +452,93 @@ const ShoppingADAutoBidContainer = () => {
                 return;
             }
         } else {
-            let weekAllSchedule = [];
-            // eslint-disable-next-line array-callback-return
-            scheduleChips.map(item => {
-                item.mon.forEach(time => !!time && weekAllSchedule.push(time));
-                item.tue.forEach(time => !!time && weekAllSchedule.push(time));
-                item.wed.forEach(time => !!time && weekAllSchedule.push(time));
-                item.thu.forEach(time => !!time && weekAllSchedule.push(time));
-                item.fri.forEach(time => !!time && weekAllSchedule.push(time));
-                item.sat.forEach(time => !!time && weekAllSchedule.push(time));
-                item.sun.forEach(time => !!time && weekAllSchedule.push(time));
-            });
-            let weekDuplicateChecker = weekAllSchedule.find(time => {
-                if (time >= parseInt(start) && time <= parseInt(finish))
-                    return time;
-                else
-                    return false;
-            });
+            let tmpWeekDays = [];
+            let tmpWeekend = [];
+            let tmpAll = [];
 
-            weekAllSchedule = weekAllSchedule.filter((time, index) => weekAllSchedule.indexOf(time) === index);
+            switch (week) {
+                case 'weekDays':
+                    scheduleChips.forEach(item => {
+                        item.mon.forEach(time => !!time && tmpWeekDays.push(time));
+                        item.tue.forEach(time => !!time && tmpWeekDays.push(time));
+                        item.wed.forEach(time => !!time && tmpWeekDays.push(time));
+                        item.thu.forEach(time => !!time && tmpWeekDays.push(time));
+                        item.fri.forEach(time => !!time && tmpWeekDays.push(time));
+                    });
+                    let weekDuplicateChecker = tmpWeekDays.find(time => {
+                        if (time >= parseInt(start) && time <= parseInt(finish))
+                            return time;
+                        else
+                            return false;
+                    });
 
-            if (weekDuplicateChecker) {
-                alert(`${week === "weekDays" ? "주중" : week === "weekend" ? "주말" : "전체 요일 중"} ${weekDuplicateChecker}시는 이미 선택하셨습니다.`);
-                return;
+                    if (weekDuplicateChecker) {
+                        alert(`주중 ${weekDuplicateChecker}시는 이미 선택하셨습니다.`);
+                        return;
+                    }
+                    break;
+                case 'weekend':
+                    scheduleChips.forEach(item => {
+                        item.sat.forEach(time => !!time && tmpWeekend.push(time));
+                        item.sun.forEach(time => !!time && tmpWeekend.push(time));
+                    });
+
+                    let weekendDuplicateChecker = tmpWeekDays.find(time => {
+                        if (time >= parseInt(start) && time <= parseInt(finish))
+                            return time;
+                        else
+                            return false;
+                    });
+
+                    if (weekendDuplicateChecker) {
+                        alert(`주말 ${weekendDuplicateChecker}시는 이미 선택하셨습니다.`);
+                        return;
+                    }
+                    break;
+                case 'all':
+                    scheduleChips.forEach(item => {
+                        item.mon.forEach(time => !!time && tmpAll.push(time));
+                        item.tue.forEach(time => !!time && tmpAll.push(time));
+                        item.wed.forEach(time => !!time && tmpAll.push(time));
+                        item.thu.forEach(time => !!time && tmpAll.push(time));
+                        item.fri.forEach(time => !!time && tmpAll.push(time));
+                        item.sat.forEach(time => !!time && tmpAll.push(time));
+                        item.sun.forEach(time => !!time && tmpAll.push(time));
+                    });
+
+                    let allDuplicateChecker = tmpWeekDays.find(time => {
+                        if (time >= parseInt(start) && time <= parseInt(finish))
+                            return time;
+                        else
+                            return false;
+                    });
+
+                    if (allDuplicateChecker) {
+                        alert(`전체 중 ${allDuplicateChecker}시는 이미 선택하셨습니다.`);
+                        return;
+                    }
+                    break;
+                default:
+                    return;
             }
         }
 
 
-
         copyChips = {...copyChips, [week]: tmp};
 
-        let schedules = scheduleChips.map(item => item.active === copyChips.active ? copyChips : item );
+        let schedules = scheduleChips.map(item => item.active === copyChips.active ? copyChips : item);
         setScheduleChips(schedules);
+
 
 
         // 보낼 양식 데이터 상태에 저장
         let finalArray = [];
         let finalData = {};
 
+        // 2진수 변환
         const getCalculatedValue = (item, weekday) => {
             let rtn = 0;
-            item[weekday].map( a => {
-                rtn += Math.pow(2, a );
-            });
+            item[weekday].map(n => rtn += Math.pow(2, n));
             return rtn;
         };
 
@@ -460,7 +558,7 @@ const ShoppingADAutoBidContainer = () => {
                     target_Rank: item.targetRank,
                     max_bid: item.maxBid,
                     min_bid: item.minBid,
-                    bid_adj_amount: '0', // item.bidAdjAmount,
+                    bid_adj_amount: keywordOption.setting.bid_adj_amount
                 }
             }
             finalArray.push(finalData);
@@ -477,11 +575,6 @@ const ShoppingADAutoBidContainer = () => {
     // 취소
     const onCancel = () => window.location.reload();
 
-
-    useEffect(() => {
-        console.info(keywordOption)
-    }, [keywordOption]);
-
     // 자동입찰 등록
     const onAddAutoBid = async () => {
         if (!keywordOption.setting.target_Rank) {
@@ -491,9 +584,13 @@ const ShoppingADAutoBidContainer = () => {
         setLoading(true);
 
         try {
-            const response = await SendRequest().post(`${serverPROTOCOL}${serverURL}/autobid/shopping_ad?CUSTOMER_ID=${customer["CUSTOMER_ID"]}`, radioState.simpleHigh === 0 ? [keywordOption] : highKeywordOption);
+            // const response = await SendRequest().post(`${serverPROTOCOL}${serverURL}/autobid/shopping_ad?CUSTOMER_ID=${customer["CUSTOMER_ID"]}`, radioState.simpleHigh === 0 ? {data: keywordOption} : {data: highKeywordOption});
 
-            console.info(response);
+            const response = await SendRequest().post(`${serverPROTOCOL}${serverURL}/autobid/shopping_ad?CUSTOMER_ID=${customer["CUSTOMER_ID"]}`,
+                radioState.simpleHigh === 0
+                    ? [keywordOption]
+                    : highKeywordOption
+            );
 
             if (response.status === 200) {
                 setLoading(false);
@@ -542,6 +639,7 @@ const ShoppingADAutoBidContainer = () => {
                 }
             });
         }
+        // eslint-disable-next-line
     }, [radioState]);
 
     // 초기 data 불러오기
@@ -554,14 +652,6 @@ const ShoppingADAutoBidContainer = () => {
         setCustomer(JSON.parse(localStorage.getItem("customer")));
         return () => setLoading(false);
     }, []);
-
-    // 설정할 keywordOption 상태에 담기
-    // useEffect(() => {
-    //     setKeywordOption({
-    //         ...keywordOption,
-    //         keyword_info: settingList.map(list => list.id)
-    //     });
-    // }, [settingList]);
 
     // 간편 설정 요일 및 시간 보내기용 데이터로 변환
     useEffect(() => {
@@ -609,6 +699,7 @@ const ShoppingADAutoBidContainer = () => {
                 }
             });
         }
+        // eslint-disable-next-line
     }, [simpleSchedule]);
 
     return (
@@ -623,11 +714,6 @@ const ShoppingADAutoBidContainer = () => {
             adGroupList={adGroupList}
             adsList={adsList}
             keywordList={keywordList}
-            checked={checked}
-            isChecked={isChecked}
-            handleAllChecked={handleAllChecked}
-            keywordId={keywordId}
-            handleChecked={handleChecked}
             settingList={settingList}
             onAddSettingBox={onAddSettingBox}
             onDeleteKeyword={onDeleteKeyword}
@@ -635,6 +721,7 @@ const ShoppingADAutoBidContainer = () => {
             radioState={radioState}
             handleRadioTab={handleRadioTab}
             onAutoBidChange={onAutoBidChange}
+            onDateChange={onDateChange}
             simpleSchedule={simpleSchedule}
             handleSimpleScheduleSetting={handleSimpleScheduleSetting}
             handleHighScheduleSetting={handleHighScheduleSetting}
@@ -646,31 +733,15 @@ const ShoppingADAutoBidContainer = () => {
             onCancel={onCancel}
             onAddAutoBid={onAddAutoBid}
             loading={loading}
+            controlProps={controlProps}
+
+            searchInput={searchInput}
+            handleSearchReset={handleSearchReset}
+            handleSearchClick={handleSearchClick}
+            handleSearchInput={handleSearchInput}
         />
     )
 }
 
 export default ShoppingADAutoBidContainer;
 
-
-
-
-
-// 체크된 키워드 아이디 parse 후 객체 담기
-// useEffect(() => {
-//     if (checked.length > 0) {
-//         setKeywordInfo(
-//             checked.reduce((target, key, index) => {
-//                 target[index] = {
-//                     "nccCampaignId": keywordId.nccCampaignId,
-//                     "nccAdgroupId": keywordId.nccAdgroupId,
-//                     "nccKeywordId": key
-//                 }
-//                 return target;
-//             }, ["초기값 있니 ?"])
-//         );
-//     }
-//     console.info(':::::::', keywordInfo)
-//
-//     // .reduce((unique, item) => unique.includes(item) ? unique : [...unique, item], []);
-// }, [checked]);
