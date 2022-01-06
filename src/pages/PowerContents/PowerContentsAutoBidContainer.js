@@ -40,8 +40,8 @@ const PowerContentsAutoBidContainer = () => {
         keyword_info: [],
         device: "PC",
         bid_cycle: 5,
-        start_Date: null,
-        end_Date: null,
+        start_Date: "",
+        end_Date: "",
         lowest_Bid_ac: 0,
         setting: {
             mon: '0~23',
@@ -240,16 +240,14 @@ const PowerContentsAutoBidContainer = () => {
         let newSettingList = [...settingList];
 
         // 체크된 것들 setting list 에 담기
-        keywordList.forEach(list => checked.forEach(check => list.nccKeywordId === check && newSettingList.push(list)));
+        keywordList.forEach((list, index) => checked.forEach(check => {
+            if (list.nccKeywordId === check && (settingList[index] && settingList[index].nccKeywordId) !== check) newSettingList.push(list)
+        }));
+
         // 다중 선택 중복 제거
         newSettingList = newSettingList.reduce((unique, item) => unique.includes(item) ? unique : [...unique, item], []);
         setSettingList(newSettingList);
         setChecked([]);
-
-        // 새로 검색 후 넣을 때 중복 제거
-        if (checked.find(check => settingList.find(list => list.nccKeywordId === check && check))) {
-            setSettingList(settingList.filter((el, index) => settingList.indexOf(el) === index));
-        }
     }, [checked, keywordList, settingList]);
 
     // SettingList keyword 삭제

@@ -45,8 +45,8 @@ const ShoppingADAutoBidContainer = () => {
         keyword_info: [],
         device: "PC",
         bid_cycle: 5,
-        start_Date: null,
-        end_Date: null,
+        start_Date: "",
+        end_Date: "",
         lowest_Bid_ac: 0,
         setting: {
             mon: '0~23',
@@ -87,7 +87,7 @@ const ShoppingADAutoBidContainer = () => {
     // 검색 reset
     const handleSearchClick = async () => {
         try {
-            const { data } = await SendRequest().post(`${serverPROTOCOL}${serverURL}/autobid/shopping_ad/keywords/search?CUSTOMER_ID=${customer["CUSTOMER_ID"]}&nccAdgroupId=${keywordId.nccAdgroupId}`, {
+            const { data } = await SendRequest().post(`${serverPROTOCOL}${serverURL}/autobid/shopping_ad/keywords/search?CUSTOMER_ID=${customer["CUSTOMER_ID"]}&nccKeywordId=${keywordId.nccKeywordId}`, {
                 word: searchInput
             });
             setKeywordList(data.keywords_list);
@@ -147,15 +147,6 @@ const ShoppingADAutoBidContainer = () => {
             keyword_info: newKeywordInfo
         });
     }, [selectedKeyword, settingList, keywordList, keywordOption, adsList, keywordId]);
-
-    useEffect(() => {
-        console.info('keywordId', keywordId)
-    }, [keywordId]);
-
-    useEffect(() => {
-        console.info('keywordOption', keywordOption)
-    }, [keywordOption]);
-
 
     // SettingList keyword 삭제
     const onDeleteKeyword = useCallback(id => {

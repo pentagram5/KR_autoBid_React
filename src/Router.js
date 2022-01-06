@@ -12,7 +12,7 @@ import PowerLinkUpdate from "./pages/PowerLink/PowerLinkUpdateContainer";
 import ShoppingADUpdate from "./pages/ShoppingAD/ShoppingADUpdateContainer";
 import SignUpContainer from "./pages/SignUp";
 import AddAdvertiserContainer from "./pages/AddAdvertiser/AddAdvertiserContainer";
-
+import PowerContentsUpdateContainer from "./pages/PowerContents/PowerContentsUpdateContainer";
 const ComponentBox = styled.div`
   padding-left: 300px;
 `;
@@ -30,6 +30,7 @@ const LoggedInRoutes = () => (
         {/* 수정 */}
         <Route path="/powerLinkUpdate" element={<PowerLinkUpdate />}/>
         <Route path="/shoppingAdUpdate" element={<ShoppingADUpdate />}/>
+        <Route path="/powerContentsUpdate" element={<PowerContentsUpdateContainer />}/>
 
         {/* 광고주 등록 */}
         <Route path="/advertiser" element={<AddAdvertiserContainer />}/>

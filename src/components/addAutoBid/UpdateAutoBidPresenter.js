@@ -11,6 +11,11 @@ import delete_2 from "../../assets/delete_2.svg";
 import clock from "../../assets/clock.svg";
 import Header from "../share/Header";
 import ScheduleCard from "../share/ScheduleCard";
+import LocalizationProvider from "@mui/lab/LocalizationProvider";
+import AdapterDateFns from "@mui/lab/AdapterDateFns";
+import DesktopDatePicker from "@mui/lab/DesktopDatePicker";
+import TextField from "@mui/material/TextField";
+import Switch from "@mui/material/Switch";
 // import Checkbox from '@mui/material/Checkbox';
 // import selectArrow2 from "../../assets/selectArrow2.svg";
 // import rightArrow from "../../assets/rightArrow.svg";
@@ -204,11 +209,57 @@ const ProgressBox = styled.div`
   opacity: 0.4;
 `;
 
+const DateBox = styled.div`
+  display: flex;
+  align-items: center;
+  // Input Style
+  .css-nxo287-MuiInputBase-input-MuiOutlinedInput-input {
+    height: 40px;
+    padding: 0 10px;
+  }
+
+  .css-1u3bzj6-MuiFormControl-root-MuiTextField-root {
+    width: 175px;
+  }
+`;
+const StyledSwitch = styled(Switch)`
+  padding: 0;
+  margin-right: 20px;
+
+  .css-julti5-MuiSwitch-root {
+    padding: 4px;
+    border-radius: 50%;
+  }
+
+  & .MuiSwitch-track {
+    border-radius: 22 / 2;
+
+    &:before,
+    &:after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 16px;
+      height: 16px;
+    }
+
+    & .MuiSwitch-thumb {
+      box-Shadow: none;
+      width: 16px;
+      height: 16px;
+      margin: 2px;
+    }
+  }
+`;
+
 const UpdateAutoBidPresenter = ({
+                                    POWER_CONTENTS,
                                     SHOPPING_AD,
                                     title,
-                                    handleCustomerChange,
 
+                                    handleCustomerChange,
+                                    onDateChange,
                                     keywordList,
 
                                     onDeleteKeyword,
@@ -232,6 +283,7 @@ const UpdateAutoBidPresenter = ({
                                 }) => {
 
     const {device, bid_cycle, bid_adj_amount, max_bid, min_bid} = keywordOption;
+
 
     return (
         <View>
@@ -335,7 +387,7 @@ const UpdateAutoBidPresenter = ({
                                 <td>
                                     주기 설정
                                 </td>
-                                <td colSpan={3}>
+                                <td>
                                     <RadioGroup row onChange={e => onAutoBidChange(e, 'bid_cycle')}>
                                         <FormControlLabel
                                             label="5분"
@@ -368,12 +420,64 @@ const UpdateAutoBidPresenter = ({
                                         />
                                     </RadioGroup>
                                 </td>
+                                <td>
+                                    입찰 기간 설정
+                                </td>
+                                <td>
+                                    <DateBox>
+                                        <StyledSwitch
+                                            onChange={e => handleRadioTab(e, "usedDate")}
+                                        />
+
+                                        {!!radioState.usedDate && (
+                                            <>
+                                                <LocalizationProvider dateAdapter={AdapterDateFns}>
+                                                    <DesktopDatePicker
+                                                        label="시작날짜"
+                                                        name="start_Date"
+                                                        value={keywordOption.start_Date}
+                                                        // minDate={new Date('2017-01-01')}
+                                                        mask="____.__.__"
+                                                        inputFormat="yyyy.MM.dd"
+                                                        onChange={newValue => onDateChange(newValue, "start_Date")}
+                                                        renderInput={(params) => <TextField {...params} />}
+                                                    />
+                                                </LocalizationProvider>
+                                                &nbsp;~&nbsp;
+                                                <LocalizationProvider dateAdapter={AdapterDateFns}>
+                                                    <DesktopDatePicker
+                                                        label="종료날짜"
+                                                        name="end_Date"
+                                                        value={keywordOption.end_Date}
+                                                        mask="____.__.__"
+                                                        inputFormat="yyyy.MM.dd"
+                                                        // minDate={new Date('2017-01-01')}
+                                                        onChange={newValue => onDateChange(newValue, "end_Date")}
+                                                        renderInput={(params) => <TextField {...params} />}
+                                                    />
+                                                </LocalizationProvider>
+                                            </>
+                                        )}
+                                    </DateBox>
+                                </td>
                             </tr>
                             <tr>
                                 <td>
+                                    최저가 입찰 설정
+                                </td>
+                                <td>
+                                    <RadioGroup row onChange={e => onAutoBidChange(e, 'lowest_Bid_ac')}>
+                                        <FormControlLabel value={0} name="lowest_Bid_ac" control={<Radio/>}
+                                                          label="미사용"
+                                                          checked={keywordOption.lowest_Bid_ac === 0}/>
+                                        <FormControlLabel value={1} name="lowest_Bid_ac" control={<Radio/>}
+                                                          label="사용"/>
+                                    </RadioGroup>
+                                </td>
+                                <td>
                                     설정 구분
                                 </td>
-                                <td colSpan={3}>
+                                <td>
                                     <RadioGroup row onChange={e => handleRadioTab(e, 'simpleHigh')}>
                                         <FormControlLabel value={0} control={<Radio/>} label="간편 설정"
                                                           checked={radioState.simpleHigh === 0}/>
@@ -419,15 +523,18 @@ const UpdateAutoBidPresenter = ({
                                         <option value={1}>1 위</option>
                                         <option value={2}>2 위</option>
                                         <option value={3}>3 위</option>
-                                        <option value={4}>4 위</option>
-                                        <option value={5}>5 위</option>
-                                        {device === "PC" &&
+                                        {!POWER_CONTENTS &&
                                         <>
-                                            <option value={6}>6 위</option>
-                                            <option value={7}>7 위</option>
-                                            <option value={8}>8 위</option>
-                                            <option value={9}>9 위</option>
-                                            <option value={10}>10 위</option>
+                                            <option value={4}>4 위</option>
+                                            <option value={5}>5 위</option>
+                                            {device === "PC" &&
+                                            <>
+                                                <option value={6}>6 위</option>
+                                                <option value={7}>7 위</option>
+                                                <option value={8}>8 위</option>
+                                                <option value={9}>9 위</option>
+                                                <option value={10}>10 위</option>
+                                            </>}
                                         </>
                                         }
 

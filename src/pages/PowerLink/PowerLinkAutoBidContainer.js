@@ -1,4 +1,4 @@
-import React, {useState, useContext, useEffect, useCallback} from 'react';
+import React, {useCallback, useContext, useEffect, useState} from 'react';
 import AddAutoBidPresenter from "../../components/addAutoBid/AddAutoBidPresenter";
 import {AuthContext} from "../../utils/AuthContext";
 import SendRequest from "../../utils/SendRequest";
@@ -40,8 +40,8 @@ const PowerLinkAutoBidContainer = () => {
         keyword_info: [],
         device: "PC",
         bid_cycle: 5,
-        start_Date: null,
-        end_Date: null,
+        start_Date: "",
+        end_Date: "",
         lowest_Bid_ac: 0,
         setting: {
             mon: '0~23',
@@ -72,7 +72,7 @@ const PowerLinkAutoBidContainer = () => {
     // 검색
     const handleSearchClick = useCallback(async () => {
         try {
-            const { data } = await SendRequest().post(`${serverPROTOCOL}${serverURL}/autobid/powerlink/keywords/search?CUSTOMER_ID=${customer["CUSTOMER_ID"]}&nccAdgroupId=${keywordId.nccAdgroupId}`, {
+            const {data} = await SendRequest().post(`${serverPROTOCOL}${serverURL}/autobid/powerlink/keywords/search?CUSTOMER_ID=${customer["CUSTOMER_ID"]}&nccAdgroupId=${keywordId.nccAdgroupId}`, {
                 word: searchInput
             });
             if (data.done) {
@@ -81,7 +81,7 @@ const PowerLinkAutoBidContainer = () => {
                 alert('캠페인, 광고그룹명을 설정 후 검색해주세요.');
                 return;
             }
-        } catch(e) {
+        } catch (e) {
             throw new Error(e);
         }
         setSearchInput("");
@@ -120,7 +120,7 @@ const PowerLinkAutoBidContainer = () => {
                 start_Date: toDay,
                 end_Date: toDay
             });
-        }  else {
+        } else {
             setRadioState({
                 ...radioState,
                 [type]: parseInt(e.target.value)
@@ -190,11 +190,6 @@ const PowerLinkAutoBidContainer = () => {
         }
     }
 
-    useEffect(() => {
-        console.info("keyword option", keywordOption)
-    }, [keywordOption]);
-
-
     // 체크박스의 배열 중 체크된 리스트 확인
     const isChecked = useCallback(id => checked.indexOf(id) !== -1, [checked]);
 
@@ -239,31 +234,18 @@ const PowerLinkAutoBidContainer = () => {
             return;
         }
         let newSettingList = [...settingList];
+
         // 체크된 것들 setting list 에 담기
-        keywordList.forEach(list => checked.forEach(check => list.nccKeywordId === check && newSettingList.push(list)));
+        keywordList.forEach((list, index) => checked.forEach(check => {
+            if (list.nccKeywordId === check && (settingList[index] && settingList[index].nccKeywordId) !== check) newSettingList.push(list)
+        }));
+
         // 다중 선택 중복 제거
-        newSettingList = newSettingList.reduce((unique, item) => unique.includes(item) ? unique : [...unique, item], []);
+        newSettingList = newSettingList.reduce((unique, item, index) => unique.includes(item) ? unique : [...unique, item], []);
 
         setSettingList(newSettingList);
-
-        // keywordList.forEach(list => {
-        //     checked.forEach(check => {
-        //         if (list.nccKeywordId === check) {
-        //             console.info('list', list);
-        //             newSettingList.concat(list);
-        //             console.info('함수 내', newSettingList);
-        //         }
-        //     });
-        // });
-        // setSettingList(newSettingList);
         setChecked([]);
     }, [checked, keywordList, settingList]);
-
-
-    useEffect(() => {
-        console.info('세팅 리스트 : ', settingList);
-    }, [settingList]);
-
 
     // SettingList keyword 삭제
     const onDeleteKeyword = useCallback(nccKeywordId => {
@@ -519,7 +501,7 @@ const PowerLinkAutoBidContainer = () => {
 
         copyChips = {...copyChips, [week]: tmp};
 
-        let schedules = scheduleChips.map(item => item.active === copyChips.active ? copyChips : item );
+        let schedules = scheduleChips.map(item => item.active === copyChips.active ? copyChips : item);
         setScheduleChips(schedules);
 
 

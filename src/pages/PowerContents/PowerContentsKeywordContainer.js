@@ -3,6 +3,7 @@ import KeywordPresenter from "../../components/keyword/KeywordPresenter";
 import {toast} from "react-toastify";
 import SendRequest from "../../utils/SendRequest";
 import * as constants from "../../utils/constants";
+import {useNavigate} from "react-router-dom";
 
 const serverPROTOCOL = constants.config.PROTOCOL;
 const serverURL = constants.config.URL;
@@ -42,6 +43,7 @@ function reducer(state, action) {
 }
 
 const PowerContentsKeywordContainer = () => {
+    const navigator = useNavigate();
     const filterRef = useRef(null);
     const [state, dispatch] = useReducer(reducer, {
         loading: true,
@@ -200,6 +202,12 @@ const PowerContentsKeywordContainer = () => {
         }
     }
 
+    // 자동입찰 설정 - 수정 페이지로 이동
+    const handleUpdateAutoBid = () => {
+        navigator('/powerContentsUpdate');
+        localStorage.setItem("checked", checked);
+    }
+
     // 자동입찰 삭제
     const handleDeleteAutoBid = async () => {
         if (checked.length === 0) {
@@ -344,6 +352,7 @@ const PowerContentsKeywordContainer = () => {
             customerList={customerList}
             handleCustomerChange={handleCustomerChange}
             handleAutoBidActive={handleAutoBidActive}
+            handleUpdateAutoBid={handleUpdateAutoBid}
             handleDeleteAutoBid={handleDeleteAutoBid}
             checked={checked}
             isChecked={isChecked}

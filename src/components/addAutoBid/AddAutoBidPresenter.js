@@ -630,7 +630,7 @@ const AddAutoBidPresenter = ({
                                 <td>
                                     설정 구분
                                 </td>
-                                <td colSpan={3}>
+                                <td>
                                     <RadioGroup row onChange={e => handleRadioTab(e, 'simpleHigh')}>
                                         <FormControlLabel value={0} control={<Radio/>} label="간편 설정"
                                                           checked={radioState.simpleHigh === 0}/>
