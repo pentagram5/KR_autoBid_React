@@ -403,6 +403,9 @@ const PowerLinkAutoBidContainer = () => {
                 keyword_info: keywordOption.keyword_info,
                 device: keywordOption.device,
                 bid_cycle: keywordOption.bid_cycle,
+                start_Date: keywordOption.start_Date,
+                end_Date: keywordOption.end_Date,
+                lowest_Bid_ac: keywordOption.lowest_Bid_ac,
                 setting: {
                     mon: getCalculatedValue(item, 'mon').toString(),
                     tue: getCalculatedValue(item, 'tue').toString(),
@@ -451,6 +454,9 @@ const PowerLinkAutoBidContainer = () => {
                     keyword_info: [],
                     device: "PC",
                     bid_cycle: 5,
+                    start_Date: "",
+                    end_Date: "",
+                    lowest_Bid_ac: 0,
                     setting: {
                         mon: '0~23',
                         tue: '0~23',
