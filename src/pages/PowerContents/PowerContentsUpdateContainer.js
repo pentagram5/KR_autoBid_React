@@ -417,7 +417,7 @@ const PowerLinkAutoBidContainer = () => {
                     target_Rank: item.targetRank,
                     max_bid: item.maxBid,
                     min_bid: item.minBid,
-                    bid_adj_amount: '0', // item.bidAdjAmount,
+                    bid_adj_amount: keywordOption.setting.bid_adj_amount,
                 }
             }
             finalArray.push(finalData);
@@ -446,14 +446,20 @@ const PowerLinkAutoBidContainer = () => {
             if (response.status === 200) {
                 toast.info('키워드를 수정했습니다.')
                 setLoading(false);
-
                 setKeywordList([]);
-
+                setRadioState({
+                    simpleHigh: 0,
+                    bid_adj_amount: 0,
+                    usedDate: 0
+                });
                 setScheduleChips([]);
                 setKeywordOption({
                     keyword_info: [],
                     device: "PC",
                     bid_cycle: 5,
+                    start_Date: "",
+                    end_Date: "",
+                    lowest_Bid_ac: 0,
                     setting: {
                         mon: '0~23',
                         tue: '0~23',
@@ -468,8 +474,9 @@ const PowerLinkAutoBidContainer = () => {
                         bid_adj_amount: 0,
                     }
                 });
-
-                navigate('/powerLinkKeyword');
+                setTimeout(() => {
+                    navigate('/powerContentsKeyword');
+                }, 800);
             }
         } catch (e) {
             throw new Error(e);

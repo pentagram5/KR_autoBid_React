@@ -472,14 +472,22 @@ const ShoppingADUpdateContainer = () => {
             );
 
             if (response.status === 200) {
+                toast.info("키워드를 수정하였습니다.");
                 setLoading(false);
-
                 setKeywordList([]);
                 setScheduleChips([]);
+                setRadioState({
+                    simpleHigh: 0,
+                    bid_adj_amount: 0,
+                    usedDate: 0
+                });
                 setKeywordOption({
                     keyword_info: [],
                     device: "PC",
                     bid_cycle: 5,
+                    start_Date: "",
+                    end_Date: "",
+                    lowest_Bid_ac: 0,
                     setting: {
                         mon: '0~23',
                         tue: '0~23',
@@ -494,8 +502,9 @@ const ShoppingADUpdateContainer = () => {
                         bid_adj_amount: 0,
                     }
                 });
-
-                // navigate('/shoppingAdKeyword');
+                setTimeout(() => {
+                    navigate('/shoppingAdKeyword');
+                }, 800);
             }
         } catch (e) {
             throw new Error(e);

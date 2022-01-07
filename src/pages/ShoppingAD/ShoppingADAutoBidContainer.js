@@ -6,6 +6,7 @@ import * as constants from "../../utils/constants";
 import colors from "../../styles/colors";
 import {korWeekChange} from "../../utils/common";
 import {tokenValidate} from "../../utils/tokenValidate";
+import {toast} from "react-toastify";
 
 const serverPROTOCOL = constants.config.PROTOCOL;
 const serverURL = constants.config.URL;
@@ -588,15 +589,23 @@ const ShoppingADAutoBidContainer = () => {
             );
 
             if (response.status === 200) {
+                toast.info("키워드 등록이 시작되었습니다.");
                 setLoading(false);
-
                 setKeywordList([]);
                 setSettingList([]);
                 setScheduleChips([]);
+                setRadioState({
+                    simpleHigh: 0,
+                    bid_adj_amount: 0,
+                    usedDate: 0
+                });
                 setKeywordOption({
                     keyword_info: [],
                     device: "PC",
                     bid_cycle: 5,
+                    start_Date: "",
+                    end_Date: "",
+                    lowest_Bid_ac: 0,
                     setting: {
                         mon: '0~23',
                         tue: '0~23',
