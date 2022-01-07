@@ -146,7 +146,6 @@ const PowerLinkAutoBidContainer = () => {
 
         let date = year + '-' + month + '-' + day;
 
-
         switch (type) {
             case 'start_Date':
             case 'end_Date':

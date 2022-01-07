@@ -427,6 +427,7 @@ const UpdateAutoBidPresenter = ({
                                     <DateBox>
                                         <StyledSwitch
                                             onChange={e => handleRadioTab(e, "usedDate")}
+                                            disabled={!!radioState.simpleHigh}
                                         />
 
                                         {!!radioState.usedDate && (
@@ -437,6 +438,7 @@ const UpdateAutoBidPresenter = ({
                                                         name="start_Date"
                                                         value={keywordOption.start_Date}
                                                         // minDate={new Date('2017-01-01')}
+                                                        disabled={!!radioState.simpleHigh}
                                                         mask="____.__.__"
                                                         inputFormat="yyyy.MM.dd"
                                                         onChange={newValue => onDateChange(newValue, "start_Date")}
@@ -449,6 +451,7 @@ const UpdateAutoBidPresenter = ({
                                                         label="종료날짜"
                                                         name="end_Date"
                                                         value={keywordOption.end_Date}
+                                                        disabled={!!radioState.simpleHigh}
                                                         mask="____.__.__"
                                                         inputFormat="yyyy.MM.dd"
                                                         // minDate={new Date('2017-01-01')}
@@ -467,11 +470,21 @@ const UpdateAutoBidPresenter = ({
                                 </td>
                                 <td>
                                     <RadioGroup row onChange={e => onAutoBidChange(e, 'lowest_Bid_ac')}>
-                                        <FormControlLabel value={0} name="lowest_Bid_ac" control={<Radio/>}
-                                                          label="미사용"
-                                                          checked={keywordOption.lowest_Bid_ac === 0}/>
-                                        <FormControlLabel value={1} name="lowest_Bid_ac" control={<Radio/>}
-                                                          label="사용"/>
+                                        <FormControlLabel
+                                            value={0}
+                                            name="lowest_Bid_ac"
+                                            control={<Radio/>}
+                                            label="미사용"
+                                            disabled={!!radioState.simpleHigh}
+                                            checked={keywordOption.lowest_Bid_ac === 0}
+                                        />
+                                        <FormControlLabel
+                                            value={1}
+                                            name="lowest_Bid_ac"
+                                            control={<Radio/>}
+                                            label="사용"
+                                            disabled={!!radioState.simpleHigh}
+                                        />
                                     </RadioGroup>
                                 </td>
                                 <td>

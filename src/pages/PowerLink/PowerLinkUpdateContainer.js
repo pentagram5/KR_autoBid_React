@@ -24,7 +24,8 @@ const PowerLinkAutoBidContainer = () => {
 
     const [radioState, setRadioState] = useState({
         simpleHigh: 0,
-        bid_adj_amount: 0
+        bid_adj_amount: 0,
+        usedDate: 0
     });
     const [simpleSchedule, setSimpleSchedule] = useState({
         week: 'all',
@@ -34,6 +35,9 @@ const PowerLinkAutoBidContainer = () => {
         keyword_info: [],
         device: "PC",
         bid_cycle: 5,
+        start_Date: "",
+        end_Date: "",
+        lowest_Bid_ac: 0,
         setting: {
             mon: '0~23',
             tue: '0~23',
@@ -69,11 +73,30 @@ const PowerLinkAutoBidContainer = () => {
 
     // 설정 구분, 입찰 조정 금액 Radio 상태
     const handleRadioTab = useCallback((e, type) => {
-        setRadioState({
-            ...radioState,
-            [type]: parseInt(e.target.value)
-        });
-    }, [radioState]);
+        let dt = new Date();
+        let year = dt.getFullYear();
+        let month = dt.getMonth() + 1;
+        let day = dt.getDate();
+
+        let toDay = year + '-' + month + '-' + day;
+
+        if (type === "usedDate") {
+            setRadioState({
+                ...radioState,
+                [type]: e.target.checked ? 1 : 0
+            });
+            setKeywordOption({
+                ...keywordOption,
+                start_Date: toDay,
+                end_Date: toDay
+            });
+        }  else {
+            setRadioState({
+                ...radioState,
+                [type]: parseInt(e.target.value)
+            });
+        }
+    }, [keywordOption, radioState]);
 
     // 입찰 전략 설정
     const onAutoBidChange = useCallback((e, type) => {
@@ -101,6 +124,7 @@ const PowerLinkAutoBidContainer = () => {
                 });
                 break;
             case 'bid_cycle':
+            case 'lowest_Bid_ac':
                 value = parseInt(value);
                 if (isNaN(value)) value = 0;
                 setKeywordOption({
@@ -113,6 +137,27 @@ const PowerLinkAutoBidContainer = () => {
         }
     }, [keywordOption]);
 
+    // 날짜 선택
+    const onDateChange = (value, type) => {
+        let dt = new Date(value);
+        let year = dt.getFullYear();
+        let month = dt.getMonth() + 1;
+        let day = dt.getDate();
+
+        let date = year + '-' + month + '-' + day;
+
+        switch (type) {
+            case 'start_Date':
+            case 'end_Date':
+                setKeywordOption({
+                    ...keywordOption,
+                    [type]: date
+                });
+                break;
+            default:
+                return;
+        }
+    }
 
     // SettingList keyword 삭제
     const onDeleteKeyword = useCallback(nccKeywordId => {
@@ -470,7 +515,6 @@ const PowerLinkAutoBidContainer = () => {
         });
     }, [keywordList]);
 
-
     return (
         <UpdateAutoBidPresenter
             title="파워링크 자동입찰수정"
@@ -480,7 +524,7 @@ const PowerLinkAutoBidContainer = () => {
             keywordList={keywordList}
             checked={checked}
             onDeleteKeyword={onDeleteKeyword}
-
+            onDateChange={onDateChange}
 
             keywordOption={keywordOption}
             radioState={radioState}
