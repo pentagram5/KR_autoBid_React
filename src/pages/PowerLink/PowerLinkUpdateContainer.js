@@ -309,6 +309,77 @@ const PowerLinkAutoBidContainer = () => {
                 alert(`[${weekKor}요일] ${weekDuplicateChecker}시는 이미 선택하셨습니다.`);
                 return;
             }
+        } else {
+            let tmpWeekDays = [];
+            let tmpWeekend = [];
+            let tmpAll = [];
+
+            switch (week) {
+                case 'weekDays':
+                    scheduleChips.forEach(item => {
+                        item.mon.forEach(time => !!time && tmpWeekDays.push(time));
+                        item.tue.forEach(time => !!time && tmpWeekDays.push(time));
+                        item.wed.forEach(time => !!time && tmpWeekDays.push(time));
+                        item.thu.forEach(time => !!time && tmpWeekDays.push(time));
+                        item.fri.forEach(time => !!time && tmpWeekDays.push(time));
+                    });
+                    let weekDuplicateChecker = tmpWeekDays.find(time => {
+                        if (time >= parseInt(start) && time <= parseInt(finish))
+                            return time;
+                        else
+                            return false;
+                    });
+
+                    if (weekDuplicateChecker) {
+                        alert(`주중 ${weekDuplicateChecker}시는 이미 선택하셨습니다.`);
+                        return;
+                    }
+                    break;
+                case 'weekend':
+                    scheduleChips.forEach(item => {
+                        item.sat.forEach(time => !!time && tmpWeekend.push(time));
+                        item.sun.forEach(time => !!time && tmpWeekend.push(time));
+                    });
+
+                    let weekendDuplicateChecker = tmpWeekend.find(time => {
+                        console.info('받은 배열 안 시간 : ', time);
+                        if (time >= parseInt(start) && time <= parseInt(finish))
+                            return time;
+                        else
+                            return false;
+                    });
+
+                    if (weekendDuplicateChecker) {
+                        alert(`주말 ${weekendDuplicateChecker}시는 이미 선택하셨습니다.`);
+                        return;
+                    }
+                    break;
+                case 'all':
+                    scheduleChips.forEach(item => {
+                        item.mon.forEach(time => !!time && tmpAll.push(time));
+                        item.tue.forEach(time => !!time && tmpAll.push(time));
+                        item.wed.forEach(time => !!time && tmpAll.push(time));
+                        item.thu.forEach(time => !!time && tmpAll.push(time));
+                        item.fri.forEach(time => !!time && tmpAll.push(time));
+                        item.sat.forEach(time => !!time && tmpAll.push(time));
+                        item.sun.forEach(time => !!time && tmpAll.push(time));
+                    });
+
+                    let allDuplicateChecker = tmpAll.find(time => {
+                        if (time >= parseInt(start) && time <= parseInt(finish))
+                            return time;
+                        else
+                            return false;
+                    });
+
+                    if (allDuplicateChecker) {
+                        alert(`전체 중 ${allDuplicateChecker}시는 이미 선택하셨습니다.`);
+                        return;
+                    }
+                    break;
+                default:
+                    return;
+            }
         }
 
         copyChips = {...copyChips, [week]: tmp};

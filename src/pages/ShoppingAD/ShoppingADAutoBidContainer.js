@@ -430,7 +430,6 @@ const ShoppingADAutoBidContainer = () => {
         if (week !== "weekDays" && week !== "weekend" && week !== "all") {
             let weekAllSchedule = [];
             scheduleChips.map(item => item[week].forEach(time => !!time && weekAllSchedule.push(time)));
-
             let weekDuplicateChecker = weekAllSchedule.find(time => {
                 if (time >= parseInt(start) && time <= parseInt(finish))
                     return time;
@@ -474,7 +473,8 @@ const ShoppingADAutoBidContainer = () => {
                         item.sun.forEach(time => !!time && tmpWeekend.push(time));
                     });
 
-                    let weekendDuplicateChecker = tmpWeekDays.find(time => {
+                    let weekendDuplicateChecker = tmpWeekend.find(time => {
+                        console.info('받은 배열 안 시간 : ', time);
                         if (time >= parseInt(start) && time <= parseInt(finish))
                             return time;
                         else
@@ -497,7 +497,7 @@ const ShoppingADAutoBidContainer = () => {
                         item.sun.forEach(time => !!time && tmpAll.push(time));
                     });
 
-                    let allDuplicateChecker = tmpWeekDays.find(time => {
+                    let allDuplicateChecker = tmpAll.find(time => {
                         if (time >= parseInt(start) && time <= parseInt(finish))
                             return time;
                         else
