@@ -5,6 +5,7 @@ import SendRequest from "../../utils/SendRequest";
 import * as constants from "../../utils/constants";
 import colors from "../../styles/colors";
 import {korWeekChange} from "../../utils/common";
+import {tokenValidate} from "../../utils/tokenValidate";
 
 const serverPROTOCOL = constants.config.PROTOCOL;
 const serverURL = constants.config.URL;
@@ -71,6 +72,7 @@ const PowerLinkAutoBidContainer = () => {
     const handleSearchInput = useCallback(e => setSearchInput(e.target.value), []);
     // 검색
     const handleSearchClick = useCallback(async () => {
+        tokenValidate();
         try {
             const {data} = await SendRequest().post(`${serverPROTOCOL}${serverURL}/autobid/powerlink/keywords/search?CUSTOMER_ID=${customer["CUSTOMER_ID"]}&nccAdgroupId=${keywordId.nccAdgroupId}`, {
                 word: searchInput
@@ -234,11 +236,11 @@ const PowerLinkAutoBidContainer = () => {
             return;
         }
         let newSettingList = [...settingList];
-
         // 체크된 것들 setting list 에 담기
         keywordList.forEach((list, index) => checked.forEach(check => {
             if (list.nccKeywordId === check && (settingList[index] && settingList[index].nccKeywordId) !== check) newSettingList.push(list)
         }));
+
 
         // 다중 선택 중복 제거
         newSettingList = newSettingList.reduce((unique, item, index) => unique.includes(item) ? unique : [...unique, item], []);
@@ -254,6 +256,7 @@ const PowerLinkAutoBidContainer = () => {
 
     // 입찰 키워드 select 선택
     const handleKeywordSelected = useCallback(async (e, type) => {
+        tokenValidate();
         const {value} = e.target;
         if (value === "") return;
         try {
@@ -274,10 +277,16 @@ const PowerLinkAutoBidContainer = () => {
         }
     }, [customer, keywordId]);
 
+    // 캠페인 리스트 불러오기
     const fetchCampaignData = useCallback(async () => {
-        if (!!customer["CUSTOMER_ID"]) {
-            const {data} = await SendRequest().get(`${serverPROTOCOL}${serverURL}/autobid/powerlink/campaign?CUSTOMER_ID=${customer["CUSTOMER_ID"]}`);
-            setCampaignList(data.campaign_list);
+        tokenValidate();
+        try {
+            if (!!customer["CUSTOMER_ID"]) {
+                const {data} = await SendRequest().get(`${serverPROTOCOL}${serverURL}/autobid/powerlink/campaign?CUSTOMER_ID=${customer["CUSTOMER_ID"]}`);
+                setCampaignList(data.campaign_list);
+            }
+        } catch(e) {
+            throw new Error(e);
         }
     }, [customer]);
 
@@ -550,6 +559,7 @@ const PowerLinkAutoBidContainer = () => {
 
     // 자동입찰 등록
     const onAddAutoBid = async () => {
+        tokenValidate();
         if (!keywordOption.setting.target_Rank) {
             alert('희망 순위를 설정해주세요.');
             return;
@@ -676,6 +686,7 @@ const PowerLinkAutoBidContainer = () => {
                 }
             });
         }
+        // eslint-disabled-next-line
     }, [simpleSchedule]);
 
     return (

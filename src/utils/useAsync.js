@@ -1,4 +1,5 @@
 import { useReducer, useEffect } from 'react';
+import {tokenValidate} from "./tokenValidate";
 
 function reducer(state, action) {
     switch (action.type) {
@@ -33,6 +34,7 @@ function useAsync(callback, deps = []) {
     });
 
     const fetchData = async () => {
+        tokenValidate();
         dispatch({ type: 'LOADING' });
         try {
             const data = await callback();

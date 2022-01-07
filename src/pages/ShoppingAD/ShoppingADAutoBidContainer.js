@@ -5,6 +5,7 @@ import SendRequest from "../../utils/SendRequest";
 import * as constants from "../../utils/constants";
 import colors from "../../styles/colors";
 import {korWeekChange} from "../../utils/common";
+import {tokenValidate} from "../../utils/tokenValidate";
 
 const serverPROTOCOL = constants.config.PROTOCOL;
 const serverURL = constants.config.URL;
@@ -86,6 +87,7 @@ const ShoppingADAutoBidContainer = () => {
     const handleSearchInput = e => setSearchInput(e.target.value);
     // 검색 reset
     const handleSearchClick = async () => {
+        tokenValidate();
         try {
             const { data } = await SendRequest().post(`${serverPROTOCOL}${serverURL}/autobid/shopping_ad/keywords/search?CUSTOMER_ID=${customer["CUSTOMER_ID"]}&nccKeywordId=${keywordId.nccKeywordId}`, {
                 word: searchInput
@@ -155,6 +157,7 @@ const ShoppingADAutoBidContainer = () => {
 
     // 입찰 키워드 select 선택
     const handleKeywordSelected = useCallback(async (e, type) => {
+        tokenValidate();
         const {value} = e.target;
         let res;
 
@@ -188,6 +191,7 @@ const ShoppingADAutoBidContainer = () => {
     }, [customer, keywordId]);
 
     const fetchCampaignData = useCallback(async () => {
+        tokenValidate();
         if (!!customer["CUSTOMER_ID"]) {
             const {data} = await SendRequest().get(`${serverPROTOCOL}${serverURL}/autobid/shopping_ad/campaign?CUSTOMER_ID=${customer["CUSTOMER_ID"]}`);
             setCampaignList(data.campaign_list);
@@ -290,10 +294,6 @@ const ShoppingADAutoBidContainer = () => {
                 return;
         }
     }
-
-    useEffect(() => {
-        console.info("keyword option", keywordOption)
-    }, [keywordOption]);
 
     // 요일, 시간 select box onChange
     const handleHighScheduleSetting = e => {
@@ -568,6 +568,7 @@ const ShoppingADAutoBidContainer = () => {
 
     // 자동입찰 등록
     const onAddAutoBid = async () => {
+        tokenValidate();
         if (!keywordOption.setting.target_Rank) {
             alert('희망 순위를 설정해주세요.');
             return;

@@ -5,6 +5,7 @@ import SendRequest from "../../utils/SendRequest";
 import * as constants from "../../utils/constants";
 import colors from "../../styles/colors";
 import {korWeekChange} from "../../utils/common";
+import {tokenValidate} from "../../utils/tokenValidate";
 
 const serverPROTOCOL = constants.config.PROTOCOL;
 const serverURL = constants.config.URL;
@@ -73,6 +74,7 @@ const PowerContentsAutoBidContainer = () => {
 
     // 검색
     const handleSearchClick = useCallback(async () => {
+        tokenValidate();
         try {
             const {data} = await SendRequest().post(`${serverPROTOCOL}${serverURL}/autobid/powercontents/keywords/search?CUSTOMER_ID=${customer["CUSTOMER_ID"]}&nccAdgroupId=${keywordId.nccAdgroupId}`, {
                 word: searchInput
@@ -191,9 +193,6 @@ const PowerContentsAutoBidContainer = () => {
         }
     }
 
-    useEffect(() => {
-        console.info("keyword option", keywordOption)
-    }, [keywordOption]);
     // 체크박스의 배열 중 체크된 리스트 확인
     const isChecked = useCallback(id => checked.indexOf(id) !== -1, [checked]);
 
@@ -257,6 +256,7 @@ const PowerContentsAutoBidContainer = () => {
 
     // 입찰 키워드 select 선택
     const handleKeywordSelected = useCallback(async (e, type) => {
+        tokenValidate();
         const {value} = e.target;
         if (value === "") return;
         try {
@@ -278,6 +278,7 @@ const PowerContentsAutoBidContainer = () => {
     }, [customer, keywordId]);
 
     const fetchCampaignData = useCallback(async () => {
+        tokenValidate();
         if (!!customer["CUSTOMER_ID"]) {
             const {data} = await SendRequest().get(`${serverPROTOCOL}${serverURL}/autobid/powercontents/campaign?CUSTOMER_ID=${customer["CUSTOMER_ID"]}`);
             setCampaignList(data.campaign_list);
@@ -557,6 +558,7 @@ const PowerContentsAutoBidContainer = () => {
 
     // 자동입찰 등록
     const onAddAutoBid = async () => {
+        tokenValidate();
         if (!keywordOption.setting.target_Rank) {
             alert('희망 순위를 설정해주세요.');
             return;

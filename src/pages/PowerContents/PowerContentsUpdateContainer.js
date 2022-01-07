@@ -7,6 +7,7 @@ import UpdateAutoBidPresenter from "../../components/addAutoBid/UpdateAutoBidPre
 import {useNavigate} from "react-router-dom";
 import {toast} from "react-toastify";
 import * as constants from "../../utils/constants";
+import {tokenValidate} from "../../utils/tokenValidate";
 
 const serverPROTOCOL = constants.config.PROTOCOL;
 const serverURL = constants.config.URL;
@@ -359,6 +360,7 @@ const PowerLinkAutoBidContainer = () => {
 
     // 자동입찰 등록
     const onAddAutoBid = async () => {
+        tokenValidate();
         if (!keywordOption.setting.target_Rank) {
             alert('희망 순위를 설정해주세요.');
             return;
@@ -474,9 +476,9 @@ const PowerLinkAutoBidContainer = () => {
         }
     }, [simpleSchedule]);
 
-    console.info('아이디 : ', checked);
 
     const fetchingData = async customerId => {
+        tokenValidate();
         try {
             const { data } = await SendRequest().post(`${serverPROTOCOL}${serverURL}/autobid/powercontents/update_info?CUSTOMER_ID=${customerId}`, checked);
 

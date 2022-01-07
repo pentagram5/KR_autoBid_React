@@ -7,6 +7,7 @@ import {korWeekChange} from "../../utils/common";
 import UpdateAutoBidPresenter from "../../components/addAutoBid/UpdateAutoBidPresenter";
 import {useNavigate} from "react-router-dom";
 import {toast} from "react-toastify";
+import {tokenValidate} from "../../utils/tokenValidate";
 
 const serverPROTOCOL = constants.config.PROTOCOL;
 const serverURL = constants.config.URL;
@@ -441,17 +442,6 @@ const ShoppingADUpdateContainer = () => {
         setHighKeywordOption(finalArray);
     }
 
-    useEffect(() => {
-        console.info('고급설정 : ', highKeywordOption);
-    }, [highKeywordOption]);
-
-    useEffect(() => {
-        console.info('간편설정 :', keywordOption);
-    }, [keywordOption]);
-    useEffect(() => {
-        console.info('keywordList :', keywordList);
-    }, [keywordList]);
-
     // 스케줄 카드 삭제
     const onDeleteChips = id => {
         scheduleBgColor.push(scheduleChips.filter(chip => id === chip.id)[0].bgColor);
@@ -464,6 +454,7 @@ const ShoppingADUpdateContainer = () => {
 
     // 자동입찰 등록
     const onAddAutoBid = async () => {
+        tokenValidate();
         if (!keywordOption.setting.target_Rank) {
             alert('희망 순위를 설정해주세요.');
             return;
@@ -476,8 +467,6 @@ const ShoppingADUpdateContainer = () => {
                     ? [keywordOption]
                     : highKeywordOption
             );
-
-            console.info(response);
 
             if (response.status === 200) {
                 setLoading(false);
@@ -531,6 +520,7 @@ const ShoppingADUpdateContainer = () => {
     }, [radioState]);
 
     const fetchingData = async customerId => {
+        tokenValidate();
         try {
             const { data } = await SendRequest().post(`${serverPROTOCOL}${serverURL}/autobid/shopping_ad/update_info?CUSTOMER_ID=${customerId}`, checked);
 
@@ -571,14 +561,6 @@ const ShoppingADUpdateContainer = () => {
         }
         return () => localStorage.removeItem("checked");
     }, []);
-
-    useEffect(() => {
-        console.info('keywordList', keywordList);
-    }, [keywordList]);
-
-    useEffect(() => {
-        console.info('checked', checked);
-    }, [checked]);
 
     // 간편 설정 요일 및 시간 보내기용 데이터로 변환
     useEffect(() => {

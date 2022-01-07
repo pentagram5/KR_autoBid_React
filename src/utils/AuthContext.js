@@ -1,10 +1,12 @@
 import React, {createContext, useState, useEffect} from 'react';
+import {useNavigate} from "react-router-dom";
 
 export const AuthContext = createContext(null);
 
 export const AuthProvider = ({ isLoggedIn: isLoggedInProp, customerList: customerListProp,  children }) => {
     const [isLoggedIn, setIsLoggedIn] = useState(isLoggedInProp);
     const [customerList, setCustomerList] = useState(customerListProp);
+    const navigate = useNavigate();
 
     const userLogin = async data => {
         const { token, id_info } = data;
@@ -13,7 +15,8 @@ export const AuthProvider = ({ isLoggedIn: isLoggedInProp, customerList: custome
             await localStorage.setItem("KR_Marketing_token", token);
             await localStorage.setItem("customer", JSON.stringify(id_info));
             setIsLoggedIn(true);
-            window.location.href = '/powerLinkKeyword';
+            navigate('/powerLinkKeyword');
+            window.location.reload();
         } catch(e) {
             throw new Error(e);
         }

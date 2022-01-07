@@ -4,6 +4,7 @@ import {toast} from "react-toastify";
 import SendRequest from "../../utils/SendRequest";
 import * as constants from "../../utils/constants";
 import {useNavigate} from "react-router-dom";
+import {tokenValidate} from "../../utils/tokenValidate";
 
 const serverPROTOCOL = constants.config.PROTOCOL;
 const serverURL = constants.config.URL;
@@ -100,6 +101,7 @@ const ShoppingADKeywordContainer = () => {
 
     // 조회필터 검색
     const onSearchFilter = async () => {
+        tokenValidate();
         const { campaignName, adgroupName, keyword, device, activate, targetRank, maxBid, bidCycle, opt } = searchFilter;
 
         try {
@@ -186,6 +188,7 @@ const ShoppingADKeywordContainer = () => {
 
     // 자동입찰 활성화 / 비활성화
     const handleAutoBidActive = async (type) => {
+        tokenValidate();
         if (checked.length === 0) {
             toast.error(`${type === "active" ? "활성화" : "비활성화"} 할 키워드를 선택해주세요.`);
             return;
@@ -204,7 +207,7 @@ const ShoppingADKeywordContainer = () => {
 
     // 자동입찰 삭제
     const handleDeleteAutoBid = async () => {
-
+        tokenValidate();
         if (checked.length === 0) {
             toast.error('삭제할 키워드를 선택해주세요.');
             return;
@@ -226,6 +229,7 @@ const ShoppingADKeywordContainer = () => {
 
     // 입찰 주기 변경
     const handleChangeAutoBidCycle = async () => {
+        tokenValidate();
         try {
             const { data } = await SendRequest().put(`${serverPROTOCOL}${serverURL}/autobid/shopping_ad/cycle?CUSTOMER_ID=${customer["CUSTOMER_ID"]}&cycle=${autoBidCycle}`, nccKeywordId);
 
@@ -249,6 +253,7 @@ const ShoppingADKeywordContainer = () => {
 
     // 다운로드
     const handleDownload = async () => {
+        tokenValidate();
         try {
             const res = await SendRequest().get(`${serverPROTOCOL}${serverURL}/autobid/shopping_ad/download?CUSTOMER_ID=${customer["CUSTOMER_ID"]}`, {
                 responseType: "blob",
@@ -278,6 +283,7 @@ const ShoppingADKeywordContainer = () => {
 
     // data fetching
     const fetchPowerLinkData = async customerId => {
+        tokenValidate();
         dispatch({type: 'LOADING'});
 
         try {
