@@ -92,6 +92,10 @@ const AddAdvertiserContainer = () => {
             if (data.done) {
                 toast.info(`선택하신 광고주를 ${!!value ? "등록" : "미등록"} 하였습니다.`);
                 setCustomerDataList(data.id_info);
+
+                const res = await SendRequest().get(`${serverPROTOCOL}${serverURL}/autobid/id`);
+                setCustomerList(res.data.id_info);
+                setChecked([]);
             }
         } catch(e) {
             throw new Error(e);
