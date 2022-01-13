@@ -219,11 +219,6 @@ const PowerLinkAutoBidContainer = () => {
         setChecked(newChecked);
     }, [checked]);
 
-
-    useEffect(() => {
-        console.info('checked', checked)
-    }, [checked]);
-
     // 광고주 select 선택
     const handleCustomerChange = useCallback(e => {
         const list = customerList.find(list => list.CUSTOMER_ID === e.target.value);
