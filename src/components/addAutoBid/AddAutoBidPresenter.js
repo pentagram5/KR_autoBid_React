@@ -434,7 +434,7 @@ const AddAutoBidPresenter = ({
                                     return (
                                         <TableRow key={list.nccKeywordId} borderColor={colors.lightBorderColor}>
                                             <TableCell onClick={e => handleChecked(e, list.nccKeywordId)}>
-                                                <Checkbox checked={isListChecked}/>
+                                                <Checkbox checked={isListChecked} />
                                             </TableCell>
                                             <TableCell width={80}>{list.Keyword}</TableCell>
                                             <TableCell width={220}>{list.nccKeywordId}</TableCell>

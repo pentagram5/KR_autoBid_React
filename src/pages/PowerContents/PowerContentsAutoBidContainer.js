@@ -215,7 +215,7 @@ const PowerContentsAutoBidContainer = () => {
         if (checkedIndex === -1) newChecked = newChecked.concat(checked, id);
         else if (checkedIndex === 0) newChecked = newChecked.concat(checked.slice(1));
         else if (checkedIndex === checked.length - 1) newChecked = newChecked.concat(checked.slice(0, -1));
-        else if (checkedIndex === 0) newChecked = newChecked.concat(checked.slice(0, checkedIndex), checked.slice(checkedIndex + 1));
+        else newChecked = newChecked.concat(checked.slice(0, checkedIndex), checked.slice(checkedIndex + 1));
 
         setChecked(newChecked);
     }, [checked]);
