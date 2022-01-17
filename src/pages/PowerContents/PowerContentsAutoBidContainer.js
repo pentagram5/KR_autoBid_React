@@ -14,9 +14,9 @@ const serverURL = constants.config.URL;
 const scheduleBgColor = [colors.pastelRed, colors.pastelYellow, colors.pastelGreen, colors.pastelBlue, colors.pastelPurple];
 
 const PowerContentsAutoBidContainer = () => {
-    const {customerList} = useContext(AuthContext);
     const [loading, setLoading] = useState(false);
     const [customer, setCustomer] = useState({});
+    const [customerList, setCustomerList] = useState([]);
     const [checked, setChecked] = useState([]);
     const [campaignList, setCampaignList] = useState([]);
     const [adGroupList, setAdGroupList] = useState([]);
@@ -610,6 +610,16 @@ const PowerContentsAutoBidContainer = () => {
         }
     }
 
+    // 광고주 리스트 불러오기
+    const fetchCustomerList = useCallback(async () => {
+        try {
+            const { data } = await SendRequest().get(`${serverPROTOCOL}${serverURL}/autobid/id`);
+            setCustomerList(data.id_info);
+        } catch(e) {
+            throw new Error(e);
+        }
+    }, []);
+
     // 간편설정, 고급설정 상태
     useEffect(() => {
         if (radioState.simpleHigh === 1) {
@@ -633,6 +643,10 @@ const PowerContentsAutoBidContainer = () => {
     useEffect(() => {
         fetchCampaignData();
     }, [fetchCampaignData]);
+
+    useEffect(() => {
+        fetchCustomerList();
+    }, []);
 
     // localStorage 광고주 id 가져오기
     useEffect(() => {

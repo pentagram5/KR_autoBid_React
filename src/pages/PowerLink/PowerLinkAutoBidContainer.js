@@ -14,9 +14,9 @@ const serverURL = constants.config.URL;
 const scheduleBgColor = [colors.pastelRed, colors.pastelYellow, colors.pastelGreen, colors.pastelBlue, colors.pastelPurple];
 
 const PowerLinkAutoBidContainer = () => {
-    const {customerList} = useContext(AuthContext);
     const [loading, setLoading] = useState(false);
     const [customer, setCustomer] = useState({});
+    const [customerList, setCustomerList] = useState([]);
     const [checked, setChecked] = useState([]);
     const [campaignList, setCampaignList] = useState([]);
     const [adGroupList, setAdGroupList] = useState([]);
@@ -29,6 +29,7 @@ const PowerLinkAutoBidContainer = () => {
         nccAdgroupId: "",
         nccKeywordId: "",
     });
+
     const [radioState, setRadioState] = useState({
         simpleHigh: 0,
         bid_adj_amount: 0,
@@ -631,10 +632,25 @@ const PowerLinkAutoBidContainer = () => {
         }
     }, [radioState]);
 
+    // 광고주 리스트 불러오기
+    const fetchCustomerList = useCallback(async () => {
+        try {
+            const { data } = await SendRequest().get(`${serverPROTOCOL}${serverURL}/autobid/id`);
+            setCustomerList(data.id_info);
+        } catch(e) {
+            throw new Error(e);
+        }
+    }, []);
+
     // 초기 data 불러오기
     useEffect(() => {
         fetchCampaignData();
     }, [fetchCampaignData]);
+
+    useEffect(() => {
+        fetchCustomerList();
+    }, []);
+
 
     // localStorage 광고주 id 가져오기
     useEffect(() => {
