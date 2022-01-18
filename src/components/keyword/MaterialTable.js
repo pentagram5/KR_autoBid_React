@@ -82,8 +82,7 @@ const CustomTable = styled(Table)`
   .css-hbtnrh-MuiTableCell-root {
     max-width: 40px;
   }
-
-  .css-1ex1afd-MuiTableCell-root:nth-child(2),
+  
   .css-1ex1afd-MuiTableCell-root:nth-child(3),
   .css-1ex1afd-MuiTableCell-root:nth-child(4) {
     min-width: 200px !important;
@@ -97,7 +96,8 @@ const CustomTable = styled(Table)`
   .css-1ex1afd-MuiTableCell-root:nth-child(9),
   .css-1ex1afd-MuiTableCell-root:nth-child(10),
   .css-1ex1afd-MuiTableCell-root:nth-child(11),
-  .css-1ex1afd-MuiTableCell-root:nth-child(12) {
+  .css-1ex1afd-MuiTableCell-root:nth-child(12),
+  .css-1ex1afd-MuiTableCell-root:nth-child(13) {
     width: 50px;
   }
 
@@ -154,6 +154,19 @@ export default function MaterialTable({
                                     onChange={handleAllChecked}
                                     checked={tableLists.length > 0 && checked.length === tableLists.slice(page * rowsPerPage,  page * rowsPerPage + rowsPerPage).length}
                                 />
+                            </TableCell>
+                            <TableCell
+                                padding="checkbox"
+                                size="small"
+                                sortDirection={orderBy === 'num' ? order : false}
+                            >
+                                <TableSortLabel
+                                    active={orderBy === 'num'}
+                                    direction={orderBy === 'num' ? order : 'asc'}
+                                    onClick={createSortHandler('num')}
+                                >
+                                    번호
+                                </TableSortLabel>
                             </TableCell>
                             <TableCell
                                 sortDirection={orderBy === 'Campaign_name' ? order : false}
@@ -292,6 +305,9 @@ export default function MaterialTable({
                                         <Checkbox
                                             checked={isListChecked}
                                         />
+                                    </TableCell>
+                                    <TableCell>
+                                        {row.num}
                                     </TableCell>
                                     <TableCell>
                                         {row.Campaign_name}

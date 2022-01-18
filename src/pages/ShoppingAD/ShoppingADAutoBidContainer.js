@@ -652,6 +652,11 @@ const ShoppingADAutoBidContainer = () => {
                     sun: '0',
                 }
             });
+        } else {
+            setSimpleSchedule({
+                week: 'all',
+                time: '0~23',
+            });
         }
         // eslint-disable-next-line
     }, [radioState]);

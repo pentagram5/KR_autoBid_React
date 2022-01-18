@@ -636,6 +636,11 @@ const PowerContentsAutoBidContainer = () => {
                     sun: '0',
                 }
             });
+        } else {
+            setSimpleSchedule({
+                week: 'all',
+                time: '0~23',
+            });
         }
     }, [radioState]);
 

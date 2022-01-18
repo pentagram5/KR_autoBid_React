@@ -29,7 +29,6 @@ const PowerLinkAutoBidContainer = () => {
         nccAdgroupId: "",
         nccKeywordId: "",
     });
-
     const [radioState, setRadioState] = useState({
         simpleHigh: 0,
         bid_adj_amount: 0,
@@ -628,6 +627,11 @@ const PowerLinkAutoBidContainer = () => {
                     sat: '0',
                     sun: '0',
                 }
+            });
+        } else {
+            setSimpleSchedule({
+                week: 'all',
+                time: '0~23',
             });
         }
     }, [radioState]);
