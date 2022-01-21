@@ -654,5 +654,5 @@ const ShoppingADUpdateContainer = () => {
     )
 }
 
-export default ShoppingADUpdateContainer;
+export default React.memo(ShoppingADUpdateContainer);
 

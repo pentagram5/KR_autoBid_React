@@ -154,4 +154,4 @@ const AddAdvertiserContainer = () => {
     )
 }
 
-export default AddAdvertiserContainer;
+export default React.memo(AddAdvertiserContainer);

@@ -828,4 +828,4 @@ const UpdateAutoBidPresenter = ({
     )
 }
 
-export default UpdateAutoBidPresenter;
+export default React.memo(UpdateAutoBidPresenter);

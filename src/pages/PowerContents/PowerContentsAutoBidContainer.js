@@ -14,6 +14,7 @@ const serverURL = constants.config.URL;
 const scheduleBgColor = [colors.pastelRed, colors.pastelYellow, colors.pastelGreen, colors.pastelBlue, colors.pastelPurple];
 
 const PowerContentsAutoBidContainer = () => {
+    const { identifier, setIdentifier } = useContext(AuthContext);
     const [loading, setLoading] = useState(false);
     const [customer, setCustomer] = useState({});
     const [customerList, setCustomerList] = useState([]);
@@ -563,7 +564,10 @@ const PowerContentsAutoBidContainer = () => {
     // 자동입찰 등록
     const onAddAutoBid = async () => {
         tokenValidate();
-        if (!keywordOption.setting.target_Rank) {
+        if (identifier !== "") {
+            alert("아직 진행중인 입찰등록이 있습니다.");
+            return;
+        } else if (!keywordOption.setting.target_Rank) {
             alert('희망 순위를 설정해주세요.');
             return;
         }
@@ -573,7 +577,7 @@ const PowerContentsAutoBidContainer = () => {
             const response = await SendRequest().post(`${serverPROTOCOL}${serverURL}/autobid/powercontents?CUSTOMER_ID=${customer["CUSTOMER_ID"]}`, radioState.simpleHigh === 0 ? [keywordOption] : highKeywordOption);
 
             if (response.status === 200) {
-                toast.info("키워드 등록이 시작되었습니다.");
+                setIdentifier(response.data.identifier);
                 setLoading(false);
                 setKeywordList([]);
                 setSettingList([]);

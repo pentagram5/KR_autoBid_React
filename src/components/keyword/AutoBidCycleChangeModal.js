@@ -92,4 +92,4 @@ const AutoBidCycleChangeModal = ({
     )
 }
 
-export default AutoBidCycleChangeModal;
+export default React.memo(AutoBidCycleChangeModal);

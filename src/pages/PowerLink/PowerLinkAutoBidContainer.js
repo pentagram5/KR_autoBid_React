@@ -1,12 +1,12 @@
 import React, {useCallback, useContext, useEffect, useState} from 'react';
 import AddAutoBidPresenter from "../../components/addAutoBid/AddAutoBidPresenter";
-import {AuthContext} from "../../utils/AuthContext";
 import SendRequest from "../../utils/SendRequest";
-import * as constants from "../../utils/constants";
 import colors from "../../styles/colors";
 import {korWeekChange} from "../../utils/common";
 import {tokenValidate} from "../../utils/tokenValidate";
 import { toast } from "react-toastify";
+import * as constants from "../../utils/constants";
+import {AuthContext} from "../../utils/AuthContext";
 
 const serverPROTOCOL = constants.config.PROTOCOL;
 const serverURL = constants.config.URL;
@@ -14,8 +14,12 @@ const serverURL = constants.config.URL;
 const scheduleBgColor = [colors.pastelRed, colors.pastelYellow, colors.pastelGreen, colors.pastelBlue, colors.pastelPurple];
 
 const PowerLinkAutoBidContainer = () => {
+    const { identifier, setIdentifier } = useContext(AuthContext);
     const [loading, setLoading] = useState(false);
     const [customer, setCustomer] = useState({});
+    const [customerName, setCustomerName] = useState("");
+    const [confirmOpen, setConfirmOpen] = useState(false);
+    const [confirmState, setConfirmState] = useState(false);
     const [customerList, setCustomerList] = useState([]);
     const [checked, setChecked] = useState([]);
     const [campaignList, setCampaignList] = useState([]);
@@ -68,6 +72,9 @@ const PowerLinkAutoBidContainer = () => {
     });
     // 스케줄 칩 상태
     const [scheduleChips, setScheduleChips] = useState([]);
+
+    // 광고주 변경 모달
+    const handleConfirmClose = useCallback(() => setConfirmOpen(false), []);
 
     // 검색 onChange
     const handleSearchInput = useCallback(e => setSearchInput(e.target.value), []);
@@ -219,16 +226,36 @@ const PowerLinkAutoBidContainer = () => {
         setChecked(newChecked);
     }, [checked]);
 
+    // confirm 모달 버튼
+    const onConfirmChange = useCallback(() => {
+        setConfirmState(false);
+        setConfirmOpen(false);
+    }, []);
+    const onConfirmCancel = useCallback(() => {
+        setConfirmState(true);
+    }, []);
+
+    const confirmFn = () => {
+
+    }
+
     // 광고주 select 선택
     const handleCustomerChange = useCallback(e => {
-        const list = customerList.find(list => list.CUSTOMER_ID === e.target.value);
-        setCustomer(list);
-        localStorage.setItem("customer", JSON.stringify(list));
-        setKeywordList([]);
-        setAdGroupList([]);
-        setSettingList([]);
-    }, [customerList]);
+        const data = e.target.value.split('__');
 
+        setCustomerName(data[1]);
+        setConfirmOpen(true);
+
+        if (confirmState) {
+            const list = customerList.find(list => list.CUSTOMER_ID === data[0]);
+
+            setCustomer(list);
+            localStorage.setItem("customer", JSON.stringify(list));
+            setKeywordList([]);
+            setAdGroupList([]);
+            setSettingList([]);
+        }
+    }, [customerList]);
 
     // 체크된 keyword SettingList 박스에 추가
     const onAddSettingBox = useCallback(() => {
@@ -565,7 +592,10 @@ const PowerLinkAutoBidContainer = () => {
     // 자동입찰 등록
     const onAddAutoBid = async () => {
         tokenValidate();
-        if (!keywordOption.setting.target_Rank) {
+        if (identifier !== "") {
+            alert("아직 진행중인 입찰등록이 있습니다.");
+            return;
+        } else if (!keywordOption.setting.target_Rank) {
             alert('희망 순위를 설정해주세요.');
             return;
         }
@@ -575,7 +605,8 @@ const PowerLinkAutoBidContainer = () => {
             const response = await SendRequest().post(`${serverPROTOCOL}${serverURL}/autobid/powerlink?CUSTOMER_ID=${customer["CUSTOMER_ID"]}`, radioState.simpleHigh === 0 ? [keywordOption] : highKeywordOption);
 
             if (response.status === 200) {
-                toast.info("키워드 등록이 시작되었습니다.");
+                setIdentifier(response.data.identifier);
+
                 setLoading(false);
                 setKeywordList([]);
                 setSettingList([]);
@@ -757,6 +788,12 @@ const PowerLinkAutoBidContainer = () => {
             handleSearchReset={handleSearchReset}
             handleSearchClick={handleSearchClick}
             handleSearchInput={handleSearchInput}
+
+            confirmOpen={confirmOpen}
+            handleConfirmClose={handleConfirmClose}
+            customerName={customerName}
+            onConfirmChange={onConfirmChange}
+            onConfirmCancel={onConfirmCancel}
         />
     )
 }

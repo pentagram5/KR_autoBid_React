@@ -397,4 +397,4 @@ const ShoppingADKeywordContainer = () => {
     )
 }
 
-export default ShoppingADKeywordContainer;
+export default React.memo(ShoppingADKeywordContainer);

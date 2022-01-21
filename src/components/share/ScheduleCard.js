@@ -115,4 +115,4 @@ const ScheduleCard = ({
     )
 }
 
-export default ScheduleCard;
+export default React.memo(ScheduleCard);

@@ -15,6 +15,7 @@ const scheduleBgColor = [colors.pastelRed, colors.pastelYellow, colors.pastelGre
 
 
 const ShoppingADAutoBidContainer = () => {
+    const { identifier } = useContext(AuthContext);
     const [loading, setLoading] = useState(false);
     const [customer, setCustomer] = useState({});
     const [customerList, setCustomerList] = useState([]);
@@ -573,7 +574,10 @@ const ShoppingADAutoBidContainer = () => {
     // 자동입찰 등록
     const onAddAutoBid = async () => {
         tokenValidate();
-        if (!keywordOption.setting.target_Rank) {
+        if (identifier !== "") {
+            alert("아직 진행중인 입찰등록이 있습니다.");
+            return;
+        } else if (!keywordOption.setting.target_Rank) {
             alert('희망 순위를 설정해주세요.');
             return;
         }
@@ -766,5 +770,5 @@ const ShoppingADAutoBidContainer = () => {
     )
 }
 
-export default ShoppingADAutoBidContainer;
+export default React.memo(ShoppingADAutoBidContainer);
 

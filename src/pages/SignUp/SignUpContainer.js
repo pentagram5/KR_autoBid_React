@@ -53,4 +53,4 @@ const SignUpContainer = () => {
     )
 }
 
-export default SignUpContainer;
+export default React.memo(SignUpContainer);

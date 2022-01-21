@@ -90,4 +90,4 @@ const LoginPresenter = ({ id, passwd, onInputChange, handleLogin, goSignUp }) =>
     )
 }
 
-export default LoginPresenter;
+export default React.memo(LoginPresenter);

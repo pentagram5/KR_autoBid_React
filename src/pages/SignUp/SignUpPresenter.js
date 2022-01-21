@@ -125,4 +125,4 @@ const SignUpPresenter = ({
     )
 }
 
-export default SignUpPresenter;
+export default React.memo(SignUpPresenter);

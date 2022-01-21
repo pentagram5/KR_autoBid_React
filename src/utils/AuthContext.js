@@ -6,6 +6,7 @@ export const AuthContext = createContext(null);
 export const AuthProvider = ({ isLoggedIn: isLoggedInProp, customerList: customerListProp,  children }) => {
     const [isLoggedIn, setIsLoggedIn] = useState(isLoggedInProp);
     const [customerList, setCustomerList] = useState(customerListProp);
+    const [identifier, setIdentifier] = useState("");
     const navigate = useNavigate();
 
     const userLogin = async data => {
@@ -40,7 +41,7 @@ export const AuthProvider = ({ isLoggedIn: isLoggedInProp, customerList: custome
 
 
     return (
-        <AuthContext.Provider value={{ isLoggedIn, customerList, userLogin, userLogout }}>
+        <AuthContext.Provider value={{ isLoggedIn, customerList, userLogin, userLogout, identifier, setIdentifier }}>
             {children}
         </AuthContext.Provider>
     )

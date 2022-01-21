@@ -56,4 +56,4 @@ const StyledButton = ({
     )
 }
 
-export default StyledButton;
+export default React.memo(StyledButton);

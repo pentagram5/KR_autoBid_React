@@ -93,4 +93,4 @@ const FilterInput = ({title, name, onChange, value, radio, input, select, option
     )
 }
 
-export default FilterInput;
+export default React.memo(FilterInput);

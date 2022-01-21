@@ -36,7 +36,7 @@ const Title = styled.div`
 const SelectForm = styled.div`
   display: flex;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: ${({ marginBottom }) => marginBottom ? marginBottom : 20}px;
 `;
 const SelectBox = styled.select`
   width: ${({width}) => width}px;
@@ -300,6 +300,12 @@ const AddAutoBidPresenter = ({
                                  handleSearchReset,
                                  handleSearchClick,
                                  handleSearchInput,
+
+                                 confirmOpen,
+                                 handleConfirmClose,
+                                 customerName,
+                                 onConfirmChange,
+                                 onConfirmCancel
                              }) => {
     const {device, bid_cycle, bid_adj_amount, max_bid, min_bid} = keywordOption;
 
@@ -318,6 +324,12 @@ const AddAutoBidPresenter = ({
                         customerList={customerList}
                         setSettingList={setSettingList}
                         setKeywordList={setKeywordList}
+
+                        confirmOpen={confirmOpen}
+                        handleConfirmClose={handleConfirmClose}
+                        customerName={customerName}
+                        onConfirmChange={onConfirmChange}
+                        onConfirmCancel={onConfirmCancel}
                     />
 
                     <Title>입찰 키워드 설정</Title>
@@ -646,7 +658,7 @@ const AddAutoBidPresenter = ({
                                     입찰 조정 금액
                                 </td>
                                 <td>
-                                    <SelectForm>
+                                    <SelectForm marginBottom="0">
                                         <RadioGroup row onChange={e => handleRadioTab(e, 'bid_adj_amount')}>
                                             <FormControlLabel value={0} name="bid_adj_amount" control={<Radio/>}
                                                               label="미사용"

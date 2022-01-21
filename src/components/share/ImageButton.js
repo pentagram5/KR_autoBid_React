@@ -60,4 +60,4 @@ const ImageButton = ({
     )
 }
 
-export default ImageButton;
+export default React.memo(ImageButton);

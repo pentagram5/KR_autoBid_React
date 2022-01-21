@@ -398,7 +398,7 @@ const PowerContentsKeywordContainer = () => {
     )
 }
 
-export default PowerContentsKeywordContainer;
+export default React.memo(PowerContentsKeywordContainer);
 
 
 

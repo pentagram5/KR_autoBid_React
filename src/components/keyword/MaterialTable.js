@@ -120,7 +120,7 @@ const BottomTableBox = styled.div`
 `;
 
 
-export default function MaterialTable({
+const MaterialTable = ({
                                           tableLists,
                                           checked,
                                           isChecked,
@@ -136,7 +136,7 @@ export default function MaterialTable({
                                           rowsPerPage,
                                           handleChangePage,
                                           handleChangeRowsPerPage,
-                                      }) {
+                                      }) => {
 
     // 남는 column row 채우기
     const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - tableLists.length) : 0;
@@ -391,3 +391,5 @@ export default function MaterialTable({
         </TableWrapper>
     )
 }
+
+export default React.memo(MaterialTable);

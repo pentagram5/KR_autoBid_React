@@ -247,4 +247,4 @@ const AddAdvertiserPresenter = ({
     )
 }
 
-export default AddAdvertiserPresenter;
+export default React.memo(AddAdvertiserPresenter);

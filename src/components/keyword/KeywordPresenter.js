@@ -456,4 +456,4 @@ const KeywordPresenter = ({
     )
 }
 
-export default KeywordPresenter;
+export default React.memo(KeywordPresenter);
