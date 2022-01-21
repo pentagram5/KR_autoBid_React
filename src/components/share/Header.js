@@ -161,17 +161,14 @@ const Header = ({
                     <AdvertiserSelector>
                         <Text>광고주</Text>
                         <SelectForm
-                            onChange={e => {
-                                console.info(e);
-                                handleCustomerChange(e);
-                            }}
+                            onChange={handleCustomerChange}
                             value={customer.CUSTOMER_ID}
                         >
                             {customerList.map(list => (
-                                <option key={list.CUSTOMER_ID} value={`${list.CUSTOMER_ID}__${list.show_login}`}>{list.show_login}</option>
+                                <option key={list.CUSTOMER_ID} value={list.CUSTOMER_ID}>{list.show_login}</option>
                             ))}
                         </SelectForm>
-                        <SelectBox
+                        {/*<SelectBox
                             width={200}
                             height={35}
                             borderRadius={18}
@@ -182,7 +179,7 @@ const Header = ({
                             options={customerList}
                         >
 
-                        </SelectBox>
+                        </SelectBox>*/}
                         
                         
                     </AdvertiserSelector>

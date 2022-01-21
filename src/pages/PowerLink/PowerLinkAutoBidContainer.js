@@ -241,20 +241,26 @@ const PowerLinkAutoBidContainer = () => {
 
     // 광고주 select 선택
     const handleCustomerChange = useCallback(e => {
-        const data = e.target.value.split('__');
+        console.info('???');
+        if (window.confirm("정말 바꾸시겠습니까?")) {
 
-        setCustomerName(data[1]);
-        setConfirmOpen(true);
-
-        if (confirmState) {
-            const list = customerList.find(list => list.CUSTOMER_ID === data[0]);
-
-            setCustomer(list);
-            localStorage.setItem("customer", JSON.stringify(list));
-            setKeywordList([]);
-            setAdGroupList([]);
-            setSettingList([]);
         }
+        // const data = e.target.value.split('__');
+
+        // console.info(data[0]);
+
+        // setCustomerName(data[1]);
+        // setConfirmOpen(true);
+
+        // if (confirmState) {
+        const list = customerList.find(list => list.CUSTOMER_ID === e.target.value);
+
+        setCustomer(list);
+        localStorage.setItem("customer", JSON.stringify(list));
+        setKeywordList([]);
+        setAdGroupList([]);
+        setSettingList([]);
+        // }
     }, [customerList]);
 
     // 체크된 keyword SettingList 박스에 추가
