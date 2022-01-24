@@ -1,5 +1,5 @@
 import React from 'react';
-import styled from "styled-components";
+import styled, {css} from "styled-components";
 import Box from '@mui/material/Box';
 import Table from '@mui/material/Table';
 import {TableBody, TableHead, TableCell, TableFooter} from "@mui/material";
@@ -55,89 +55,117 @@ function TablePaginationActions(props) {
 
 const TableWrapper = styled.div`
   position: relative;
+  padding: 58px 0;
+  overflow-x: scroll;
 
-  .css-11xur9t-MuiPaper-root-MuiTableContainer-root {
-    height: calc(100vh - 498px);
-  }
-`;
-
-const CustomTable = styled(Table)`
-  thead th {
-    text-align: center;
-    background: ${colors.ultraLightGray};
-  }
-
-  td:first-child {
-    padding-left: 4px;
-  }
-
-  td {
-    padding: 6px 0;
-    text-align: center;
-  }
-  
-  tfoot td {
-    height: 50px;
-  }
-  
-  .css-hbtnrh-MuiTableCell-root {
-    max-width: 40px;
-  }
-  
-  .css-1ex1afd-MuiTableCell-root:nth-child(3),
-  .css-1ex1afd-MuiTableCell-root:nth-child(4) {
-    min-width: 200px !important;
-    white-space: pre;
-  }
-
-  .css-1ex1afd-MuiTableCell-root:nth-child(5),
-  .css-1ex1afd-MuiTableCell-root:nth-child(6),
-  .css-1ex1afd-MuiTableCell-root:nth-child(7),
-  .css-1ex1afd-MuiTableCell-root:nth-child(8),
-  .css-1ex1afd-MuiTableCell-root:nth-child(9),
-  .css-1ex1afd-MuiTableCell-root:nth-child(10),
-  .css-1ex1afd-MuiTableCell-root:nth-child(11),
-  .css-1ex1afd-MuiTableCell-root:nth-child(12),
-  .css-1ex1afd-MuiTableCell-root:nth-child(13) {
-    width: 50px;
-  }
-
+  // 테이블 헤더 span 
   .css-1qgma8u-MuiButtonBase-root-MuiTableSortLabel-root {
-    display: flex;
-    justify-content: center;
     position: relative;
     left: 12px;
   }
-`;
-const BottomTableBox = styled.div`
-  width: 100%;
-  border-top: 1px solid rgba(224, 224, 224, 1);
-  background-color: ${colors.white};
-  position: absolute;
-  bottom: 0;
-  table {
-    width: 100%;
+
+  .css-11xur9t-MuiPaper-root-MuiTableContainer-root {
+    width: 1920px;
+    height: 552px;
+  }
+  
+  thead {
+    width: 1920px !important;
+    position: absolute;
+    top: 0;
+    background: ${colors.ultraLightGray};
+  }
+
+  th,
+  td {
+    text-align: center;
+  }
+  
+  th {
+    padding: 16px 0;
+  }
+    
+  td {
+    padding: 6px 0;
+  }
+
+  th:nth-child(1),
+  td:nth-child(1) {
+    width: 50px !important;
+    padding: 6px 4px;
+  }
+
+  th:nth-child(2),
+  td:nth-child(2) {
+    width: 80px !important;
+  }
+
+  th:nth-child(3),
+  td:nth-child(3),
+  th:nth-child(4),
+  td:nth-child(4) {
+    width: 320px !important;
+    white-space: pre;
+  }
+  th:nth-child(5),
+  td:nth-child(5) {
+    width: 190px !important;
+  }
+  th:nth-child(6),
+  td:nth-child(6),
+  th:nth-child(9),
+  td:nth-child(9),
+  th:nth-child(11),
+  td:nth-child(11),
+  th:nth-child(13),
+  td:nth-child(13) {
+    width: 100px !important;
+  }
+  th:nth-child(7),
+  td:nth-child(7),
+  th:nth-child(8),
+  td:nth-child(8) {
+    width: 150px !important;
+  }
+  th:nth-child(10),
+  td:nth-child(10) {
+    width: 140px !important;
+  }
+  th:nth-child(12),
+  td:nth-child(12) {
+    width: 120px !important;
+  }
+
+  tfoot {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+  }
+
+  tfoot td {
+    border-bottom: none;
   }
 `;
 
-
 const MaterialTable = ({
-                                          tableLists,
-                                          checked,
-                                          isChecked,
-                                          handleChecked,
-                                          handleAllChecked,
+                           tableLists,
+                           checked,
+                           isChecked,
+                           handleChecked,
+                           handleAllChecked,
 
-                                          orderBy,
-                                          order,
-                                          handleRequestSort,
-                                          getComparator,
+                           orderBy,
+                           order,
+                           handleRequestSort,
+                           getComparator,
 
-                                          page,
-                                          rowsPerPage,
-                                          handleChangePage,
-                                          handleChangeRowsPerPage,
-                                      }) => {
+                           page,
+                           rowsPerPage,
+                           handleChangePage,
+                           handleChangeRowsPerPage,
+                       }) => {
+
+    console.info('로우 펄 페이지 :', rowsPerPage);
 
     // 남는 column row 채우기
     const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - tableLists.length) : 0;
@@ -147,13 +175,13 @@ const MaterialTable = ({
     return (
         <TableWrapper>
             <TableContainer component={Paper}>
-                <CustomTable>
+                <Table>
                     <TableHead>
                         <TableRow>
                             <TableCell padding="checkbox">
                                 <Checkbox
                                     onChange={handleAllChecked}
-                                    checked={tableLists.length > 0 && checked.length === tableLists.slice(page * rowsPerPage,  page * rowsPerPage + rowsPerPage).length}
+                                    checked={tableLists.length > 0 && checked.length === tableLists.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).length}
                                 />
                             </TableCell>
                             <TableCell
@@ -359,36 +387,52 @@ const MaterialTable = ({
                     </TableBody>
                     <TableFooter>
                         <TableRow>
-                            <TableCell />
+                            <TablePagination
+                                // rowsPerPageOptions={[10, 20, 30, {label: 'All', value: -1}]}
+                                rowsPerPageOptions={[10, 30, 50, 100]}
+                                colSpan={11}
+                                count={tableLists.length}
+                                rowsPerPage={rowsPerPage}
+                                page={page}
+                                SelectProps={{
+                                    inputProps: {
+                                        'aria-label': 'rows per page',
+                                    },
+                                    native: true,
+                                }}
+                                onPageChange={handleChangePage}
+                                onRowsPerPageChange={handleChangeRowsPerPage}
+                                ActionsComponent={TablePaginationActions}
+                            />
                         </TableRow>
                     </TableFooter>
-                </CustomTable>
+                </Table>
 
-                <BottomTableBox>
+                {/*<TableBox bottom={0}>
                     <table>
                         <tbody>
-                            <tr>
-                                <TablePagination
-                                    // rowsPerPageOptions={[10, 20, 30, {label: 'All', value: -1}]}
-                                    rowsPerPageOptions={[10, 30, 50, 100]}
-                                    colSpan={11}
-                                    count={tableLists.length}
-                                    rowsPerPage={rowsPerPage}
-                                    page={page}
-                                    SelectProps={{
-                                        inputProps: {
-                                            'aria-label': 'rows per page',
-                                        },
-                                        native: true,
-                                    }}
-                                    onPageChange={handleChangePage}
-                                    onRowsPerPageChange={handleChangeRowsPerPage}
-                                    ActionsComponent={TablePaginationActions}
-                                />
-                            </tr>
+                        <tr>
+                            <TablePagination
+                                // rowsPerPageOptions={[10, 20, 30, {label: 'All', value: -1}]}
+                                rowsPerPageOptions={[10, 30, 50, 100]}
+                                colSpan={11}
+                                count={tableLists.length}
+                                rowsPerPage={rowsPerPage}
+                                page={page}
+                                SelectProps={{
+                                    inputProps: {
+                                        'aria-label': 'rows per page',
+                                    },
+                                    native: true,
+                                }}
+                                onPageChange={handleChangePage}
+                                onRowsPerPageChange={handleChangeRowsPerPage}
+                                ActionsComponent={TablePaginationActions}
+                            />
+                        </tr>
                         </tbody>
                     </table>
-                </BottomTableBox>
+                </TableBox>*/}
             </TableContainer>
         </TableWrapper>
     )

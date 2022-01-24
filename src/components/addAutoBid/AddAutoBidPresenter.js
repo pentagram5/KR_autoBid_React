@@ -662,9 +662,13 @@ const AddAutoBidPresenter = ({
                                         <RadioGroup row onChange={e => handleRadioTab(e, 'bid_adj_amount')}>
                                             <FormControlLabel value={0} name="bid_adj_amount" control={<Radio/>}
                                                               label="미사용"
-                                                              checked={radioState.bid_adj_amount === 0}/>
+                                                              checked={radioState.bid_adj_amount === 0}
+                                                              disabled={!!radioState.simpleHigh}
+                                            />
                                             <FormControlLabel value={1} name="bid_adj_amount" control={<Radio/>}
-                                                              label="사용"/>
+                                                              label="사용"
+                                                              disabled={!!radioState.simpleHigh}
+                                            />
                                         </RadioGroup>
                                         {radioState.bid_adj_amount !== 0 &&
                                         <InputBox>

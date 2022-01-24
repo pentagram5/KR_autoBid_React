@@ -35,7 +35,7 @@ const Title = styled.div`
 const SelectForm = styled.div`
   display: flex;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: ${({ marginBottom }) => marginBottom ? marginBottom : 20}px;
 `;
 const SelectBox = styled.select`
   width: ${({width}) => width}px;
@@ -503,13 +503,17 @@ const UpdateAutoBidPresenter = ({
                                     입찰 조정 금액
                                 </td>
                                 <td>
-                                    <SelectForm>
+                                    <SelectForm marginBottom="0">
                                         <RadioGroup row onChange={e => handleRadioTab(e, 'bid_adj_amount')}>
                                             <FormControlLabel value={0} name="bid_adj_amount" control={<Radio/>}
                                                               label="미사용"
-                                                              checked={radioState.bid_adj_amount === 0}/>
+                                                              checked={radioState.bid_adj_amount === 0}
+                                                              disabled={!!radioState.simpleHigh}
+                                            />
                                             <FormControlLabel value={1} name="bid_adj_amount" control={<Radio/>}
-                                                              label="사용"/>
+                                                              label="사용"
+                                                              disabled={!!radioState.simpleHigh}
+                                            />
                                         </RadioGroup>
                                         {radioState.bid_adj_amount !== 0 &&
                                         <InputBox>
