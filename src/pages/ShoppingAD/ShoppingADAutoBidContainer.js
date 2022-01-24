@@ -18,6 +18,11 @@ const ShoppingADAutoBidContainer = () => {
     const { identifier } = useContext(AuthContext);
     const [loading, setLoading] = useState(false);
     const [customer, setCustomer] = useState({});
+
+    const [customerName, setCustomerName] = useState("");
+    const [customerId, setCustomerId] = useState("");
+    const [confirmOpen, setConfirmOpen] = useState(false);
+
     const [customerList, setCustomerList] = useState([]);
     const [campaignList, setCampaignList] = useState([]);
     const [adGroupList, setAdGroupList] = useState([]);
@@ -75,15 +80,33 @@ const ShoppingADAutoBidContainer = () => {
     // 스케줄 칩 상태
     const [scheduleChips, setScheduleChips] = useState([]);
 
-    // 광고주 select 선택
-    const handleCustomerChange = useCallback(e => {
-        const list = customerList.find(list => list.CUSTOMER_ID === e.target.value);
+    // 광고주 변경 모달
+    const handleConfirmClose = useCallback(() => setConfirmOpen(false), []);
+
+    // confirm 모달 버튼
+    const onConfirmChange = useCallback(() => {
+        const list = customerList.find(list => list.CUSTOMER_ID === customerId);
+
         setCustomer(list);
         localStorage.setItem("customer", JSON.stringify(list));
         setKeywordList([]);
         setAdGroupList([]);
         setSettingList([]);
-    }, [customerList]);
+
+        setConfirmOpen(false);
+    }, [customerId, customer]);
+
+    const onConfirmCancel = useCallback(() => {
+        setConfirmOpen(false);
+    }, []);
+
+    // 광고주 select 선택
+    const handleCustomerChange = useCallback(e => {
+        const data = e.target.value.split('__');
+        setConfirmOpen(true);
+        setCustomerId(data[0]);
+        setCustomerName(data[1]);
+    }, [customerList, customerId, customerName]);
 
     // 검색 onChange
     const handleSearchInput = e => setSearchInput(e.target.value);
@@ -306,7 +329,6 @@ const ShoppingADAutoBidContainer = () => {
             [name]: value
         });
     }
-
 
     const {week, start, finish} = highSchedule;
 
@@ -766,6 +788,12 @@ const ShoppingADAutoBidContainer = () => {
             handleSearchReset={handleSearchReset}
             handleSearchClick={handleSearchClick}
             handleSearchInput={handleSearchInput}
+
+            confirmOpen={confirmOpen}
+            handleConfirmClose={handleConfirmClose}
+            customerName={customerName}
+            onConfirmChange={onConfirmChange}
+            onConfirmCancel={onConfirmCancel}
         />
     )
 }

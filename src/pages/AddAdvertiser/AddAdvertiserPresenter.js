@@ -122,7 +122,13 @@ const AddAdvertiserPresenter = ({
                                     handleChecked,
                                     handleAdvertiserRegister,
                                     searchTerm,
-                                    handleSearchAdvertiser
+                                    handleSearchAdvertiser,
+
+                                    confirmOpen,
+                                    handleConfirmClose,
+                                    customerName,
+                                    onConfirmChange,
+                                    onConfirmCancel,
                                 }) => {
 
     return (
@@ -133,6 +139,12 @@ const AddAdvertiserPresenter = ({
                     handleCustomerChange={handleCustomerChange}
                     customer={customer}
                     customerList={customerList}
+
+                    confirmOpen={confirmOpen}
+                    handleConfirmClose={handleConfirmClose}
+                    customerName={customerName}
+                    onConfirmChange={onConfirmChange}
+                    onConfirmCancel={onConfirmCancel}
                 />
                 <AdvertiserSearch>
                     <Text fontWeight={700}>광고주 로그인 ID</Text>

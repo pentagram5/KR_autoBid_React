@@ -10,6 +10,11 @@ const serverURL = constants.config.URL;
 const AddAdvertiserContainer = () => {
     const [searchTerm, setSearchTerm] = useState("");
     const [customer, setCustomer] = useState({});
+
+    const [customerName, setCustomerName] = useState("");
+    const [customerId, setCustomerId] = useState("");
+    const [confirmOpen, setConfirmOpen] = useState(false);
+
     const [customerList, setCustomerList] = useState([]);
     const [customerDataList, setCustomerDataList] = useState([]);
     const [checked, setChecked] = useState([]);
@@ -54,12 +59,30 @@ const AddAdvertiserContainer = () => {
         setChecked(newChecked);
     }
 
-    // 광고주 select 선택
-    const handleCustomerChange = useCallback(e => {
-        const list = customerList.find(list => list.CUSTOMER_ID === e.target.value);
+    // 광고주 변경 모달
+    const handleConfirmClose = useCallback(() => setConfirmOpen(false), []);
+
+    // confirm 모달 버튼
+    const onConfirmChange = useCallback(() => {
+        const list = customerList.find(list => list.CUSTOMER_ID === customerId);
+
         setCustomer(list);
         localStorage.setItem("customer", JSON.stringify(list));
-    }, [customerList]);
+
+        setConfirmOpen(false);
+    }, [customerId, customer]);
+
+    const onConfirmCancel = useCallback(() => {
+        setConfirmOpen(false);
+    }, []);
+
+    // 광고주 select 선택
+    const handleCustomerChange = useCallback(e => {
+        const data = e.target.value.split('__');
+        setConfirmOpen(true);
+        setCustomerId(data[0]);
+        setCustomerName(data[1]);
+    }, [customerList, customerId, customerName]);
 
     // 광고주 리스트 불러오기
     const fetchCustomer = async () => {
@@ -150,6 +173,12 @@ const AddAdvertiserContainer = () => {
             handleAdvertiserRegister={handleAdvertiserRegister}
             searchTerm={searchTerm}
             handleSearchAdvertiser={handleSearchAdvertiser}
+
+            confirmOpen={confirmOpen}
+            handleConfirmClose={handleConfirmClose}
+            customerName={customerName}
+            onConfirmChange={onConfirmChange}
+            onConfirmCancel={onConfirmCancel}
         />
     )
 }

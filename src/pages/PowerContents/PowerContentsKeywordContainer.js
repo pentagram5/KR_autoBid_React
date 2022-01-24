@@ -53,6 +53,11 @@ const PowerContentsKeywordContainer = () => {
     });
     const {loading, data, error} = state;
     const [customer, setCustomer] = useState({});
+
+    const [customerName, setCustomerName] = useState("");
+    const [customerId, setCustomerId] = useState("");
+    const [confirmOpen, setConfirmOpen] = useState(false);
+
     const [customerList, setCustomerList] = useState([]);
     const [checked, setChecked] = useState([]);
     const [nccKeywordId, setNccKeywordId] = useState([]);
@@ -156,12 +161,30 @@ const PowerContentsKeywordContainer = () => {
         setPage(0);
     };
 
-    // 광고주 select 선택
-    const handleCustomerChange = useCallback(e => {
-        const list = customerList.find(list => list.CUSTOMER_ID === e.target.value);
+    // 광고주 변경 모달
+    const handleConfirmClose = useCallback(() => setConfirmOpen(false), []);
+
+    // confirm 모달 버튼
+    const onConfirmChange = useCallback(() => {
+        const list = customerList.find(list => list.CUSTOMER_ID === customerId);
+
         setCustomer(list);
         localStorage.setItem("customer", JSON.stringify(list));
-    }, [customerList]);
+
+        setConfirmOpen(false);
+    }, [customerId, customer]);
+
+    const onConfirmCancel = useCallback(() => {
+        setConfirmOpen(false);
+    }, []);
+
+    // 광고주 select 선택
+    const handleCustomerChange = useCallback(e => {
+        const data = e.target.value.split('__');
+        setConfirmOpen(true);
+        setCustomerId(data[0]);
+        setCustomerName(data[1]);
+    }, [customerList, customerId, customerName]);
 
     // 체크박스 전체 선택
     const handleAllChecked = e => {
@@ -394,6 +417,12 @@ const PowerContentsKeywordContainer = () => {
             onFilterChange={onFilterChange}
             onFilterReset={onFilterReset}
             onSearchFilter={onSearchFilter}
+
+            confirmOpen={confirmOpen}
+            handleConfirmClose={handleConfirmClose}
+            customerName={customerName}
+            onConfirmChange={onConfirmChange}
+            onConfirmCancel={onConfirmCancel}
         />
     )
 }

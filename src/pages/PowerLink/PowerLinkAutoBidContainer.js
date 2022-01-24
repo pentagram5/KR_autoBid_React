@@ -4,7 +4,6 @@ import SendRequest from "../../utils/SendRequest";
 import colors from "../../styles/colors";
 import {korWeekChange} from "../../utils/common";
 import {tokenValidate} from "../../utils/tokenValidate";
-import { toast } from "react-toastify";
 import * as constants from "../../utils/constants";
 import {AuthContext} from "../../utils/AuthContext";
 
@@ -17,9 +16,11 @@ const PowerLinkAutoBidContainer = () => {
     const { identifier, setIdentifier } = useContext(AuthContext);
     const [loading, setLoading] = useState(false);
     const [customer, setCustomer] = useState({});
+
     const [customerName, setCustomerName] = useState("");
+    const [customerId, setCustomerId] = useState("");
     const [confirmOpen, setConfirmOpen] = useState(false);
-    const [confirmState, setConfirmState] = useState(false);
+
     const [customerList, setCustomerList] = useState([]);
     const [checked, setChecked] = useState([]);
     const [campaignList, setCampaignList] = useState([]);
@@ -72,9 +73,6 @@ const PowerLinkAutoBidContainer = () => {
     });
     // 스케줄 칩 상태
     const [scheduleChips, setScheduleChips] = useState([]);
-
-    // 광고주 변경 모달
-    const handleConfirmClose = useCallback(() => setConfirmOpen(false), []);
 
     // 검색 onChange
     const handleSearchInput = useCallback(e => setSearchInput(e.target.value), []);
@@ -186,7 +184,6 @@ const PowerLinkAutoBidContainer = () => {
 
         let date = year + '-' + month + '-' + day;
 
-
         switch (type) {
             case 'start_Date':
             case 'end_Date':
@@ -226,42 +223,33 @@ const PowerLinkAutoBidContainer = () => {
         setChecked(newChecked);
     }, [checked]);
 
+    // 광고주 변경 모달
+    const handleConfirmClose = useCallback(() => setConfirmOpen(false), []);
+
     // confirm 모달 버튼
     const onConfirmChange = useCallback(() => {
-        setConfirmState(false);
-        setConfirmOpen(false);
-    }, []);
-    const onConfirmCancel = useCallback(() => {
-        setConfirmState(true);
-    }, []);
-
-    const confirmFn = () => {
-
-    }
-
-    // 광고주 select 선택
-    const handleCustomerChange = useCallback(e => {
-        console.info('???');
-        if (window.confirm("정말 바꾸시겠습니까?")) {
-
-        }
-        // const data = e.target.value.split('__');
-
-        // console.info(data[0]);
-
-        // setCustomerName(data[1]);
-        // setConfirmOpen(true);
-
-        // if (confirmState) {
-        const list = customerList.find(list => list.CUSTOMER_ID === e.target.value);
+        const list = customerList.find(list => list.CUSTOMER_ID === customerId);
 
         setCustomer(list);
         localStorage.setItem("customer", JSON.stringify(list));
         setKeywordList([]);
         setAdGroupList([]);
         setSettingList([]);
-        // }
-    }, [customerList]);
+
+        setConfirmOpen(false);
+    }, [customerId, customer]);
+
+    const onConfirmCancel = useCallback(() => {
+        setConfirmOpen(false);
+    }, []);
+
+    // 광고주 select 선택
+    const handleCustomerChange = useCallback(e => {
+        const data = e.target.value.split('__');
+        setConfirmOpen(true);
+        setCustomerId(data[0]);
+        setCustomerName(data[1]);
+    }, [customerList, customerId, customerName]);
 
     // 체크된 keyword SettingList 박스에 추가
     const onAddSettingBox = useCallback(() => {

@@ -2,9 +2,7 @@ import React from 'react';
 import styled from "styled-components";
 import Box from '@mui/material/Box';
 import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableHead from '@mui/material/TableHead';
-import TableCell from '@mui/material/TableCell';
+import {TableBody, TableHead, TableCell, TableFooter} from "@mui/material";
 import TableContainer from '@mui/material/TableContainer';
 import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
@@ -13,7 +11,6 @@ import IconButton from '@mui/material/IconButton';
 import Checkbox from '@mui/material/Checkbox';
 import colors from "../../styles/colors";
 import {TableSortLabel} from "@mui/material";
-
 
 function TablePaginationActions(props) {
     const {count, page, rowsPerPage, onPageChange} = props;
@@ -77,6 +74,10 @@ const CustomTable = styled(Table)`
   td {
     padding: 6px 0;
     text-align: center;
+  }
+  
+  tfoot td {
+    height: 50px;
   }
   
   .css-hbtnrh-MuiTableCell-root {
@@ -356,10 +357,11 @@ const MaterialTable = ({
                             </TableRow>
                         )}
                     </TableBody>
-                    {/*<TableFooter>
-                        <TableRow>*/}
-                    {/*</TableRow>
-                    </TableFooter>*/}
+                    <TableFooter>
+                        <TableRow>
+                            <TableCell />
+                        </TableRow>
+                    </TableFooter>
                 </CustomTable>
 
                 <BottomTableBox>

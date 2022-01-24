@@ -174,7 +174,13 @@ const KeywordPresenter = ({
                               searchFilter,
                               onFilterChange,
                               onFilterReset,
-                              onSearchFilter
+                              onSearchFilter,
+
+                              confirmOpen,
+                              handleConfirmClose,
+                              customerName,
+                              onConfirmChange,
+                              onConfirmCancel,
                           }) => {
 
     const { campaignName, adgroupName, keyword, device, activate, targetRank, maxBid, bidCycle, opt } = searchFilter;
@@ -191,6 +197,12 @@ const KeywordPresenter = ({
                     handleCustomerChange={handleCustomerChange}
                     customer={customer}
                     customerList={customerList}
+
+                    confirmOpen={confirmOpen}
+                    handleConfirmClose={handleConfirmClose}
+                    customerName={customerName}
+                    onConfirmChange={onConfirmChange}
+                    onConfirmCancel={onConfirmCancel}
                 />
                 <KeywordInfoBox>
                     <Text fontColor={colors.deepGray} fontSize={14} fontWeight={700}>등록된 주기별 키워드 수</Text>

@@ -8,7 +8,6 @@ import {toast} from "react-toastify";
 import Modal from '@mui/material/Modal';
 import * as constants from "../../utils/constants";
 import StyledButton from "./StyledButton";
-import SelectBox from "./SelectBox";
 
 const serverPROTOCOL = constants.config.PROTOCOL;
 const serverURL = constants.config.URL;
@@ -162,26 +161,12 @@ const Header = ({
                         <Text>광고주</Text>
                         <SelectForm
                             onChange={handleCustomerChange}
-                            value={customer.CUSTOMER_ID}
+                            value={`${customer.CUSTOMER_ID}__${customer.show_login}`}
                         >
                             {customerList.map(list => (
-                                <option key={list.CUSTOMER_ID} value={list.CUSTOMER_ID}>{list.show_login}</option>
+                                <option key={list.CUSTOMER_ID} value={`${list.CUSTOMER_ID}__${list.show_login}`}>{list.show_login}</option>
                             ))}
                         </SelectForm>
-                        {/*<SelectBox
-                            width={200}
-                            height={35}
-                            borderRadius={18}
-                            fontSize={16}
-                            fontColor={colors.white}
-                            bgColor={colors.graySkyblue}
-                            border={`10px solid ${colors.ultraLightSkyBlue}`}
-                            options={customerList}
-                        >
-
-                        </SelectBox>*/}
-                        
-                        
                     </AdvertiserSelector>
                 )}
                 {!!done && (
