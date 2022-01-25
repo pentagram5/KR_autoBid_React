@@ -365,10 +365,11 @@ const MaterialTable = ({
 
                                     {/*  88 순위밖, 99 - */}
                                     <TableCell>
-                                        {(row.current_rank !== 55 && row.current_rank !== 66 && row.current_rank !== 77) && row.current_rank}
-                                        {(row.current_rank === 55 && row.current_rank !== 66 && row.current_rank !== 77) && '순위 밖'}
-                                        {(row.current_rank === 66 && row.current_rank !== 55 && row.current_rank !== 77) && '실행 전'}
-                                        {(row.current_rank === 77 && row.current_rank !== 55 && row.current_rank !== 66) && '스케줄 밖'}
+                                        {(row.current_rank !== 55 && row.current_rank !== 66 && row.current_rank !== 77 && row.current_rank !== 88) && row.current_rank}
+                                        {(row.current_rank === 55 && row.current_rank !== 66 && row.current_rank !== 77 && row.current_rank !== 88) && '순위 밖'}
+                                        {(row.current_rank === 66 && row.current_rank !== 55 && row.current_rank !== 77 && row.current_rank !== 88) && '실행 전'}
+                                        {(row.current_rank === 77 && row.current_rank !== 55 && row.current_rank !== 66 && row.current_rank !== 88) && '스케줄 밖'}
+                                        {(row.current_rank === 88 && row.current_rank !== 55 && row.current_rank !== 66 && row.current_rank !== 77) && '노출 없음'}
                                     </TableCell>
                                     <TableCell>
                                         {!!row.activate ? '활성화' : '비활성화'}
