@@ -12,6 +12,31 @@ import Checkbox from '@mui/material/Checkbox';
 import colors from "../../styles/colors";
 import {TableSortLabel} from "@mui/material";
 
+const HiddenText = styled.div`
+  width: ${({width}) => width ? width : 218}px !important;
+  overflow-x: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding: 0 5px;
+  margin: 0;
+`;
+
+const HoverBox = styled.div`
+  position: absolute;
+  border: 1px solid ${colors.blue};
+  border-radius: 4px;
+  padding: 6px 8px;
+  top: 6px;
+  left: 200px;
+  z-index: 1;
+  background-color: ${colors.white};
+  display: none;
+  
+  ${HiddenText}:hover & {
+    display: block;
+  }
+`;
+
 function TablePaginationActions(props) {
     const {count, page, rowsPerPage, onPageChange} = props;
     const handleFirstPageButtonClick = e => onPageChange(e, 0);
@@ -68,7 +93,7 @@ const TableWrapper = styled.div`
     width: 1920px;
     height: 552px;
   }
-  
+
   thead {
     width: 1920px !important;
     position: absolute;
@@ -80,11 +105,11 @@ const TableWrapper = styled.div`
   td {
     text-align: center;
   }
-  
+
   th {
     padding: 16px 0;
   }
-    
+
   td {
     padding: 6px 0;
   }
@@ -104,36 +129,53 @@ const TableWrapper = styled.div`
   td:nth-child(3),
   th:nth-child(4),
   td:nth-child(4) {
-    width: 320px !important;
+    width: 180px !important;
     white-space: pre;
   }
+
   th:nth-child(5),
   td:nth-child(5) {
-    width: 190px !important;
+    width: 220px !important;
+    position: relative;
   }
+
   th:nth-child(6),
-  td:nth-child(6),
-  th:nth-child(9),
-  td:nth-child(9),
+  td:nth-child(6) {
+    width: 200px !important;
+    position: relative;
+  }
+
+  th:nth-child(7),
+  td:nth-child(7) {
+    width: 150px !important;
+  }
+
+  th:nth-child(8),
+  td:nth-child(8),
   th:nth-child(11),
   td:nth-child(11),
   th:nth-child(13),
-  td:nth-child(13) {
-    width: 100px !important;
+  td:nth-child(13),
+  th:nth-child(15),
+  td:nth-child(15) {
+    width: 90px !important;
   }
-  th:nth-child(7),
-  td:nth-child(7),
-  th:nth-child(8),
-  td:nth-child(8) {
-    width: 150px !important;
-  }
+
+  th:nth-child(9),
+  td:nth-child(9),
   th:nth-child(10),
   td:nth-child(10) {
-    width: 140px !important;
+    width: 120px !important;
   }
+
   th:nth-child(12),
   td:nth-child(12) {
     width: 120px !important;
+  }
+
+  th:nth-child(14),
+  td:nth-child(14) {
+    width: 140px !important;
   }
 
   tfoot {
@@ -147,7 +189,7 @@ const TableWrapper = styled.div`
   }
 `;
 
-const MaterialTable = ({
+const ShoppingTable = ({
                            tableLists,
                            checked,
                            isChecked,
@@ -214,6 +256,28 @@ const MaterialTable = ({
                                     onClick={createSortHandler('Adgroup_name')}
                                 >
                                     광고그룹
+                                </TableSortLabel>
+                            </TableCell>
+                            <TableCell
+                                sortDirection={orderBy === 'productName' ? order : false}
+                            >
+                                <TableSortLabel
+                                    active={orderBy === 'productName'}
+                                    direction={orderBy === 'productName' ? order : 'asc'}
+                                    onClick={createSortHandler('productName')}
+                                >
+                                    소재명
+                                </TableSortLabel>
+                            </TableCell>
+                            <TableCell
+                                sortDirection={orderBy === 'adId' ? order : false}
+                            >
+                                <TableSortLabel
+                                    active={orderBy === 'adId'}
+                                    direction={orderBy === 'adId' ? order : 'asc'}
+                                    onClick={createSortHandler('adId')}
+                                >
+                                    소재 ID
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell
@@ -342,6 +406,22 @@ const MaterialTable = ({
                                         {row.Adgroup_name}
                                     </TableCell>
                                     <TableCell>
+                                        <HiddenText>
+                                            {row.productName}
+                                            <HoverBox>
+                                                {row.productName}
+                                            </HoverBox>
+                                        </HiddenText>
+                                    </TableCell>
+                                    <TableCell>
+                                        <HiddenText width={198}>
+                                            {row.adId}
+                                            <HoverBox>
+                                                {row.adId}
+                                            </HoverBox>
+                                        </HiddenText>
+                                    </TableCell>
+                                    <TableCell>
                                         {row.Keyword}
                                     </TableCell>
                                     <TableCell>
@@ -411,4 +491,4 @@ const MaterialTable = ({
     )
 }
 
-export default React.memo(MaterialTable);
+export default React.memo(ShoppingTable);

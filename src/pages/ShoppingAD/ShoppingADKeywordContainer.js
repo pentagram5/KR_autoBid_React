@@ -373,6 +373,7 @@ const ShoppingADKeywordContainer = () => {
 
     return (
         <KeywordPresenter
+            SHOPPING
             title="쇼핑광고 자동입찰관리"
             loading={loading}
             error={error}
