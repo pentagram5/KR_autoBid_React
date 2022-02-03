@@ -124,7 +124,7 @@ const Header = ({
         try {
             const res = await SendRequest().get(`${serverPROTOCOL}${serverURL}/autobid/status__/${identifier}`);
 
-            if (res.data.identifier.status) {
+            if (res.data && res.data.identifier && res.data.identifier.status) {
                 setPercent(res.data.identifier.percentage);
                 setDone(res.data.identifier.status);
                 setTimeout(() => getProgressPercent(), 1000);
