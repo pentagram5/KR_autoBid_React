@@ -172,7 +172,13 @@ const PowerContentsKeywordContainer = () => {
         localStorage.setItem("customer", JSON.stringify(list));
 
         setConfirmOpen(false);
+        setChecked([]);
+        console.info('??')
     }, [customerId, customer]);
+
+    useEffect(() => {
+        console.info('checked', checked);
+    }, [checked]);
 
     const onConfirmCancel = useCallback(() => {
         setConfirmOpen(false);

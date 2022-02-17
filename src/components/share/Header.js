@@ -110,9 +110,9 @@ const Header = ({
                     customerList,
                     update,
 
-                    confirmOpen,
+                    confirmOpen = false,
                     handleConfirmClose,
-                    customerName,
+                    customerName = "",
                     onConfirmChange,
                     onConfirmCancel
                 }) => {
@@ -151,6 +151,11 @@ const Header = ({
             clearTimeout(getProgressPercent);
         }
     }, []);
+
+    useEffect(() => {
+        console.info('confirmOpen : ', confirmOpen);
+        console.info('customerName : ', customerName);
+    }, [confirmOpen, customerName]);
 
     return (
         <View>

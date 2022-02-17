@@ -174,6 +174,7 @@ const PowerLinkKeywordContainer = () => {
         localStorage.setItem("customer", JSON.stringify(list));
 
         setConfirmOpen(false);
+        setChecked([]);
     }, [customerId, customer]);
 
     const onConfirmCancel = useCallback(() => {

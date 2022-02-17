@@ -97,14 +97,14 @@ const TableWrapper = styled.div`
 
   th:nth-child(2),
   td:nth-child(2) {
-    width: 80px !important;
+    width: 104px !important;
   }
 
   th:nth-child(3),
   td:nth-child(3),
   th:nth-child(4),
   td:nth-child(4) {
-    width: 320px !important;
+    width: 312px !important;
     white-space: pre;
   }
   th:nth-child(5),
@@ -319,65 +319,65 @@ const MaterialTable = ({
                     </TableHead>
                     <TableBody>
                         {tableLists &&
-                        (rowsPerPage > 0
-                                ? tableLists.sort(getComparator(order, orderBy)).slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                                : tableLists
-                        ).map(row => {
-                            const isListChecked = isChecked(row.nccKeywordId);
+                            (rowsPerPage > 0
+                                    ? tableLists.sort(getComparator(order, orderBy)).slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                                    : tableLists
+                            ).map(row => {
+                                const isListChecked = isChecked(row.nccKeywordId);
 
-                            return (
-                                <TableRow key={row.nccKeywordId}>
-                                    <TableCell padding="checkbox" onClick={e => handleChecked(e, row.nccKeywordId)}>
-                                        <Checkbox
-                                            checked={isListChecked}
-                                        />
-                                    </TableCell>
-                                    <TableCell>
-                                        {row.num}
-                                    </TableCell>
-                                    <TableCell>
-                                        {row.Campaign_name}
-                                    </TableCell>
-                                    <TableCell>
-                                        {row.Adgroup_name}
-                                    </TableCell>
-                                    <TableCell>
-                                        {row.Keyword}
-                                    </TableCell>
-                                    <TableCell>
-                                        {row.device}
-                                    </TableCell>
-                                    <TableCell>
-                                        {!!row.min_bid ? `${parseInt(row.min_bid).toLocaleString()} 원` : '-'}
-                                    </TableCell>
-                                    <TableCell>
-                                        {!!row.max_bid ? `${parseInt(row.max_bid).toLocaleString()} 원` : '-'}
-                                    </TableCell>
-                                    <TableCell>
-                                        {row.target_Rank}
-                                    </TableCell>
-                                    <TableCell>
-                                        {parseInt(row.current_bid).toLocaleString()} 원
-                                    </TableCell>
+                                return (
+                                    <TableRow key={row.nccKeywordId}>
+                                        <TableCell padding="checkbox" onClick={e => handleChecked(e, row.nccKeywordId)}>
+                                            <Checkbox
+                                                checked={isListChecked}
+                                            />
+                                        </TableCell>
+                                        <TableCell>
+                                            {row.num}
+                                        </TableCell>
+                                        <TableCell>
+                                            {row.Campaign_name}
+                                        </TableCell>
+                                        <TableCell>
+                                            {row.Adgroup_name}
+                                        </TableCell>
+                                        <TableCell>
+                                            {row.Keyword}
+                                        </TableCell>
+                                        <TableCell>
+                                            {row.device}
+                                        </TableCell>
+                                        <TableCell>
+                                            {!!row.min_bid ? `${parseInt(row.min_bid).toLocaleString()} 원` : '-'}
+                                        </TableCell>
+                                        <TableCell>
+                                            {!!row.max_bid ? `${parseInt(row.max_bid).toLocaleString()} 원` : '-'}
+                                        </TableCell>
+                                        <TableCell>
+                                            {row.target_Rank}
+                                        </TableCell>
+                                        <TableCell>
+                                            {parseInt(row.current_bid).toLocaleString()} 원
+                                        </TableCell>
 
-                                    <TableCell>
-                                        {(row.current_rank !== 55 && row.current_rank !== 60 && row.current_rank !== 65 && row.current_rank !== 66 && row.current_rank !== 70 && row.current_rank !== 77) && row.current_rank}
-                                        {row.current_rank === 55 && '순위밖'}
-                                        {row.current_rank === 60 && '광고그룹정지'}
-                                        {row.current_rank === 65 && '노출없음'}
-                                        {row.current_rank === 66 && '실행전'}
-                                        {row.current_rank === 70 && '비활성화'}
-                                        {row.current_rank === 77 && '스케줄밖'}
-                                    </TableCell>
-                                    <TableCell>
-                                        {!!row.activate ? '활성화' : '비활성화'}
-                                    </TableCell>
-                                    <TableCell>
-                                        {row.bid_cycle} 분
-                                    </TableCell>
-                                </TableRow>
-                            )
-                        })}
+                                        <TableCell>
+                                            {(row.current_rank !== 55 && row.current_rank !== 60 && row.current_rank !== 65 && row.current_rank !== 66 && row.current_rank !== 70 && row.current_rank !== 77) && row.current_rank}
+                                            {row.current_rank === 55 && '순위밖'}
+                                            {row.current_rank === 60 && '광고그룹정지'}
+                                            {row.current_rank === 65 && '노출없음'}
+                                            {row.current_rank === 66 && '실행전'}
+                                            {row.current_rank === 70 && '비활성화'}
+                                            {row.current_rank === 77 && '스케줄밖'}
+                                        </TableCell>
+                                        <TableCell>
+                                            {!!row.activate ? '활성화' : '비활성화'}
+                                        </TableCell>
+                                        <TableCell>
+                                            {row.bid_cycle} 분
+                                        </TableCell>
+                                    </TableRow>
+                                )
+                            })}
                         {emptyRows > 0 && (
                             <TableRow style={{height: 53 * emptyRows}}>
                                 <TableCell colSpan={6}/>
