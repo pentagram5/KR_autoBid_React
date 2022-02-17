@@ -233,7 +233,7 @@ const ShoppingTable = ({
                                     direction={orderBy === 'num' ? order : 'asc'}
                                     onClick={createSortHandler('num')}
                                 >
-                                    번호
+                                    고유 번호
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell
