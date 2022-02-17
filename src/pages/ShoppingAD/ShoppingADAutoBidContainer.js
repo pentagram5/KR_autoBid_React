@@ -77,6 +77,12 @@ const ShoppingADAutoBidContainer = () => {
         start: '',
         finish: '',
     });
+    const [daily, setDaily] = useState({
+        day: [],
+        weekDays: [],
+        weekend: [],
+        all: []
+    });
     // 스케줄 칩 상태
     const [scheduleChips, setScheduleChips] = useState([]);
 
@@ -156,15 +162,15 @@ const ShoppingADAutoBidContainer = () => {
         newKeywordId = {...keywordId};
         newKeywordInfo.push(newKeywordId);
 
-        keywordList.forEach(list => {
-            let title = adsList.map(list => list.nccAdId === list.nccAdId && list.productTitle);
+        keywordList.forEach(keyword => {
+            let title = adsList.find(ads => ads.nccAdId === keywordId.nccKeywordId);
 
-            if (list.id === selectedKeyword) {
-                list.title = title[0];
+            if (keyword.id === selectedKeyword) {
+                keyword.title = title.productTitle;
 
-                setSettingList([list]);
-                for (let key in list) {
-                    newKeywordId["schKeyword"] = list["schKeyword"]
+                setSettingList([keyword]);
+                for (let key in keyword) {
+                    newKeywordId["schKeyword"] = keyword["schKeyword"]
                 }
             }
         });
@@ -375,9 +381,24 @@ const ShoppingADAutoBidContainer = () => {
         active: !chip.active
     } : {...chip, active: false}));
 
+
+
+
+
+
+
+
+
+    useEffect(() => {
+        console.info('카피 한 것 :', daily)
+    }, [daily]);
+
     // 시간 설정
     const onAddChips = () => {
-        let tmp;
+        let tmp = [];
+        let tmpWeekDays = [];
+        let tmpWeekend = [];
+        let tmpAll = [];
         let weekKor = '';
         let copyChips = scheduleChips.find(item => item.active && item);
 
@@ -405,50 +426,63 @@ const ShoppingADAutoBidContainer = () => {
                 for (let i = parseInt(start); i <= parseInt(finish); i++) tmp.push(i);
                 break;
             case 'weekDays':
-                let tmpWeekDays = [];
-                for (let i = parseInt(start); i <= parseInt(finish); i++) tmpWeekDays.push(i);
+                for (let i = parseInt(start); i <= parseInt(finish); i++) tmpWeekDays.push(i)
                 copyChips = {
                     ...copyChips,
-                    mon: [...tmpWeekDays],
-                    tue: [...tmpWeekDays],
-                    wed: [...tmpWeekDays],
-                    thu: [...tmpWeekDays],
-                    fri: [...tmpWeekDays],
-                    sat: [...copyChips.sat],
-                    sun: [...copyChips.sun],
+                    mon: [...daily.weekend, ...daily.all, ...tmpWeekDays],
+                    tue: [...daily.weekend, ...daily.all, ...tmpWeekDays],
+                    wed: [...daily.weekend, ...daily.all, ...tmpWeekDays],
+                    thu: [...daily.weekend, ...daily.all, ...tmpWeekDays],
+                    fri: [...daily.weekend, ...daily.all, ...tmpWeekDays],
+                    sat: [...daily.weekend, ...daily.all, ...copyChips.sat],
+                    sun: [...daily.weekend, ...daily.all, ...copyChips.sun],
                 };
                 break;
             case 'weekend':
-                let tmpWeekend = [];
                 for (let i = parseInt(start); i <= parseInt(finish); i++) tmpWeekend.push(i);
+
                 copyChips = {
                     ...copyChips,
-                    mon: [...copyChips.mon],
-                    tue: [...copyChips.tue],
-                    wed: [...copyChips.wed],
-                    thu: [...copyChips.thu],
-                    fri: [...copyChips.fri],
-                    sat: [...tmpWeekend],
-                    sun: [...tmpWeekend],
+                    mon: [...daily.day, ...daily.weekDays, ...daily.all, ...copyChips.mon],
+                    tue: [...daily.day, ...daily.weekDays, ...daily.all, ...copyChips.tue],
+                    wed: [...daily.day, ...daily.weekDays, ...daily.all, ...copyChips.wed],
+                    thu: [...daily.day, ...daily.weekDays, ...daily.all, ...copyChips.thu],
+                    fri: [...daily.day, ...daily.weekDays, ...daily.all, ...copyChips.fri],
+                    sat: [...daily.day, ...daily.weekDays, ...daily.all, ...tmpWeekend],
+                    sun: [...daily.day, ...daily.weekDays, ...daily.all, ...tmpWeekend],
                 };
                 break;
             case 'all':
-                let tmpAll = [];
                 for (let i = parseInt(start); i <= parseInt(finish); i++) tmpAll.push(i);
                 copyChips = {
                     ...copyChips,
-                    mon: [...tmpAll],
-                    tue: [...tmpAll],
-                    wed: [...tmpAll],
-                    thu: [...tmpAll],
-                    fri: [...tmpAll],
-                    sat: [...tmpAll],
-                    sun: [...tmpAll],
+                    mon: [...daily.day, ...daily.weekDays, ...daily.weekend, ...tmpAll],
+                    tue: [...daily.day, ...daily.weekDays, ...daily.weekend, ...tmpAll],
+                    wed: [...daily.day, ...daily.weekDays, ...daily.weekend, ...tmpAll],
+                    thu: [...daily.day, ...daily.weekDays, ...daily.weekend, ...tmpAll],
+                    fri: [...daily.day, ...daily.weekDays, ...daily.weekend, ...tmpAll],
+                    sat: [...daily.day, ...daily.weekDays, ...daily.weekend, ...tmpAll],
+                    sun: [...daily.day, ...daily.weekDays, ...daily.weekend, ...tmpAll],
                 };
                 break;
             default:
                 weekKor = '';
         }
+
+
+
+        // console.info('highKeywordOption : ', highKeywordOption);
+        console.info('tmpAll : ', tmpAll);
+        console.info('tmpWeekDays : ', tmpWeekDays);
+        console.info('tmpWeekend : ', tmpWeekend);
+        console.info('tmp : ', tmp);
+        setDaily({
+            ...daily,
+            day: [...tmp],
+            weekDays: [...tmpWeekDays],
+            weekend: [...tmpWeekend],
+            all: [...tmpAll]
+        });
 
         // 중복체크
         if (week !== "weekDays" && week !== "weekend" && week !== "all") {
