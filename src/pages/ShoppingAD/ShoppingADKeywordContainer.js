@@ -173,6 +173,7 @@ const ShoppingADKeywordContainer = () => {
 
         setConfirmOpen(false);
         setChecked([]);
+        setPage(0);
     }, [customerId, customer]);
 
     const onConfirmCancel = useCallback(() => {

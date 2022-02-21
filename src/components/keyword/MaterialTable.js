@@ -148,7 +148,7 @@ const TableWrapper = styled.div`
 `;
 
 const MaterialTable = ({
-                           tableLists,
+                           tableLists = [],
                            checked,
                            isChecked,
                            handleChecked,
@@ -159,8 +159,8 @@ const MaterialTable = ({
                            handleRequestSort,
                            getComparator,
 
-                           page,
-                           rowsPerPage,
+                           page = 0,
+                           rowsPerPage = 10,
                            handleChangePage,
                            handleChangeRowsPerPage,
                        }) => {

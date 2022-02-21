@@ -173,12 +173,8 @@ const PowerContentsKeywordContainer = () => {
 
         setConfirmOpen(false);
         setChecked([]);
-        console.info('??')
+        setPage(0);
     }, [customerId, customer]);
-
-    useEffect(() => {
-        console.info('checked', checked);
-    }, [checked]);
 
     const onConfirmCancel = useCallback(() => {
         setConfirmOpen(false);

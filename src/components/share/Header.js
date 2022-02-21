@@ -152,11 +152,6 @@ const Header = ({
         }
     }, []);
 
-    useEffect(() => {
-        console.info('confirmOpen : ', confirmOpen);
-        console.info('customerName : ', customerName);
-    }, [confirmOpen, customerName]);
-
     return (
         <View>
             <Title>{title}</Title>

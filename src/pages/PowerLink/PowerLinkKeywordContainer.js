@@ -175,15 +175,15 @@ const PowerLinkKeywordContainer = () => {
 
         setConfirmOpen(false);
         setChecked([]);
+        setPage(0);
     }, [customerId, customer]);
 
-    const onConfirmCancel = useCallback(() => {
-        setConfirmOpen(false);
-    }, []);
+    const onConfirmCancel = useCallback(() => setConfirmOpen(false), []);
 
     // 광고주 select 선택
     const handleCustomerChange = useCallback(e => {
         const data = e.target.value.split('__');
+
         setConfirmOpen(true);
         setCustomerId(data[0]);
         setCustomerName(data[1]);
