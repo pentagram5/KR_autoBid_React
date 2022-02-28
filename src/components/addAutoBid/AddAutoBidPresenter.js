@@ -11,7 +11,6 @@ import LocalizationProvider from '@mui/lab/LocalizationProvider';
 import AdapterDateFns from '@mui/lab/AdapterDateFns';
 import TextField from '@mui/material/TextField';
 import Switch from '@mui/material/Switch';
-
 import StyledButton from "../share/StyledButton";
 import selectArrow2 from "../../assets/selectArrow2.svg";
 import selectArrow3 from "../../assets/selectArrow3.svg";
@@ -21,6 +20,8 @@ import delete_2 from "../../assets/delete_2.svg";
 import clock from "../../assets/clock.svg";
 import Header from "../share/Header";
 import ScheduleCard from "../share/ScheduleCard";
+import download from "../../assets/download.svg";
+import ImageButton from "../share/ImageButton";
 
 const View = styled.div`
   width: calc(100vw - 300px);
@@ -211,7 +212,13 @@ const ProgressBox = styled.div`
 `;
 const SearchForm = styled.div`
   display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin: 30px 0 10px;
+`;
+const FlexBox = styled.div`
+  display: flex;
+  align-items: center;
 `;
 const DateBox = styled.div`
   display: flex;
@@ -256,8 +263,25 @@ const StyledSwitch = styled(Switch)`
     }
   }
 `;
+const ExcelFileUpload = styled.label`
+  height: 29px;
+  padding: 0 10px;
+  font-size: 13px;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: ${colors.white};
+  background-color: ${colors.blue};
+  border-radius: 3px;
+  cursor: pointer;
+`;
+const FileInput = styled.input`
+  display: none;
+`;
 
 const AddAutoBidPresenter = ({
+                                 POWER_LINK,
                                  SHOPPING_AD,
                                  POWER_CONTENTS,
                                  title,
@@ -305,7 +329,10 @@ const AddAutoBidPresenter = ({
                                  handleConfirmClose,
                                  customerName,
                                  onConfirmChange,
-                                 onConfirmCancel
+                                 onConfirmCancel,
+
+                                 handleTemplateDownload,
+                                 handleTemplateUpload,
                              }) => {
     const {device, bid_cycle, bid_adj_amount, max_bid, min_bid} = keywordOption;
 
@@ -376,25 +403,44 @@ const AddAutoBidPresenter = ({
 
                     {/* 검색 */}
                     <SearchForm>
-                        <InputBox width={350} padding="0 10px 0 20px">
-                            <Input
-                                value={searchInput}
-                                onChange={handleSearchInput}
-                                onKeyUp={e => e.key === "Enter" && handleSearchClick()}
-                                placeholder="검색할 키워드를 입력해주세요."
+                        <FlexBox>
+                            <InputBox width={350} padding="0 10px 0 20px">
+                                <Input
+                                    value={searchInput}
+                                    onChange={handleSearchInput}
+                                    onKeyUp={e => e.key === "Enter" && handleSearchClick()}
+                                    placeholder="검색할 키워드를 입력해주세요."
+                                />
+                                <Image src={delete_2} cursor="pointer" onClick={handleSearchReset}/>
+                            </InputBox>
+                            <StyledButton
+                                title="검색"
+                                margin="0 0 0 10px"
+                                width={80}
+                                height={40}
+                                fontColor={colors.white}
+                                bgColor={colors.black}
+                                borderRadius={1}
+                                onClick={handleSearchClick}
                             />
-                            <Image src={delete_2} cursor="pointer" onClick={handleSearchReset}/>
-                        </InputBox>
-                        <StyledButton
-                            title="검색"
-                            margin="0 0 0 10px"
-                            width={80}
-                            height={40}
-                            fontColor={colors.white}
-                            bgColor={colors.black}
-                            borderRadius={1}
-                            onClick={handleSearchClick}
-                        />
+                        </FlexBox>
+                        {POWER_LINK && (
+                            <FlexBox>
+                                <ImageButton
+                                    title="대량 등록 템플릿 다운로드"
+                                    fontColor={colors.blue}
+                                    border={`1px solid ${colors.blue}`}
+                                    bgColor={colors.white}
+                                    imgSrc={download}
+                                    height={29}
+                                    onClick={handleTemplateDownload}
+                                />
+                                <ExcelFileUpload>
+                                    <FileInput type="file" accept=".xls, .xlsx" onChange={handleTemplateUpload} />
+                                    대량 등록 템플릿 업로드
+                                </ExcelFileUpload>
+                            </FlexBox>
+                        )}
                     </SearchForm>
 
                     <TableBox>

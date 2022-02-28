@@ -77,12 +77,7 @@ const ShoppingADAutoBidContainer = () => {
         start: '',
         finish: '',
     });
-    const [daily, setDaily] = useState({
-        day: [],
-        weekDays: [],
-        weekend: [],
-        all: []
-    });
+
     // 스케줄 칩 상태
     const [scheduleChips, setScheduleChips] = useState([]);
 
@@ -381,24 +376,9 @@ const ShoppingADAutoBidContainer = () => {
         active: !chip.active
     } : {...chip, active: false}));
 
-
-
-
-
-
-
-
-
-    useEffect(() => {
-        console.info('카피 한 것 :', daily)
-    }, [daily]);
-
     // 시간 설정
     const onAddChips = () => {
         let tmp = [];
-        let tmpWeekDays = [];
-        let tmpWeekend = [];
-        let tmpAll = [];
         let weekKor = '';
         let copyChips = scheduleChips.find(item => item.active && item);
 
@@ -413,6 +393,8 @@ const ShoppingADAutoBidContainer = () => {
             return false;
         }
 
+        let currentChip = scheduleChips.find(obj => obj.id === copyChips.id);
+
         switch (week) {
             case 'mon':
             case 'tue':
@@ -426,63 +408,52 @@ const ShoppingADAutoBidContainer = () => {
                 for (let i = parseInt(start); i <= parseInt(finish); i++) tmp.push(i);
                 break;
             case 'weekDays':
+                let tmpWeekDays = [];
                 for (let i = parseInt(start); i <= parseInt(finish); i++) tmpWeekDays.push(i)
                 copyChips = {
                     ...copyChips,
-                    mon: [...daily.weekend, ...daily.all, ...tmpWeekDays],
-                    tue: [...daily.weekend, ...daily.all, ...tmpWeekDays],
-                    wed: [...daily.weekend, ...daily.all, ...tmpWeekDays],
-                    thu: [...daily.weekend, ...daily.all, ...tmpWeekDays],
-                    fri: [...daily.weekend, ...daily.all, ...tmpWeekDays],
-                    sat: [...daily.weekend, ...daily.all, ...copyChips.sat],
-                    sun: [...daily.weekend, ...daily.all, ...copyChips.sun],
+                    mon: [...currentChip.mon,  ...tmpWeekDays],
+                    tue: [...currentChip.tue,  ...tmpWeekDays],
+                    wed: [...currentChip.wed,  ...tmpWeekDays],
+                    thu: [...currentChip.thu,  ...tmpWeekDays],
+                    fri: [...currentChip.fri,  ...tmpWeekDays],
+                    sat: [...currentChip.sat,  ...copyChips.sat],
+                    sun: [...currentChip.sun,  ...copyChips.sun],
                 };
                 break;
             case 'weekend':
+                let tmpWeekend = [];
                 for (let i = parseInt(start); i <= parseInt(finish); i++) tmpWeekend.push(i);
 
                 copyChips = {
                     ...copyChips,
-                    mon: [...daily.day, ...daily.weekDays, ...daily.all, ...copyChips.mon],
-                    tue: [...daily.day, ...daily.weekDays, ...daily.all, ...copyChips.tue],
-                    wed: [...daily.day, ...daily.weekDays, ...daily.all, ...copyChips.wed],
-                    thu: [...daily.day, ...daily.weekDays, ...daily.all, ...copyChips.thu],
-                    fri: [...daily.day, ...daily.weekDays, ...daily.all, ...copyChips.fri],
-                    sat: [...daily.day, ...daily.weekDays, ...daily.all, ...tmpWeekend],
-                    sun: [...daily.day, ...daily.weekDays, ...daily.all, ...tmpWeekend],
+                    mon: [...currentChip.mon, ...copyChips.mon],
+                    tue: [...currentChip.tue, ...copyChips.tue],
+                    wed: [...currentChip.wed, ...copyChips.wed],
+                    thu: [...currentChip.thu, ...copyChips.thu],
+                    fri: [...currentChip.fri, ...copyChips.fri],
+                    sat: [...currentChip.sat, ...tmpWeekend],
+                    sun: [...currentChip.sun, ...tmpWeekend],
                 };
                 break;
             case 'all':
+                let tmpAll = [];
+
                 for (let i = parseInt(start); i <= parseInt(finish); i++) tmpAll.push(i);
                 copyChips = {
                     ...copyChips,
-                    mon: [...daily.day, ...daily.weekDays, ...daily.weekend, ...tmpAll],
-                    tue: [...daily.day, ...daily.weekDays, ...daily.weekend, ...tmpAll],
-                    wed: [...daily.day, ...daily.weekDays, ...daily.weekend, ...tmpAll],
-                    thu: [...daily.day, ...daily.weekDays, ...daily.weekend, ...tmpAll],
-                    fri: [...daily.day, ...daily.weekDays, ...daily.weekend, ...tmpAll],
-                    sat: [...daily.day, ...daily.weekDays, ...daily.weekend, ...tmpAll],
-                    sun: [...daily.day, ...daily.weekDays, ...daily.weekend, ...tmpAll],
+                    mon: [...currentChip.mon, ...tmpAll],
+                    tue: [...currentChip.tue, ...tmpAll],
+                    wed: [...currentChip.wed, ...tmpAll],
+                    thu: [...currentChip.thu, ...tmpAll],
+                    fri: [...currentChip.fri, ...tmpAll],
+                    sat: [...currentChip.sat, ...tmpAll],
+                    sun: [...currentChip.sun, ...tmpAll],
                 };
                 break;
             default:
                 weekKor = '';
         }
-
-
-
-        // console.info('highKeywordOption : ', highKeywordOption);
-        console.info('tmpAll : ', tmpAll);
-        console.info('tmpWeekDays : ', tmpWeekDays);
-        console.info('tmpWeekend : ', tmpWeekend);
-        console.info('tmp : ', tmp);
-        setDaily({
-            ...daily,
-            day: [...tmp],
-            weekDays: [...tmpWeekDays],
-            weekend: [...tmpWeekend],
-            all: [...tmpAll]
-        });
 
         // 중복체크
         if (week !== "weekDays" && week !== "weekend" && week !== "all") {
@@ -532,7 +503,6 @@ const ShoppingADAutoBidContainer = () => {
                     });
 
                     let weekendDuplicateChecker = tmpWeekend.find(time => {
-                        console.info('받은 배열 안 시간 : ', time);
                         if (time >= parseInt(start) && time <= parseInt(finish))
                             return time;
                         else

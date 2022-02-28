@@ -6,10 +6,10 @@ const Button = styled.button`
   font-weight: ${({fontWeight}) => fontWeight ? fontWeight : 600};
   width: ${({width}) => width}px;
   height: ${({height}) => height}px;
+  padding: 0 10px;
   color: ${({fontColor}) => fontColor};
   border: ${({border}) => border ? border : "none"};
   height: ${({height}) => height}px;
-  line-height: 1.5;
   background-color: ${({bgColor}) => bgColor};
   border-radius: ${({borderRadius}) => borderRadius ? borderRadius : 4}px;
   

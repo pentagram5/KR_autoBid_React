@@ -382,6 +382,8 @@ const PowerContentsAutoBidContainer = () => {
             return false;
         }
 
+        let currentChip = scheduleChips.find(obj => obj.id === copyChips.id);
+
         switch (week) {
             case 'mon':
             case 'tue':
@@ -399,13 +401,13 @@ const PowerContentsAutoBidContainer = () => {
                 for (let i = parseInt(start); i <= parseInt(finish); i++) tmpWeekDays.push(i);
                 copyChips = {
                     ...copyChips,
-                    mon: [...tmpWeekDays],
-                    tue: [...tmpWeekDays],
-                    wed: [...tmpWeekDays],
-                    thu: [...tmpWeekDays],
-                    fri: [...tmpWeekDays],
-                    sat: [...copyChips.sat],
-                    sun: [...copyChips.sun],
+                    mon: [...currentChip.mon, ...tmpWeekDays],
+                    tue: [...currentChip.tue, ...tmpWeekDays],
+                    wed: [...currentChip.wed, ...tmpWeekDays],
+                    thu: [...currentChip.thu, ...tmpWeekDays],
+                    fri: [...currentChip.fri, ...tmpWeekDays],
+                    sat: [...currentChip.sat, ...copyChips.sat],
+                    sun: [...currentChip.sun, ...copyChips.sun],
                 };
                 break;
             case 'weekend':
@@ -413,13 +415,13 @@ const PowerContentsAutoBidContainer = () => {
                 for (let i = parseInt(start); i <= parseInt(finish); i++) tmpWeekend.push(i);
                 copyChips = {
                     ...copyChips,
-                    mon: [...copyChips.mon],
-                    tue: [...copyChips.tue],
-                    wed: [...copyChips.wed],
-                    thu: [...copyChips.thu],
-                    fri: [...copyChips.fri],
-                    sat: [...tmpWeekend],
-                    sun: [...tmpWeekend],
+                    mon: [...currentChip.mon, ...copyChips.mon],
+                    tue: [...currentChip.tue, ...copyChips.tue],
+                    wed: [...currentChip.wed, ...copyChips.wed],
+                    thu: [...currentChip.thu, ...copyChips.thu],
+                    fri: [...currentChip.fri, ...copyChips.fri],
+                    sat: [...currentChip.sat, ...tmpWeekend],
+                    sun: [...currentChip.sun, ...tmpWeekend],
                 };
                 break;
             case 'all':
@@ -427,13 +429,13 @@ const PowerContentsAutoBidContainer = () => {
                 for (let i = parseInt(start); i <= parseInt(finish); i++) tmpAll.push(i);
                 copyChips = {
                     ...copyChips,
-                    mon: [...tmpAll],
-                    tue: [...tmpAll],
-                    wed: [...tmpAll],
-                    thu: [...tmpAll],
-                    fri: [...tmpAll],
-                    sat: [...tmpAll],
-                    sun: [...tmpAll],
+                    mon: [...currentChip.mon, ...tmpAll],
+                    tue: [...currentChip.tue, ...tmpAll],
+                    wed: [...currentChip.wed, ...tmpAll],
+                    thu: [...currentChip.thu, ...tmpAll],
+                    fri: [...currentChip.fri, ...tmpAll],
+                    sat: [...currentChip.sat, ...tmpAll],
+                    sun: [...currentChip.sun, ...tmpAll],
                 };
                 break;
             default:

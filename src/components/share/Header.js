@@ -8,12 +8,14 @@ import {toast} from "react-toastify";
 import Modal from '@mui/material/Modal';
 import * as constants from "../../utils/constants";
 import StyledButton from "./StyledButton";
+import {Switch} from "antd";
+import 'antd/dist/antd.css';
 
 const serverPROTOCOL = constants.config.PROTOCOL;
 const serverURL = constants.config.URL;
 
 const View = styled.div`
-  height: 94px;
+  min-height: 94px;
   padding-top: 20px;
   display: flex;
   justify-content: space-between;
@@ -24,9 +26,16 @@ const Title = styled.div`
   font-size: 36px;
   font-weight: 700;
 `;
-const AdvertiserSelector = styled.div`
+const RowBox = styled.div`
+  min-width: 286px;
   display: flex;
-  align-items: center;`;
+  align-items: center;
+  justify-content: space-between;
+  
+  & + & {
+    margin-top: 10px;
+  }
+`;
 const Text = styled.div`
   font-size: ${({ fontSize }) => fontSize ? fontSize : 24}px;
   font-weight: ${({ fontWeight }) => fontWeight ? fontWeight : 700};
@@ -48,11 +57,10 @@ const SelectForm = styled.select`
   border-radius: 18px;
 `;
 const Box = styled.div`
-  ${({display}) => display && css`
-    display: ${display};
-    justify-content: center;
-    align-items: center;
-  `}
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
 `;
 const ProgressBox = styled.div`
   margin-top: 20px;
@@ -102,6 +110,13 @@ const ActiveText = styled.span`
   font-weight: 800;
   color: ${colors.yellow};
 `;
+const SwitchBox = styled.div`
+  width: 100px;
+  text-align: right;
+  .ant-switch-inner {
+    line-height: 1.5;
+  }
+`;
 
 const Header = ({
                     title,
@@ -116,9 +131,12 @@ const Header = ({
                     onConfirmChange,
                     onConfirmCancel
                 }) => {
+
     const { identifier, setIdentifier } = useContext(AuthContext);
     const [percent, setPercent] = useState(0);
     const [done, setDone] = useState(0);
+    const [activeModal, setActiveModal] = useState(false);
+    const [activate, setActivate] = useState(false);
 
     const getProgressPercent = useCallback(async () => {
         try {
@@ -140,6 +158,25 @@ const Header = ({
         }
     }, []);
 
+    const handleIdActiveModalOpen = useCallback(() => setActiveModal(true), []);
+
+    const onClickActive = useCallback(async () => {
+        try {
+            const { data } = await SendRequest().post(`${serverPROTOCOL}${serverURL}/autobid/id/autoActive?CUSTOMER_ID=${customer.CUSTOMER_ID}&activate=${!activate}`);
+
+            if (data.done) {
+                localStorage.setItem("customer", JSON.stringify(data.id_info));
+                setActivate(!activate);
+                setActiveModal(false);
+                toast.info("처리가 완료되었습니다.");
+                window.location.reload();
+            }
+        } catch(e) {
+            throw new Error(e);
+        }
+    }, [activate]);
+    const onClickInactive = useCallback(() => setActiveModal(false), []);
+
     useEffect(() => {
         if (identifier !== "") getProgressPercent();
     }, [identifier]);
@@ -152,22 +189,44 @@ const Header = ({
         }
     }, []);
 
+    useEffect(() => {
+        setActivate(customer.autoActive);
+    }, [customer]);
+
+
+    useEffect(() => {
+        console.info('customer', customer);
+    }, [customer]);
+
     return (
         <View>
             <Title>{title}</Title>
             <Box>
                 {!update && (
-                    <AdvertiserSelector>
-                        <Text>광고주</Text>
-                        <SelectForm
-                            onChange={handleCustomerChange}
-                            value={`${customer.CUSTOMER_ID}__${customer.show_login}`}
-                        >
-                            {customerList.map(list => (
-                                <option key={list.CUSTOMER_ID} value={`${list.CUSTOMER_ID}__${list.show_login}`}>{list.show_login}</option>
-                            ))}
-                        </SelectForm>
-                    </AdvertiserSelector>
+                    <>
+                        <RowBox>
+                            <Text>광고주</Text>
+                            <SelectForm
+                                onChange={handleCustomerChange}
+                                value={`${customer.CUSTOMER_ID}__${customer.show_login}`}
+                            >
+                                {customerList.map(list => (
+                                    <option key={list.CUSTOMER_ID} value={`${list.CUSTOMER_ID}__${list.show_login}`}>{list.show_login}</option>
+                                ))}
+                            </SelectForm>
+                        </RowBox>
+                        <RowBox>
+                            <Text fontSize={16} fontWeight={400}>자동입찰 기능 사용</Text>
+                            <SwitchBox>
+                                <Switch
+                                    checkedChildren="ON"
+                                    unCheckedChildren="OFF"
+                                    checked={activate}
+                                    onClick={handleIdActiveModalOpen}
+                                />
+                            </SwitchBox>
+                        </RowBox>
+                    </>
                 )}
                 {!!done && (
                     <ProgressBox>
@@ -179,6 +238,8 @@ const Header = ({
                     </ProgressBox>
                 )}
             </Box>
+
+
             <Modal
                 open={confirmOpen}
                 onClose={handleConfirmClose}
@@ -210,6 +271,43 @@ const Header = ({
                                 fontColor={colors.white}
                                 borderRadius={1}
                                 onClick={onConfirmChange}
+                            />
+                        </ButtonBox>
+                    </ConfirmModal>
+                </>
+            </Modal>
+
+            <Modal
+                open={activeModal}
+                onClose={() => setActiveModal(false)}
+                style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
+            >
+                <>
+                    <ConfirmModal>
+                        <InfoBox>
+                            <Text fontSize={20} fontWeight={600} fontColor={colors.lightBlack}>
+                                <ActiveText>{customer.show_login}</ActiveText> 의 <br/>
+                                계정을 {customer.autoActive ? "비활성화" : "활성화"} 하시겠습니까 ?
+                            </Text>
+                        </InfoBox>
+                        <ButtonBox>
+                            <StyledButton
+                                title="취소"
+                                width={170}
+                                height={60}
+                                borderRadius={1}
+                                fontColor={colors.lightBlack}
+                                bgColor={colors.white}
+                                onClick={onClickInactive}
+                            />
+                            <StyledButton
+                                title="확인"
+                                width={170}
+                                height={60}
+                                bgColor={colors.skyBlue}
+                                fontColor={colors.white}
+                                borderRadius={1}
+                                onClick={onClickActive}
                             />
                         </ButtonBox>
                     </ConfirmModal>

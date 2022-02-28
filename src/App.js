@@ -26,6 +26,7 @@ function App() {
 
             if (!!token) {
                 const {data: {id_info}} = await SendRequest().get(`${serverPROTOCOL}${serverURL}/autobid/id`);
+
                 setIsLoggedIn(true);
                 setCustomerList(id_info);
             } else {

@@ -342,7 +342,6 @@ const PowerLinkAutoBidContainer = () => {
                     });
 
                     let weekendDuplicateChecker = tmpWeekend.find(time => {
-                        console.info('받은 배열 안 시간 : ', time);
                         if (time >= parseInt(start) && time <= parseInt(finish))
                             return time;
                         else
@@ -460,6 +459,7 @@ const PowerLinkAutoBidContainer = () => {
                     start_Date: "",
                     end_Date: "",
                     lowest_Bid_ac: 0,
+
                     setting: {
                         mon: '0~23',
                         tue: '0~23',

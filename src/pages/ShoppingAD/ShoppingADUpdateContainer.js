@@ -359,7 +359,6 @@ const ShoppingADUpdateContainer = () => {
                     });
 
                     let weekendDuplicateChecker = tmpWeekend.find(time => {
-                        console.info('받은 배열 안 시간 : ', time);
                         if (time >= parseInt(start) && time <= parseInt(finish))
                             return time;
                         else

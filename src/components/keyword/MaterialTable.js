@@ -361,13 +361,14 @@ const MaterialTable = ({
                                         </TableCell>
 
                                         <TableCell>
-                                            {(row.current_rank !== 55 && row.current_rank !== 60 && row.current_rank !== 65 && row.current_rank !== 66 && row.current_rank !== 70 && row.current_rank !== 77) && row.current_rank}
+                                            {(row.current_rank !== 55 && row.current_rank !== 60 && row.current_rank !== 65 && row.current_rank !== 66 && row.current_rank !== 70 && row.current_rank !== 77 && row.current_rank !== 100) && row.current_rank}
                                             {row.current_rank === 55 && '순위밖'}
                                             {row.current_rank === 60 && '광고그룹정지'}
                                             {row.current_rank === 65 && '노출없음'}
                                             {row.current_rank === 66 && '실행전'}
                                             {row.current_rank === 70 && '비활성화'}
                                             {row.current_rank === 77 && '스케줄밖'}
+                                            {row.current_rank === 100 && '기능 정지'}
                                         </TableCell>
                                         <TableCell>
                                             {!!row.activate ? '활성화' : '비활성화'}
