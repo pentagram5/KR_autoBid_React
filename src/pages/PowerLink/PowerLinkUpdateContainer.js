@@ -48,7 +48,7 @@ const PowerLinkAutoBidContainer = () => {
             sun: '0~23',
             target_Rank: 0,
             max_bid: 0,
-            min_bid: 0,
+            min_bid: 70,
             bid_adj_amount: 0,
         }
     });
@@ -179,7 +179,13 @@ const PowerLinkAutoBidContainer = () => {
     const {week, start, finish} = highSchedule;
 
     // 스케줄 중복 data finder
-    const sameScheduleFinder = schedules => schedules.find(list => keywordOption.setting.target_Rank === list.targetRank && keywordOption.setting.max_bid === list.maxBid && keywordOption.setting.min_bid === list.minBid);
+    const sameScheduleFinder = schedules => schedules.find(list => {
+        console.info('target_Rank : ', keywordOption.setting.target_Rank === list.targetRank);
+        console.info('keywordOption.setting.target_Rank : ', keywordOption.setting.target_Rank);
+        console.info('list.targetRank: ', list.targetRank);
+
+        return (keywordOption.setting.target_Rank === list.targetRank) && (keywordOption.setting.max_bid === list.maxBid) && (keywordOption.setting.min_bid === list.minBid)
+    });
 
     // 스케줄 추가
     const onAddSchedule = () => {
@@ -235,6 +241,8 @@ const PowerLinkAutoBidContainer = () => {
             return false;
         }
 
+        let currentChip = scheduleChips.find(obj => obj.id === copyChips.id);
+
         switch (week) {
             case 'mon':
             case 'tue':
@@ -253,13 +261,13 @@ const PowerLinkAutoBidContainer = () => {
 
                 copyChips = {
                     ...copyChips,
-                    mon: [...tmpWeekDays],
-                    tue: [...tmpWeekDays],
-                    wed: [...tmpWeekDays],
-                    thu: [...tmpWeekDays],
-                    fri: [...tmpWeekDays],
-                    sat: [...copyChips.sat],
-                    sun: [...copyChips.sun],
+                    mon: [...currentChip.mon, ...tmpWeekDays],
+                    tue: [...currentChip.tue, ...tmpWeekDays],
+                    wed: [...currentChip.wed, ...tmpWeekDays],
+                    thu: [...currentChip.thu, ...tmpWeekDays],
+                    fri: [...currentChip.fri, ...tmpWeekDays],
+                    sat: [...currentChip.sat, ...copyChips.sat],
+                    sun: [...currentChip.sun, ...copyChips.sun],
                 };
                 break;
             case 'weekend':
@@ -267,13 +275,13 @@ const PowerLinkAutoBidContainer = () => {
                 for (let i = parseInt(start); i <= parseInt(finish); i++) tmpWeekend.push(i);
                 copyChips = {
                     ...copyChips,
-                    mon: [...copyChips.mon],
-                    tue: [...copyChips.tue],
-                    wed: [...copyChips.wed],
-                    thu: [...copyChips.thu],
-                    fri: [...copyChips.fri],
-                    sat: [...tmpWeekend],
-                    sun: [...tmpWeekend],
+                    mon: [...currentChip.mon, ...copyChips.mon],
+                    tue: [...currentChip.tue, ...copyChips.tue],
+                    wed: [...currentChip.wed, ...copyChips.wed],
+                    thu: [...currentChip.thu, ...copyChips.thu],
+                    fri: [...currentChip.fri, ...copyChips.fri],
+                    sat: [...currentChip.sat, ...tmpWeekend],
+                    sun: [...currentChip.sun, ...tmpWeekend],
                 };
                 break;
             case 'all':
@@ -281,13 +289,13 @@ const PowerLinkAutoBidContainer = () => {
                 for (let i = parseInt(start); i <= parseInt(finish); i++) tmpAll.push(i);
                 copyChips = {
                     ...copyChips,
-                    mon: [...tmpAll],
-                    tue: [...tmpAll],
-                    wed: [...tmpAll],
-                    thu: [...tmpAll],
-                    fri: [...tmpAll],
-                    sat: [...tmpAll],
-                    sun: [...tmpAll],
+                    mon: [...currentChip.mon, ...tmpAll],
+                    tue: [...currentChip.tue, ...tmpAll],
+                    wed: [...currentChip.wed, ...tmpAll],
+                    thu: [...currentChip.thu, ...tmpAll],
+                    fri: [...currentChip.fri, ...tmpAll],
+                    sat: [...currentChip.sat, ...tmpAll],
+                    sun: [...currentChip.sun, ...tmpAll],
                 };
                 break;
             default:
@@ -439,6 +447,12 @@ const PowerLinkAutoBidContainer = () => {
         }
         setLoading(true);
 
+        if (radioState.simpleHigh) {
+            console.info('highKeywordOption', highKeywordOption);
+        } else {
+            console.info('keywordOption', keywordOption);
+        }
+
         try {
             const response = await SendRequest().post(`${serverPROTOCOL}${serverURL}/autobid/powerlink/update?CUSTOMER_ID=${customer["CUSTOMER_ID"]}`, radioState.simpleHigh === 0 ? [keywordOption] : highKeywordOption);
 
@@ -561,11 +575,83 @@ const PowerLinkAutoBidContainer = () => {
         try {
             const { data } = await SendRequest().post(`${serverPROTOCOL}${serverURL}/autobid/powerlink/update_info?CUSTOMER_ID=${customerId}`, checked);
 
-            setKeywordList(data);
+            console.info('준연이가 준거 ::: ', data);
+
+            if (checked.length > 1) { // 수정리스트 하나 이상일 때
+                setKeywordList(data.keyword_info);
+            } else { // 수정리스트 하나 일 때
+                setKeywordList(data.keyword_info);
+                setRadioState({
+                    ...radioState,
+                    simpleHigh:  data.setting_type,
+                    usedDate: data.keyword_setting.start_Date !== "" ? data.keyword_setting.start_Date : 0
+                });
+
+                // 간편설정 고급설정
+                if (data.setting_type === 0) {
+                    console.info('간편설정 :', data);
+                    setKeywordOption({
+                        ...keywordOption,
+                        device: data.keyword_setting.device,
+                        bid_cycle: parseInt(data.keyword_setting.bid_cycle, 10),
+                        start_Date: data.keyword_setting.start_Date ? data.keyword_setting.start_Date : "",
+                        end_Date: data.keyword_setting.end_Date ? data.keyword_setting.end_Date :"",
+                        lowest_Bid_ac: data.keyword_setting.lowest_Bid_ac,
+                        setting: {
+                            ...keywordOption.setting,
+                            target_Rank: parseInt(data.keyword_setting.setting[0].target_Rank, 10),
+                            max_bid: data.keyword_setting.setting[0].max_bid,
+                            min_bid: data.keyword_setting.setting[0].min_bid ,
+                            bid_adj_amount: data.keyword_setting.setting[0].bid_adj_amount
+                        }
+                    });
+                } else {
+                    let chips = [];
+
+                    // 스케줄 칩
+                    data.keyword_setting.setting.map((data, index) => {
+                        chips.push({
+                            id: data.target_Rank + '-' + data.max_bid + '-' + data.min_bid,
+                            targetRank: parseInt(data.target_Rank, 10),
+                            maxBid: data.max_bid,
+                            minBid: data.min_bid,
+                            active: index === 0,
+                            bgColor: scheduleBgColor[index],
+                            mon: data.mon,
+                            tue: data.tue,
+                            wed: data.wed,
+                            thu: data.thu,
+                            fri: data.fri,
+                            sat: data.sat,
+                            sun: data.sun,
+                        });
+                    });
+                    setScheduleChips(chips);
+                    setKeywordOption({
+                        ...keywordOption,
+                        device: data.keyword_setting.device,
+                        bid_cycle: parseInt(data.keyword_setting.bid_cycle, 10),
+                        start_Date: data.keyword_setting.start_Date ? data.keyword_setting.start_Date : "",
+                        end_Date: data.keyword_setting.end_Date ? data.keyword_setting.end_Date :"",
+                        lowest_Bid_ac: data.keyword_setting.lowest_Bid_ac,
+                        setting: {
+                            ...keywordOption.setting,
+                            target_Rank: parseInt(data.keyword_setting.setting[0].target_Rank, 10),
+                            max_bid: data.keyword_setting.setting[0].max_bid,
+                            min_bid: data.keyword_setting.setting[0].min_bid,
+                            bid_adj_amount: data.keyword_setting.setting[0].bid_adj_amount,
+                        }
+                    });
+                }
+            }
         } catch(e) {
             throw new Error(e);
         }
     }
+
+    useEffect(() => {
+        console.info('useEffect ::: ', keywordOption.setting)
+    }, [keywordOption]);
 
     useEffect(() => {
         const arr = localStorage.getItem("checked");
@@ -582,19 +668,25 @@ const PowerLinkAutoBidContainer = () => {
         return () => localStorage.removeItem("checked");
     }, []);
 
-    useEffect(() => {
+    useEffect(async () => {
         if (!!customer["CUSTOMER_ID"] && checked.length !== 0) {
-            fetchingData(customer["CUSTOMER_ID"]);
+            console.info('패칭데이터 :');
+            await fetchingData(customer["CUSTOMER_ID"]);
         }
     }, [customer, checked]);
 
 
-    useEffect(() => {
-        setKeywordOption({
-            ...keywordOption,
-            keyword_info: keywordList.map(list => list.nccKeywordId)
-        });
-    }, [keywordList]);
+    // useEffect(() => {
+    //     setKeywordOption({
+    //         ...keywordOption,
+    //         keyword_info: keywordList.map(list => list.nccKeywordId)
+    //     });
+
+    // }, [keywordList]);
+
+    // useEffect(() => {
+    //     console.info('keywordOption', keywordOption);
+    // }, [keywordOption]);
 
     return (
         <UpdateAutoBidPresenter

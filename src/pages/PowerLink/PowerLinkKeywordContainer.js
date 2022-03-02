@@ -305,7 +305,7 @@ const PowerLinkKeywordContainer = () => {
         }
     }
 
-    // data fetching
+    // 데이터 불러오기
     const fetchPowerLinkData = async customerId => {
         tokenValidate();
         dispatch({type: 'LOADING'});

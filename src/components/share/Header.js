@@ -129,7 +129,7 @@ const Header = ({
                     handleConfirmClose,
                     customerName = "",
                     onConfirmChange,
-                    onConfirmCancel
+                    onConfirmCancel,
                 }) => {
 
     const { identifier, setIdentifier } = useContext(AuthContext);
@@ -160,6 +160,7 @@ const Header = ({
 
     const handleIdActiveModalOpen = useCallback(() => setActiveModal(true), []);
 
+    // 자동입찰 기능
     const onClickActive = useCallback(async () => {
         try {
             const { data } = await SendRequest().post(`${serverPROTOCOL}${serverURL}/autobid/id/autoActive?CUSTOMER_ID=${customer.CUSTOMER_ID}&activate=${!activate}`);
@@ -190,12 +191,7 @@ const Header = ({
     }, []);
 
     useEffect(() => {
-        setActivate(customer.autoActive);
-    }, [customer]);
-
-
-    useEffect(() => {
-        console.info('customer', customer);
+        if (customer) setActivate(customer.autoActive);
     }, [customer]);
 
     return (
@@ -286,8 +282,8 @@ const Header = ({
                     <ConfirmModal>
                         <InfoBox>
                             <Text fontSize={20} fontWeight={600} fontColor={colors.lightBlack}>
-                                <ActiveText>{customer.show_login}</ActiveText> 의 <br/>
-                                계정을 {customer.autoActive ? "비활성화" : "활성화"} 하시겠습니까 ?
+                                <ActiveText>{customer && customer.show_login}</ActiveText> 의 <br/>
+                                계정을 {customer && customer.autoActive ? "비활성화" : "활성화"} 하시겠습니까 ?
                             </Text>
                         </InfoBox>
                         <ButtonBox>

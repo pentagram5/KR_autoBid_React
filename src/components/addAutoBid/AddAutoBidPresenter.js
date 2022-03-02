@@ -334,7 +334,7 @@ const AddAutoBidPresenter = ({
                                  handleTemplateDownload,
                                  handleTemplateUpload,
                              }) => {
-    const {device, bid_cycle, bid_adj_amount, max_bid, min_bid} = keywordOption;
+    const {device, bid_cycle, bid_adj_amount, setting: { max_bid, min_bid }} = keywordOption;
 
     return (
         <View>
@@ -782,18 +782,6 @@ const AddAutoBidPresenter = ({
                             }
                             <tr>
                                 <td>
-                                    최대 입찰가
-                                </td>
-                                <td>
-                                    <InputBox>
-                                        <Input
-                                            name="max_bid"
-                                            value={max_bid}
-                                            onChange={e => onAutoBidChange(e, 'max_bid')}
-                                        /> 원
-                                    </InputBox>
-                                </td>
-                                <td>
                                     최소 입찰가
                                 </td>
                                 <td>
@@ -802,6 +790,18 @@ const AddAutoBidPresenter = ({
                                             name="min_bid"
                                             value={min_bid}
                                             onChange={e => onAutoBidChange(e, 'min_bid')}
+                                        /> 원
+                                    </InputBox>
+                                </td>
+                                <td>
+                                    최대 입찰가
+                                </td>
+                                <td>
+                                    <InputBox>
+                                        <Input
+                                            name="max_bid"
+                                            value={max_bid}
+                                            onChange={e => onAutoBidChange(e, 'max_bid')}
                                         /> 원
                                     </InputBox>
                                 </td>

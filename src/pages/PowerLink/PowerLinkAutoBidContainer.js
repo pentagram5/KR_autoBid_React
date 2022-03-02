@@ -61,10 +61,11 @@ const PowerLinkAutoBidContainer = () => {
             sun: '0~23',
             target_Rank: 0,
             max_bid: 0,
-            min_bid: 0,
+            min_bid: 70,
             bid_adj_amount: 0,
         }
     });
+
     const [highKeywordOption, setHighKeywordOption] = useState([]);
     // 입찰 관리 스케줄 고급 설정
     const [highSchedule, setHighSchedule] = useState({
@@ -150,6 +151,16 @@ const PowerLinkAutoBidContainer = () => {
                 break;
             case 'max_bid':
             case 'min_bid':
+                value = parseInt(value.replace(/[^-0-9]/g,''), 10);
+                if (isNaN(value)) value = 0;
+                setKeywordOption({
+                    ...keywordOption,
+                    setting: {
+                        ...keywordOption.setting,
+                        [name]: value
+                    }
+                });
+                break;
             case 'target_Rank':
             case 'bid_adj_amount':
                 value = parseInt(value);
@@ -706,16 +717,17 @@ const PowerLinkAutoBidContainer = () => {
 
         formData.append("file", file);
 
+        console.info('customer["CUSTOMER_ID"] ::: ', customer);
+
         try {
-            const res = await SendRequest().post(`${serverPROTOCOL}${serverURL}/autobid/powerlink/xlsx`, formData);
+            const res = await SendRequest().post(`${serverPROTOCOL}${serverURL}/autobid/powerlink/xlsx?CUSTOMER_ID=${customer["CUSTOMER_ID"]}`, formData);
             if (res.status === 200) {
                 toast.info("업로드를 성공하였습니다.");
             }
-            console.info('시발 ', res.data);
         } catch(e) {
             throw new Error(e);
         }
-    }, []);
+    }, [customer]);
 
     // 초기 data 불러오기
     useEffect(() => {
@@ -725,7 +737,6 @@ const PowerLinkAutoBidContainer = () => {
     useEffect(() => {
         fetchCustomerList();
     }, []);
-
 
     // localStorage 광고주 id 가져오기
     useEffect(() => {

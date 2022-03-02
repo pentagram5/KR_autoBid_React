@@ -282,8 +282,9 @@ const UpdateAutoBidPresenter = ({
 
                                 }) => {
 
-    const {device, bid_cycle, bid_adj_amount, max_bid, min_bid} = keywordOption;
+    const {device, bid_cycle, bid_adj_amount, setting: { max_bid, min_bid, target_Rank }} = keywordOption;
 
+    // console.info('presenter :  ', keywordOption);
 
     return (
         <View>
@@ -298,7 +299,6 @@ const UpdateAutoBidPresenter = ({
                         handleCustomerChange={handleCustomerChange}
                         update
                     />
-
 
                     <TableBox>
                         <KeywordTable>
@@ -340,9 +340,7 @@ const UpdateAutoBidPresenter = ({
                                     )
                                 }
                             })}
-
                         </KeywordTable>
-
                     </TableBox>
 
                     <Title>입찰 전략 설정</Title>
@@ -401,6 +399,7 @@ const UpdateAutoBidPresenter = ({
                                             label="10분"
                                             name="bid_cycle"
                                             value={10}
+                                            checked={bid_cycle === 10}
                                             control={<Radio/>}
                                             disabled={!!radioState.simpleHigh}
                                         />
@@ -408,6 +407,7 @@ const UpdateAutoBidPresenter = ({
                                             label="30분"
                                             name="bid_cycle"
                                             value={30}
+                                            checked={bid_cycle === 30}
                                             control={<Radio/>}
                                             disabled={!!radioState.simpleHigh}
                                         />
@@ -415,6 +415,7 @@ const UpdateAutoBidPresenter = ({
                                             label="60분"
                                             name="bid_cycle"
                                             value={60}
+                                            checked={bid_cycle === 60}
                                             control={<Radio/>}
                                             disabled={!!radioState.simpleHigh}
                                         />
@@ -494,7 +495,7 @@ const UpdateAutoBidPresenter = ({
                                     <RadioGroup row onChange={e => handleRadioTab(e, 'simpleHigh')}>
                                         <FormControlLabel value={0} control={<Radio/>} label="간편 설정"
                                                           checked={radioState.simpleHigh === 0}/>
-                                        <FormControlLabel value={1} control={<Radio/>} label="고급 설정"/>
+                                        <FormControlLabel value={1} control={<Radio/>} label="고급 설정" checked={radioState.simpleHigh === 1}/>
                                     </RadioGroup>
                                 </td>
                             </tr>
@@ -534,6 +535,7 @@ const UpdateAutoBidPresenter = ({
                                         bgImg={selectArrow3}
                                         padding="0 10px"
                                         name="target_Rank"
+                                        value={target_Rank}
                                         onChange={e => onAutoBidChange(e, 'target_Rank')}
                                     >
                                         <option value={0}>희망순위</option>
@@ -581,18 +583,6 @@ const UpdateAutoBidPresenter = ({
                             }
                             <tr>
                                 <td>
-                                    최대 입찰가
-                                </td>
-                                <td>
-                                    <InputBox>
-                                        <Input
-                                            name="max_bid"
-                                            value={max_bid}
-                                            onChange={e => onAutoBidChange(e, 'max_bid')}
-                                        /> 원
-                                    </InputBox>
-                                </td>
-                                <td>
                                     최소 입찰가
                                 </td>
                                 <td>
@@ -601,6 +591,18 @@ const UpdateAutoBidPresenter = ({
                                             name="min_bid"
                                             value={min_bid}
                                             onChange={e => onAutoBidChange(e, 'min_bid')}
+                                        /> 원
+                                    </InputBox>
+                                </td>
+                                <td>
+                                    최대 입찰가
+                                </td>
+                                <td>
+                                    <InputBox>
+                                        <Input
+                                            name="max_bid"
+                                            value={max_bid}
+                                            onChange={e => onAutoBidChange(e, 'max_bid')}
                                         /> 원
                                     </InputBox>
                                 </td>
