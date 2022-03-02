@@ -591,7 +591,7 @@ const PowerLinkAutoBidContainer = () => {
                 if (data.setting_type === 0) {
                     console.info('간편설정 :', data);
                     setKeywordOption({
-                        ...keywordOption,
+                        keyword_info: checked,
                         device: data.keyword_setting.device,
                         bid_cycle: parseInt(data.keyword_setting.bid_cycle, 10),
                         start_Date: data.keyword_setting.start_Date ? data.keyword_setting.start_Date : "",
@@ -628,7 +628,7 @@ const PowerLinkAutoBidContainer = () => {
                     });
                     setScheduleChips(chips);
                     setKeywordOption({
-                        ...keywordOption,
+                        keyword_info: checked,
                         device: data.keyword_setting.device,
                         bid_cycle: parseInt(data.keyword_setting.bid_cycle, 10),
                         start_Date: data.keyword_setting.start_Date ? data.keyword_setting.start_Date : "",
