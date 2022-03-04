@@ -21,7 +21,6 @@ const PowerLinkAutoBidContainer = () => {
     const [customerName, setCustomerName] = useState("");
     const [customerId, setCustomerId] = useState("");
     const [confirmOpen, setConfirmOpen] = useState(false);
-
     const [customerList, setCustomerList] = useState([]);
     const [checked, setChecked] = useState([]);
     const [campaignList, setCampaignList] = useState([]);
@@ -589,8 +588,13 @@ const PowerLinkAutoBidContainer = () => {
 
     // 스케줄 카드 삭제
     const onDeleteChips = id => {
+        let targetRank = id.split('-')[0];
+        let minBid = id.split('-')[1];
+        let maxBid = id.split('-')[2];
+
         scheduleBgColor.push(scheduleChips.filter(chip => id === chip.id)[0].bgColor);
         setScheduleChips(scheduleChips.filter(chip => id !== chip.id));
+        setHighKeywordOption(highKeywordOption.filter(list => list.target_Rank === targetRank && list.min_bid === minBid && list.max_bid === maxBid));
     }
 
     // 취소
@@ -604,6 +608,9 @@ const PowerLinkAutoBidContainer = () => {
             return;
         } else if (!keywordOption.setting.target_Rank) {
             alert('희망 순위를 설정해주세요.');
+            return;
+        } else if (highKeywordOption.length < 1) {
+            alert('스케줄의 시간을 설정해주세요.');
             return;
         }
         setLoading(true);
@@ -691,6 +698,7 @@ const PowerLinkAutoBidContainer = () => {
             const res = await SendRequest().get(`${serverPROTOCOL}${serverURL}/autobid/powerlink/xlsx?CUSTOMER_ID=${customer["CUSTOMER_ID"]}`, {
                 responseType: "blob",
             });
+
             const url = window.URL.createObjectURL(new Blob([res.data], {
                 type: res.headers['content-type'],
             }));
@@ -712,18 +720,13 @@ const PowerLinkAutoBidContainer = () => {
     // 대량 등록 템플릿 업로드
     const handleTemplateUpload = useCallback(async e => {
         const file = e.target.files[0];
-        console.info(file);
         const formData = new FormData();
 
         formData.append("file", file);
 
-        console.info('customer["CUSTOMER_ID"] ::: ', customer);
-
         try {
             const res = await SendRequest().post(`${serverPROTOCOL}${serverURL}/autobid/powerlink/xlsx?CUSTOMER_ID=${customer["CUSTOMER_ID"]}`, formData);
-            if (res.status === 200) {
-                toast.info("업로드를 성공하였습니다.");
-            }
+            setIdentifier(res.data.identifier);
         } catch(e) {
             throw new Error(e);
         }

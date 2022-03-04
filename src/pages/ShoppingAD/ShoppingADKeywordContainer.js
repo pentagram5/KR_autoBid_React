@@ -272,6 +272,10 @@ const ShoppingADKeywordContainer = () => {
 
     // 자동입찰 설정 - 수정 페이지로 이동
     const handleUpdateAutoBid = () => {
+        if (checked.length > 1) {
+            alert("수정은 한개의 키워드만 가능합니다.");
+            return;
+        }
         navigator('/shoppingAdUpdate');
         localStorage.setItem("checked", checked);
     }

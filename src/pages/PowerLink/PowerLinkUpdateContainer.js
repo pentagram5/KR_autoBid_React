@@ -11,6 +11,7 @@ import {tokenValidate} from "../../utils/tokenValidate";
 
 const serverPROTOCOL = constants.config.PROTOCOL;
 const serverURL = constants.config.URL;
+const scheduleBgColor = [colors.pastelRed, colors.pastelYellow, colors.pastelGreen, colors.pastelBlue, colors.pastelPurple];
 
 const PowerLinkAutoBidContainer = () => {
     const navigate = useNavigate();
@@ -90,7 +91,7 @@ const PowerLinkAutoBidContainer = () => {
                 start_Date: toDay,
                 end_Date: toDay
             });
-        }  else {
+        } else {
             setRadioState({
                 ...radioState,
                 [type]: parseInt(e.target.value)
@@ -175,17 +176,10 @@ const PowerLinkAutoBidContainer = () => {
         });
     }
 
-    const scheduleBgColor = [colors.pastelRed, colors.pastelYellow, colors.pastelGreen, colors.pastelBlue, colors.pastelPurple];
     const {week, start, finish} = highSchedule;
 
     // 스케줄 중복 data finder
-    const sameScheduleFinder = schedules => schedules.find(list => {
-        console.info('target_Rank : ', keywordOption.setting.target_Rank === list.targetRank);
-        console.info('keywordOption.setting.target_Rank : ', keywordOption.setting.target_Rank);
-        console.info('list.targetRank: ', list.targetRank);
-
-        return (keywordOption.setting.target_Rank === list.targetRank) && (keywordOption.setting.max_bid === list.maxBid) && (keywordOption.setting.min_bid === list.minBid)
-    });
+    const sameScheduleFinder = schedules => schedules.find(list => (keywordOption.setting.target_Rank === list.targetRank) && (keywordOption.setting.max_bid === list.maxBid) && (keywordOption.setting.min_bid === list.minBid));
 
     // 스케줄 추가
     const onAddSchedule = () => {
@@ -205,6 +199,7 @@ const PowerLinkAutoBidContainer = () => {
             targetRank: keywordOption.setting.target_Rank,
             maxBid: keywordOption.setting.max_bid,
             minBid: keywordOption.setting.min_bid,
+            bid_adj_amount: keywordOption.setting.bid_adj_amount,
             active: false,
             bgColor: scheduleBgColor[scheduleChips.length],
             mon: [],
@@ -391,9 +386,8 @@ const PowerLinkAutoBidContainer = () => {
 
         copyChips = {...copyChips, [week]: tmp};
 
-        let schedules = scheduleChips.map(item => item.active === copyChips.active ? copyChips : item );
+        let schedules = scheduleChips.map(item => item.active === copyChips.active ? copyChips : item);
         setScheduleChips(schedules);
-
 
         // 보낼 양식 데이터 상태에 저장
         let finalArray = [];
@@ -433,10 +427,45 @@ const PowerLinkAutoBidContainer = () => {
     }
 
     // 스케줄 카드 삭제
-    const onDeleteChips = id => setScheduleChips(scheduleChips.filter(chip => id !== chip.id));
+    const onDeleteChips = id => {
+        scheduleBgColor.push(scheduleChips.filter(chip => id === chip.id)[0].bgColor);
+        setScheduleChips(scheduleChips.filter(chip => id !== chip.id));
+    }
 
     // 취소
-    const onCancel = () => window.location.reload();
+    const onCancel = () => navigate(-1);
+
+    useEffect(() => {
+        const getCalculatedValue = (item) => {
+            let rtn = 0;
+            item.map(x => rtn += Math.pow(2, x));
+            return rtn;
+        };
+        let finalArray = scheduleChips.map(chip => {
+            return {
+                keyword_info: keywordOption.keyword_info,
+                device: keywordOption.device,
+                bid_cycle: keywordOption.bid_cycle,
+                start_Date: keywordOption.start_Date,
+                end_Date: keywordOption.end_Date,
+                lowest_Bid_ac: keywordOption.lowest_Bid_ac,
+                setting: {
+                    mon: getCalculatedValue(chip.mon),
+                    tue: getCalculatedValue(chip.tue),
+                    wed: getCalculatedValue(chip.wed),
+                    thu: getCalculatedValue(chip.thu),
+                    fri: getCalculatedValue(chip.fri),
+                    sat: getCalculatedValue(chip.sat),
+                    sun: getCalculatedValue(chip.sun),
+                    target_Rank: chip.targetRank,
+                    max_bid: chip.maxBid,
+                    min_bid: chip.minBid,
+                    bid_adj_amount: chip.bid_adj_amount
+                }
+            }
+        });
+        setHighKeywordOption(finalArray);
+    }, [keywordOption, scheduleChips]);
 
     // 자동입찰 등록
     const onAddAutoBid = async () => {
@@ -446,13 +475,6 @@ const PowerLinkAutoBidContainer = () => {
             return;
         }
         setLoading(true);
-
-        if (radioState.simpleHigh) {
-            console.info('highKeywordOption', highKeywordOption);
-        } else {
-            console.info('keywordOption', keywordOption);
-        }
-
         try {
             const response = await SendRequest().post(`${serverPROTOCOL}${serverURL}/autobid/powerlink/update?CUSTOMER_ID=${customer["CUSTOMER_ID"]}`, radioState.simpleHigh === 0 ? [keywordOption] : highKeywordOption);
 
@@ -573,37 +595,42 @@ const PowerLinkAutoBidContainer = () => {
     const fetchingData = async customerId => {
         tokenValidate();
         try {
-            const { data } = await SendRequest().post(`${serverPROTOCOL}${serverURL}/autobid/powerlink/update_info?CUSTOMER_ID=${customerId}`, checked);
-
-            console.info('준연이가 준거 ::: ', data);
+            const {data} = await SendRequest().post(`${serverPROTOCOL}${serverURL}/autobid/powerlink/update_info?CUSTOMER_ID=${customerId}`, checked);
 
             if (checked.length > 1) { // 수정리스트 하나 이상일 때
                 setKeywordList(data.keyword_info);
+                setKeywordOption({
+                   ...keywordOption,
+                   keyword_info: data.keyword_info.map(list => list.nccKeywordId)
+                });
             } else { // 수정리스트 하나 일 때
                 setKeywordList(data.keyword_info);
                 setRadioState({
                     ...radioState,
-                    simpleHigh:  data.setting_type,
+                    simpleHigh: data.setting_type,
                     usedDate: data.keyword_setting.start_Date !== "" ? data.keyword_setting.start_Date : 0
                 });
 
-                // 간편설정 고급설정
+                // 간편설정
                 if (data.setting_type === 0) {
-                    console.info('간편설정 :', data);
                     setKeywordOption({
-                        keyword_info: checked,
+                        keyword_info: [data.keyword_info[0].nccKeywordId],
                         device: data.keyword_setting.device,
                         bid_cycle: parseInt(data.keyword_setting.bid_cycle, 10),
                         start_Date: data.keyword_setting.start_Date ? data.keyword_setting.start_Date : "",
-                        end_Date: data.keyword_setting.end_Date ? data.keyword_setting.end_Date :"",
+                        end_Date: data.keyword_setting.end_Date ? data.keyword_setting.end_Date : "",
                         lowest_Bid_ac: data.keyword_setting.lowest_Bid_ac,
                         setting: {
                             ...keywordOption.setting,
-                            target_Rank: parseInt(data.keyword_setting.setting[0].target_Rank, 10),
+                            target_Rank: data.keyword_setting.setting[0].target_Rank,
                             max_bid: data.keyword_setting.setting[0].max_bid,
-                            min_bid: data.keyword_setting.setting[0].min_bid ,
+                            min_bid: data.keyword_setting.setting[0].min_bid,
                             bid_adj_amount: data.keyword_setting.setting[0].bid_adj_amount
                         }
+                    });
+                    setSimpleSchedule({
+                        week: data.weekType,
+                        time: data.timeType,
                     });
                 } else {
                     let chips = [];
@@ -617,6 +644,7 @@ const PowerLinkAutoBidContainer = () => {
                             minBid: data.min_bid,
                             active: index === 0,
                             bgColor: scheduleBgColor[index],
+                            bid_adj_amount: data.bid_adj_amount,
                             mon: data.mon,
                             tue: data.tue,
                             wed: data.wed,
@@ -626,13 +654,15 @@ const PowerLinkAutoBidContainer = () => {
                             sun: data.sun,
                         });
                     });
+
                     setScheduleChips(chips);
+
                     setKeywordOption({
-                        keyword_info: checked,
+                        keyword_info: [data.keyword_info[0].nccKeywordId],
                         device: data.keyword_setting.device,
                         bid_cycle: parseInt(data.keyword_setting.bid_cycle, 10),
                         start_Date: data.keyword_setting.start_Date ? data.keyword_setting.start_Date : "",
-                        end_Date: data.keyword_setting.end_Date ? data.keyword_setting.end_Date :"",
+                        end_Date: data.keyword_setting.end_Date ? data.keyword_setting.end_Date : "",
                         lowest_Bid_ac: data.keyword_setting.lowest_Bid_ac,
                         setting: {
                             ...keywordOption.setting,
@@ -644,14 +674,10 @@ const PowerLinkAutoBidContainer = () => {
                     });
                 }
             }
-        } catch(e) {
+        } catch (e) {
             throw new Error(e);
         }
     }
-
-    useEffect(() => {
-        console.info('useEffect ::: ', keywordOption.setting)
-    }, [keywordOption]);
 
     useEffect(() => {
         const arr = localStorage.getItem("checked");
@@ -664,29 +690,14 @@ const PowerLinkAutoBidContainer = () => {
             });
             navigate('/powerLinkKeyword');
         }
-
         return () => localStorage.removeItem("checked");
     }, []);
 
     useEffect(async () => {
         if (!!customer["CUSTOMER_ID"] && checked.length !== 0) {
-            console.info('패칭데이터 :');
             await fetchingData(customer["CUSTOMER_ID"]);
         }
     }, [customer, checked]);
-
-
-    // useEffect(() => {
-    //     setKeywordOption({
-    //         ...keywordOption,
-    //         keyword_info: keywordList.map(list => list.nccKeywordId)
-    //     });
-
-    // }, [keywordList]);
-
-    // useEffect(() => {
-    //     console.info('keywordOption', keywordOption);
-    // }, [keywordOption]);
 
     return (
         <UpdateAutoBidPresenter

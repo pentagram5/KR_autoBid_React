@@ -6,7 +6,6 @@ import * as constants from "../../utils/constants";
 import colors from "../../styles/colors";
 import {korWeekChange} from "../../utils/common";
 import {tokenValidate} from "../../utils/tokenValidate";
-import {toast} from "react-toastify";
 
 const serverPROTOCOL = constants.config.PROTOCOL;
 const serverURL = constants.config.URL;
@@ -61,7 +60,7 @@ const PowerContentsAutoBidContainer = () => {
             sun: '0~23',
             target_Rank: 0,
             max_bid: 0,
-            min_bid: 0,
+            min_bid: 70,
             bid_adj_amount: 0,
         }
     });

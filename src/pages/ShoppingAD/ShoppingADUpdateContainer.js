@@ -11,9 +11,7 @@ import {tokenValidate} from "../../utils/tokenValidate";
 
 const serverPROTOCOL = constants.config.PROTOCOL;
 const serverURL = constants.config.URL;
-
 const scheduleBgColor = [colors.pastelRed, colors.pastelYellow, colors.pastelGreen, colors.pastelBlue, colors.pastelPurple];
-
 
 const ShoppingADUpdateContainer = () => {
     const navigate = useNavigate();
@@ -51,7 +49,7 @@ const ShoppingADUpdateContainer = () => {
             sun: '0~23',
             target_Rank: 0,
             max_bid: 0,
-            min_bid: 0,
+            min_bid: 70,
             bid_adj_amount: 0,
         }
     });
@@ -65,23 +63,13 @@ const ShoppingADUpdateContainer = () => {
     // 스케줄 칩 상태
     const [scheduleChips, setScheduleChips] = useState([]);
 
-    // 광고주 select 선택
-    const handleCustomerChange = useCallback(e => {
-        const list = customerList.find(list => list.CUSTOMER_ID === e.target.value);
-        setCustomer(list);
-        localStorage.setItem("customer", JSON.stringify(list));
-        setKeywordList([]);
-    }, [customerList]);
-
-
-    // SettingList keyword 삭제
-    const onDeleteKeyword = useCallback((nccKeywordId, schKeyword) => {
-        setKeywordList(keywordList.filter(list => list.nccKeywordId !== nccKeywordId && list.Keyword !== schKeyword));
-        setKeywordOption({
-            ...keywordOption,
-            keyword_info: keywordList.filter(list => list.nccKeywordId !== nccKeywordId && list.Keyword !== schKeyword)
-        });
-    }, [keywordList]);
+    // // 광고주 select 선택
+    // const handleCustomerChange = useCallback(e => {
+    //     const list = customerList.find(list => list.CUSTOMER_ID === e.target.value);
+    //     setCustomer(list);
+    //     localStorage.setItem("customer", JSON.stringify(list));
+    //     setKeywordList([]);
+    // }, [customerList]);
 
 
     // 간편 설정 요일, 시간 설정
@@ -112,7 +100,7 @@ const ShoppingADUpdateContainer = () => {
                 start_Date: toDay,
                 end_Date: toDay
             });
-        }  else {
+        } else {
             setRadioState({
                 ...radioState,
                 [type]: parseInt(e.target.value)
@@ -181,6 +169,14 @@ const ShoppingADUpdateContainer = () => {
         }
     }
 
+    // SettingList keyword 삭제
+    const onDeleteKeyword = useCallback((nccKeywordId, schKeyword) => {
+        setKeywordList(keywordList.filter(list => list.nccKeywordId !== nccKeywordId && list.Keyword !== schKeyword));
+        setKeywordOption({
+            ...keywordOption,
+            keyword_info: keywordList.filter(list => list.nccKeywordId !== nccKeywordId && list.Keyword !== schKeyword)
+        });
+    }, [keywordList]);
 
     // 요일, 시간 select box onChange
     const handleHighScheduleSetting = e => {
@@ -215,6 +211,7 @@ const ShoppingADUpdateContainer = () => {
             targetRank: keywordOption.setting.target_Rank,
             maxBid: keywordOption.setting.max_bid,
             minBid: keywordOption.setting.min_bid,
+            bid_adj_amount: keywordOption.setting.bid_adj_amount,
             active: false,
             bgColor: scheduleBgColor.shift(),
             mon: [],
@@ -312,7 +309,6 @@ const ShoppingADUpdateContainer = () => {
         }
 
 
-
         // 중복체크
         if (week !== "weekDays" && week !== "weekend" && week !== "all") {
             let weekAllSchedule = [];
@@ -400,13 +396,10 @@ const ShoppingADUpdateContainer = () => {
             }
         }
 
-
         copyChips = {...copyChips, [week]: tmp};
 
         let schedules = scheduleChips.map(item => item.active === copyChips.active ? copyChips : item);
         setScheduleChips(schedules);
-
-
 
         // 보낼 양식 데이터 상태에 저장
         let finalArray = [];
@@ -455,16 +448,47 @@ const ShoppingADUpdateContainer = () => {
     // 취소
     const onCancel = () => window.location.reload();
 
+    useEffect(() => {
+        const getCalculatedValue = (item) => {
+            let rtn = 0;
+            item.map(x => rtn += Math.pow(2, x));
+            return rtn;
+        };
+        let finalArray = scheduleChips.map(chip => {
+            return {
+                keyword_info: keywordOption.keyword_info,
+                device: keywordOption.device,
+                bid_cycle: keywordOption.bid_cycle,
+                start_Date: keywordOption.start_Date,
+                end_Date: keywordOption.end_Date,
+                lowest_Bid_ac: keywordOption.lowest_Bid_ac,
+                setting: {
+                    mon: getCalculatedValue(chip.mon),
+                    tue: getCalculatedValue(chip.tue),
+                    wed: getCalculatedValue(chip.wed),
+                    thu: getCalculatedValue(chip.thu),
+                    fri: getCalculatedValue(chip.fri),
+                    sat: getCalculatedValue(chip.sat),
+                    sun: getCalculatedValue(chip.sun),
+                    target_Rank: chip.targetRank,
+                    max_bid: chip.maxBid,
+                    min_bid: chip.minBid,
+                    bid_adj_amount: chip.bid_adj_amount
+                }
+            }
+        });
+        setHighKeywordOption(finalArray);
+    }, [keywordOption, scheduleChips]);
 
     // 자동입찰 등록
     const onAddAutoBid = async () => {
         tokenValidate();
+
         if (!keywordOption.setting.target_Rank) {
             alert('희망 순위를 설정해주세요.');
             return;
         }
         setLoading(true);
-
         try {
             const response = await SendRequest().post(`${serverPROTOCOL}${serverURL}/autobid/shopping_ad/update?CUSTOMER_ID=${customer["CUSTOMER_ID"]}`,
                 radioState.simpleHigh === 0
@@ -532,47 +556,10 @@ const ShoppingADUpdateContainer = () => {
         // eslint-disable-next-line
     }, [radioState]);
 
-    const fetchingData = async customerId => {
-        tokenValidate();
-        try {
-            const { data } = await SendRequest().post(`${serverPROTOCOL}${serverURL}/autobid/shopping_ad/update_info?CUSTOMER_ID=${customerId}`, checked);
-
-            setKeywordList(data);
-            setKeywordOption({
-                ...keywordOption,
-                keyword_info: data
-            });
-        } catch(e) {
-            throw new Error(e);
-        }
-    }
-
-    // 초기 data 불러오기
-    useEffect(() => {
-        if (!!customer["CUSTOMER_ID"] && checked.length !== 0) {
-            fetchingData(customer["CUSTOMER_ID"]);
-        }
-    }, [customer, checked]);
-
     // localStorage 광고주 id 가져오기
     useEffect(() => {
         setCustomer(JSON.parse(localStorage.getItem("customer")));
         return () => setLoading(false);
-    }, []);
-
-    useEffect(() => {
-        const arr = localStorage.getItem("checked");
-        setCustomer(JSON.parse(localStorage.getItem("customer")));
-        if (arr) {
-            setChecked(arr.split(','));
-        } else {
-            toast.info('수정할 키워드가 없습니다.', {
-                autoClose: 1000
-            });
-            navigate('/shoppingADKeyword');
-
-        }
-        return () => localStorage.removeItem("checked");
     }, []);
 
     // 간편 설정 요일 및 시간 보내기용 데이터로 변환
@@ -624,11 +611,109 @@ const ShoppingADUpdateContainer = () => {
         // eslint-disable-next-line
     }, [simpleSchedule]);
 
+
+    const fetchingData = async customerId => {
+        tokenValidate();
+        try {
+            const {data} = await SendRequest().post(`${serverPROTOCOL}${serverURL}/autobid/shopping_ad/update_info?CUSTOMER_ID=${customerId}`, checked);
+
+            setKeywordList(data.keyword_info);
+            setRadioState({
+                ...radioState,
+                simpleHigh: data.setting_type,
+                usedDate: data.keyword_setting.start_Date !== "" ? data.keyword_setting.start_Date : 0
+            });
+
+            if (data.setting_type === 0) {
+                setKeywordOption({
+                    keyword_info: [data.keyword_info[0]],
+                    device: data.keyword_setting.device,
+                    bid_cycle: parseInt(data.keyword_setting.bid_cycle, 10),
+                    start_Date: data.keyword_setting.start_Date ? data.keyword_setting.start_Date : "",
+                    end_Date: data.keyword_setting.end_Date ? data.keyword_setting.end_Date : "",
+                    lowest_Bid_ac: data.keyword_setting.lowest_Bid_ac,
+                    setting: {
+                        ...keywordOption.setting,
+                        target_Rank: data.keyword_setting.setting[0].target_Rank,
+                        max_bid: data.keyword_setting.setting[0].max_bid,
+                        min_bid: data.keyword_setting.setting[0].min_bid,
+                        bid_adj_amount: data.keyword_setting.setting[0].bid_adj_amount
+                    }
+                });
+                setSimpleSchedule({
+                    week: data.weekType,
+                    time: data.timeType,
+                });
+            } else {
+                let chips = [];
+
+                // 스케줄 칩
+                data.keyword_setting.setting.map((data, index) => {
+                    chips.push({
+                        id: data.target_Rank + '-' + data.max_bid + '-' + data.min_bid,
+                        targetRank: parseInt(data.target_Rank, 10),
+                        maxBid: data.max_bid,
+                        minBid: data.min_bid,
+                        active: index === 0,
+                        bgColor: scheduleBgColor[index],
+                        bid_adj_amount: data.bid_adj_amount,
+                        mon: data.mon,
+                        tue: data.tue,
+                        wed: data.wed,
+                        thu: data.thu,
+                        fri: data.fri,
+                        sat: data.sat,
+                        sun: data.sun,
+                    });
+                });
+                setScheduleChips(chips);
+                setKeywordOption({
+                    keyword_info: [data.keyword_info[0]],
+                    device: data.keyword_setting.device,
+                    bid_cycle: parseInt(data.keyword_setting.bid_cycle, 10),
+                    start_Date: data.keyword_setting.start_Date ? data.keyword_setting.start_Date : "",
+                    end_Date: data.keyword_setting.end_Date ? data.keyword_setting.end_Date :"",
+                    lowest_Bid_ac: data.keyword_setting.lowest_Bid_ac,
+                    setting: {
+                        ...keywordOption.setting,
+                        target_Rank: parseInt(data.keyword_setting.setting[0].target_Rank, 10),
+                        max_bid: data.keyword_setting.setting[0].max_bid,
+                        min_bid: data.keyword_setting.setting[0].min_bid,
+                        bid_adj_amount: data.keyword_setting.setting[0].bid_adj_amount,
+                    }
+                });
+            }
+        } catch (e) {
+            throw new Error(e);
+        }
+    }
+
+    useEffect(() => {
+        const arr = localStorage.getItem("checked");
+        setCustomer(JSON.parse(localStorage.getItem("customer")));
+        if (arr) {
+            setChecked(arr.split(','));
+        } else {
+            toast.info('수정할 키워드가 없습니다.', {
+                autoClose: 1000
+            });
+            navigate('/shoppingADKeyword');
+        }
+        return () => localStorage.removeItem("checked");
+    }, []);
+
+    // 초기 data 불러오기
+    useEffect(async () => {
+        if (!!customer["CUSTOMER_ID"] && checked.length !== 0) {
+            await fetchingData(customer["CUSTOMER_ID"]);
+        }
+    }, [customer, checked]);
+
     return (
         <UpdateAutoBidPresenter
             SHOPPING_AD
             title="쇼핑광고 자동입찰수정"
-            handleCustomerChange={handleCustomerChange}
+            // handleCustomerChange={handleCustomerChange}
             customerList={customerList}
             customer={customer}
             keywordList={keywordList}

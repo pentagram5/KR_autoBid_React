@@ -16,10 +16,6 @@ import AdapterDateFns from "@mui/lab/AdapterDateFns";
 import DesktopDatePicker from "@mui/lab/DesktopDatePicker";
 import TextField from "@mui/material/TextField";
 import Switch from "@mui/material/Switch";
-// import Checkbox from '@mui/material/Checkbox';
-// import selectArrow2 from "../../assets/selectArrow2.svg";
-// import rightArrow from "../../assets/rightArrow.svg";
-// import rightLeftArrow from "../../assets/rightLeftArrow.svg";
 
 const View = styled.div`
   width: calc(100vw - 300px);
@@ -282,9 +278,7 @@ const UpdateAutoBidPresenter = ({
 
                                 }) => {
 
-    const {device, bid_cycle, bid_adj_amount, setting: { max_bid, min_bid, target_Rank }} = keywordOption;
-
-    // console.info('presenter :  ', keywordOption);
+    const {device, bid_cycle, setting: { max_bid, min_bid, target_Rank, bid_adj_amount }} = keywordOption;
 
     return (
         <View>
@@ -376,6 +370,7 @@ const UpdateAutoBidPresenter = ({
                                             value="MOBILE"
                                             name="device"
                                             control={<Radio/>}
+                                            checked={device === "MOBILE"}
                                             disabled={!!radioState.simpleHigh}
                                         />
                                     </RadioGroup>
@@ -485,6 +480,7 @@ const UpdateAutoBidPresenter = ({
                                             control={<Radio/>}
                                             label="사용"
                                             disabled={!!radioState.simpleHigh}
+                                            checked={keywordOption.lowest_Bid_ac === 1}
                                         />
                                     </RadioGroup>
                                 </td>
@@ -513,6 +509,7 @@ const UpdateAutoBidPresenter = ({
                                             />
                                             <FormControlLabel value={1} name="bid_adj_amount" control={<Radio/>}
                                                               label="사용"
+                                                              checked={radioState.bid_adj_amount === 1}
                                                               disabled={!!radioState.simpleHigh}
                                             />
                                         </RadioGroup>
@@ -567,8 +564,10 @@ const UpdateAutoBidPresenter = ({
                                     <RadioGroup row onChange={e => handleSimpleScheduleSetting(e, 'week')}>
                                         <FormControlLabel value="all" control={<Radio/>} label="매일"
                                                           checked={simpleSchedule.week === 'all'}/>
-                                        <FormControlLabel value="weekDays" control={<Radio/>} label="주중"/>
-                                        <FormControlLabel value="weekend" control={<Radio/>} label="주말"/>
+                                        <FormControlLabel value="weekDays" control={<Radio/>} label="주중"
+                                                          checked={simpleSchedule.week === 'weekDays'}/>
+                                        <FormControlLabel value="weekend" control={<Radio/>} label="주말"
+                                                          checked={simpleSchedule.week === 'weekend'}/>
                                     </RadioGroup>
                                 </td>
                                 <td>시간 설정</td>
@@ -576,7 +575,7 @@ const UpdateAutoBidPresenter = ({
                                     <RadioGroup row onChange={e => handleSimpleScheduleSetting(e, 'time')}>
                                         <FormControlLabel value="0~23" control={<Radio/>} label="00시~24시"
                                                           checked={simpleSchedule.time === '0~23'}/>
-                                        <FormControlLabel value="9~18" control={<Radio/>} label="09시~18시"/>
+                                        <FormControlLabel value="9~18" control={<Radio/>} label="09시~18시" checked={simpleSchedule.time === '9~18'}/>
                                     </RadioGroup>
                                 </td>
                             </tr>

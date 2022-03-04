@@ -427,10 +427,45 @@ const PowerLinkAutoBidContainer = () => {
     }
 
     // 스케줄 카드 삭제
-    const onDeleteChips = id => setScheduleChips(scheduleChips.filter(chip => id !== chip.id));
+    const onDeleteChips = id => {
+        scheduleBgColor.push(scheduleChips.filter(chip => id === chip.id)[0].bgColor);
+        setScheduleChips(scheduleChips.filter(chip => id !== chip.id));
+    }
 
     // 취소
     const onCancel = () => window.location.reload();
+
+    useEffect(() => {
+        const getCalculatedValue = (item) => {
+            let rtn = 0;
+            item.map(x => rtn += Math.pow(2, x));
+            return rtn;
+        };
+        let finalArray = scheduleChips.map(chip => {
+            return {
+                keyword_info: keywordOption.keyword_info,
+                device: keywordOption.device,
+                bid_cycle: keywordOption.bid_cycle,
+                start_Date: keywordOption.start_Date,
+                end_Date: keywordOption.end_Date,
+                lowest_Bid_ac: keywordOption.lowest_Bid_ac,
+                setting: {
+                    mon: getCalculatedValue(chip.mon),
+                    tue: getCalculatedValue(chip.tue),
+                    wed: getCalculatedValue(chip.wed),
+                    thu: getCalculatedValue(chip.thu),
+                    fri: getCalculatedValue(chip.fri),
+                    sat: getCalculatedValue(chip.sat),
+                    sun: getCalculatedValue(chip.sun),
+                    target_Rank: chip.targetRank,
+                    max_bid: chip.maxBid,
+                    min_bid: chip.minBid,
+                    bid_adj_amount: chip.bid_adj_amount
+                }
+            }
+        });
+        setHighKeywordOption(finalArray);
+    }, [keywordOption, scheduleChips]);
 
     // 자동입찰 등록
     const onAddAutoBid = async () => {
@@ -563,9 +598,84 @@ const PowerLinkAutoBidContainer = () => {
         try {
             const { data } = await SendRequest().post(`${serverPROTOCOL}${serverURL}/autobid/powercontents/update_info?CUSTOMER_ID=${customerId}`, checked);
 
-            setKeywordList(data);
+            // setKeywordList(data);
+            if (checked.length > 1) { // 수정리스트 하나 이상일 때
+                setKeywordList(data.keyword_info);
+                setKeywordOption({
+                    ...keywordOption,
+                    keyword_info: data.keyword_info.map(list => list.nccKeywordId)
+                });
+            } else { // 수정리스트 하나 일 때
+                setKeywordList(data.keyword_info);
+                setRadioState({
+                    ...radioState,
+                    simpleHigh: data.setting_type,
+                    usedDate: data.keyword_setting.start_Date !== "" ? data.keyword_setting.start_Date : 0
+                });
 
-            console.info('::::::', data);
+                // 간편설정
+                if (data.setting_type === 0) {
+                    setKeywordOption({
+                        keyword_info: [data.keyword_info[0].nccKeywordId],
+                        device: data.keyword_setting.device,
+                        bid_cycle: parseInt(data.keyword_setting.bid_cycle, 10),
+                        start_Date: data.keyword_setting.start_Date ? data.keyword_setting.start_Date : "",
+                        end_Date: data.keyword_setting.end_Date ? data.keyword_setting.end_Date : "",
+                        lowest_Bid_ac: data.keyword_setting.lowest_Bid_ac,
+                        setting: {
+                            ...keywordOption.setting,
+                            target_Rank: data.keyword_setting.setting[0].target_Rank,
+                            max_bid: data.keyword_setting.setting[0].max_bid,
+                            min_bid: data.keyword_setting.setting[0].min_bid,
+                            bid_adj_amount: data.keyword_setting.setting[0].bid_adj_amount
+                        }
+                    });
+                    setSimpleSchedule({
+                        week: data.weekType,
+                        time: data.timeType,
+                    });
+                } else {
+                    let chips = [];
+
+                    // 스케줄 칩
+                    data.keyword_setting.setting.map((data, index) => {
+                        chips.push({
+                            id: data.target_Rank + '-' + data.max_bid + '-' + data.min_bid,
+                            targetRank: parseInt(data.target_Rank, 10),
+                            maxBid: data.max_bid,
+                            minBid: data.min_bid,
+                            active: index === 0,
+                            bgColor: scheduleBgColor[index],
+                            bid_adj_amount: data.bid_adj_amount,
+                            mon: data.mon,
+                            tue: data.tue,
+                            wed: data.wed,
+                            thu: data.thu,
+                            fri: data.fri,
+                            sat: data.sat,
+                            sun: data.sun,
+                        });
+                    });
+
+                    setScheduleChips(chips);
+
+                    setKeywordOption({
+                        keyword_info: [data.keyword_info[0].nccKeywordId],
+                        device: data.keyword_setting.device,
+                        bid_cycle: parseInt(data.keyword_setting.bid_cycle, 10),
+                        start_Date: data.keyword_setting.start_Date ? data.keyword_setting.start_Date : "",
+                        end_Date: data.keyword_setting.end_Date ? data.keyword_setting.end_Date : "",
+                        lowest_Bid_ac: data.keyword_setting.lowest_Bid_ac,
+                        setting: {
+                            ...keywordOption.setting,
+                            target_Rank: parseInt(data.keyword_setting.setting[0].target_Rank, 10),
+                            max_bid: data.keyword_setting.setting[0].max_bid,
+                            min_bid: data.keyword_setting.setting[0].min_bid,
+                            bid_adj_amount: data.keyword_setting.setting[0].bid_adj_amount,
+                        }
+                    });
+                }
+            }
 
         } catch(e) {
             throw new Error(e);
@@ -605,7 +715,7 @@ const PowerLinkAutoBidContainer = () => {
     return (
         <UpdateAutoBidPresenter
             POWER_CONTENTS
-            title="파워링크 자동입찰수정"
+            title="파워콘텐츠 자동입찰수정"
             customerList={customerList}
             customer={customer}
 
