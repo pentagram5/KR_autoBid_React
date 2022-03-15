@@ -66,7 +66,7 @@ const ShoppingADAutoBidContainer = () => {
             sun: '0~23',
             target_Rank: 0,
             max_bid: 0,
-            min_bid: 0,
+            min_bid: 70,
             bid_adj_amount: 0,
         }
     });
@@ -350,6 +350,12 @@ const ShoppingADAutoBidContainer = () => {
         } else if (sameScheduleFinder(scheduleChips)) {
             alert('동일한 스케줄이 이미 추가되었습니다.');
             return;
+        } else if (keywordOption.setting.min_bid < 70) {
+            alert('최소입찰가는 최소 70원 이상으로 입력해주세요.');
+            return;
+        } else if (keywordOption.setting.max_bid !== 0 && (keywordOption.setting.min_bid > keywordOption.setting.max_bid)) {
+            alert("최대 입찰가는 최소 입찰가보다 큰 금액을 입력해주세요.");
+            return;
         }
 
         let chip = {
@@ -606,6 +612,16 @@ const ShoppingADAutoBidContainer = () => {
         } else if (!keywordOption.setting.target_Rank) {
             alert('희망 순위를 설정해주세요.');
             return;
+        } else if ((radioState.simpleHigh === 1) && (highKeywordOption.length < 1)) {
+            alert('스케줄의 시간을 설정해주세요.');
+            return;
+        } else if (keywordOption.setting.min_bid < 70) {
+            alert('최소입찰가는 최소 70원 이상으로 입력해주세요.');
+            return;
+        }
+        if ((!radioState.simpleHigh) && (keywordOption.setting.max_bid !== 0 && (keywordOption.setting.min_bid >= keywordOption.setting.max_bid))) {
+            alert("최대 입찰가는 최소 입찰가보다 큰 금액을 입력해주세요.");
+            return;
         }
         setLoading(true);
 
@@ -646,7 +662,7 @@ const ShoppingADAutoBidContainer = () => {
                         sun: '0~23',
                         target_Rank: 0,
                         max_bid: 0,
-                        min_bid: 0,
+                        min_bid: 70,
                         bid_adj_amount: 0,
                     }
                 });

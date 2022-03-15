@@ -90,49 +90,51 @@ const TableWrapper = styled.div`
   }
 
   th:nth-child(1),
-  td:nth-child(1) {
+  td:nth-child(1),
+  th:nth-child(2),
+  td:nth-child(2) {
     width: 50px !important;
     padding: 6px 4px;
   }
 
-  th:nth-child(2),
-  td:nth-child(2) {
+  th:nth-child(3),
+  td:nth-child(3) {
     width: 104px !important;
   }
 
-  th:nth-child(3),
-  td:nth-child(3),
   th:nth-child(4),
-  td:nth-child(4) {
+  td:nth-child(4),
+  th:nth-child(5),
+  td:nth-child(5) {
     width: 312px !important;
     white-space: pre;
   }
-  th:nth-child(5),
-  td:nth-child(5) {
-    width: 190px !important;
-  }
   th:nth-child(6),
-  td:nth-child(6),
-  th:nth-child(9),
-  td:nth-child(9),
-  th:nth-child(11),
-  td:nth-child(11),
-  th:nth-child(13),
-  td:nth-child(13) {
-    width: 100px !important;
+  td:nth-child(6) {
+    width: 190px !important;
   }
   th:nth-child(7),
   td:nth-child(7),
+  th:nth-child(10),
+  td:nth-child(10),
+  th:nth-child(12),
+  td:nth-child(12),
+  th:nth-child(14),
+  td:nth-child(14) {
+    width: 100px !important;
+  }
   th:nth-child(8),
-  td:nth-child(8) {
+  td:nth-child(8),
+  th:nth-child(9),
+  td:nth-child(9) {
     width: 150px !important;
   }
-  th:nth-child(10),
-  td:nth-child(10) {
+  th:nth-child(11),
+  td:nth-child(11) {
     width: 140px !important;
   }
-  th:nth-child(12),
-  td:nth-child(12) {
+  th:nth-child(13),
+  td:nth-child(13) {
     width: 120px !important;
   }
 
@@ -180,6 +182,12 @@ const MaterialTable = ({
                                     onChange={handleAllChecked}
                                     checked={tableLists.length > 0 && checked.length === tableLists.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).length}
                                 />
+                            </TableCell>
+                            <TableCell
+                                padding="checkbox"
+                                size="small"
+                            >
+                                순서
                             </TableCell>
                             <TableCell
                                 padding="checkbox"
@@ -322,7 +330,7 @@ const MaterialTable = ({
                             (rowsPerPage > 0
                                     ? tableLists.sort(getComparator(order, orderBy)).slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                                     : tableLists
-                            ).map(row => {
+                            ).map((row, index) => {
                                 const isListChecked = isChecked(row.nccKeywordId);
 
                                 return (
@@ -331,6 +339,9 @@ const MaterialTable = ({
                                             <Checkbox
                                                 checked={isListChecked}
                                             />
+                                        </TableCell>
+                                        <TableCell>
+                                            {row.idx}
                                         </TableCell>
                                         <TableCell>
                                             {row.num}

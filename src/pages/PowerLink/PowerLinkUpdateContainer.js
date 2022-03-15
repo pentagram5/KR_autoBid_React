@@ -192,6 +192,12 @@ const PowerLinkAutoBidContainer = () => {
         } else if (sameScheduleFinder(scheduleChips)) {
             alert('동일한 스케줄이 이미 추가되었습니다.');
             return;
+        } else if (keywordOption.setting.min_bid < 70) {
+            alert('최소입찰가는 최소 70원 이상으로 입력해주세요.');
+            return;
+        } else if (keywordOption.setting.max_bid !== 0 && (keywordOption.setting.min_bid >= keywordOption.setting.max_bid)) {
+            alert("최대 입찰가는 최소 입찰가보다 큰 금액을 입력해주세요.");
+            return;
         }
 
         let chip = {
@@ -472,6 +478,13 @@ const PowerLinkAutoBidContainer = () => {
         tokenValidate();
         if (!keywordOption.setting.target_Rank) {
             alert('희망 순위를 설정해주세요.');
+            return;
+        }
+        if ((!radioState.simpleHigh) && (keywordOption.setting.max_bid !== 0 && (keywordOption.setting.min_bid > keywordOption.setting.max_bid))) {
+            alert("최대 입찰가는 최소 입찰가보다 큰 금액을 입력해주세요.");
+            return;
+        } else if (keywordOption.setting.min_bid < 70) {
+            alert('최소입찰가는 최소 70원 이상으로 입력해주세요.');
             return;
         }
         setLoading(true);

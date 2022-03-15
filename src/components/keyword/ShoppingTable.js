@@ -115,66 +115,68 @@ const TableWrapper = styled.div`
   }
 
   th:nth-child(1),
-  td:nth-child(1) {
+  td:nth-child(1),
+  th:nth-child(2),
+  td:nth-child(2) {
     width: 50px !important;
     padding: 6px 4px;
   }
 
-  th:nth-child(2),
-  td:nth-child(2) {
+  th:nth-child(3),
+  td:nth-child(3) {
     width: 80px !important;
   }
 
-  th:nth-child(3),
-  td:nth-child(3),
   th:nth-child(4),
-  td:nth-child(4) {
+  td:nth-child(4),
+  th:nth-child(5),
+  td:nth-child(5) {
     width: 180px !important;
     white-space: pre;
   }
 
-  th:nth-child(5),
-  td:nth-child(5) {
-    width: 220px !important;
-    position: relative;
-  }
-
   th:nth-child(6),
   td:nth-child(6) {
-    width: 200px !important;
+    width: 220px !important;
     position: relative;
   }
 
   th:nth-child(7),
   td:nth-child(7) {
-    width: 150px !important;
+    width: 200px !important;
+    position: relative;
   }
 
   th:nth-child(8),
-  td:nth-child(8),
-  th:nth-child(11),
-  td:nth-child(11),
-  th:nth-child(13),
-  td:nth-child(13),
-  th:nth-child(15),
-  td:nth-child(15) {
-    width: 90px !important;
+  td:nth-child(8) {
+    width: 150px !important;
   }
 
   th:nth-child(9),
   td:nth-child(9),
-  th:nth-child(10),
-  td:nth-child(10) {
-    width: 120px !important;
-  }
-
   th:nth-child(12),
-  td:nth-child(12) {
+  td:nth-child(12),
+  th:nth-child(14),
+  td:nth-child(14),
+  th:nth-child(16),
+  td:nth-child(16) {
+    width: 90px !important;
+  }
+
+  th:nth-child(10),
+  td:nth-child(10),
+  th:nth-child(11),
+  td:nth-child(11) {
     width: 120px !important;
   }
 
-  th:nth-child(14),
-  td:nth-child(14) {
+  th:nth-child(13),
+  td:nth-child(13) {
+    width: 120px !important;
+  }
+
+  th:nth-child(15),
+  td:nth-child(15) {
     width: 140px !important;
   }
 
@@ -222,6 +224,12 @@ const ShoppingTable = ({
                                     onChange={handleAllChecked}
                                     checked={tableLists.length > 0 && checked.length === tableLists.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).length}
                                 />
+                            </TableCell>
+                            <TableCell
+                                padding="checkbox"
+                                size="small"
+                            >
+                                순서
                             </TableCell>
                             <TableCell
                                 padding="checkbox"
@@ -395,6 +403,9 @@ const ShoppingTable = ({
                                         <Checkbox
                                             checked={isListChecked}
                                         />
+                                    </TableCell>
+                                    <TableCell>
+                                        {row.idx}
                                     </TableCell>
                                     <TableCell>
                                         {row.num}

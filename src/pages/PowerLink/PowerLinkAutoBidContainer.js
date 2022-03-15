@@ -338,6 +338,12 @@ const PowerLinkAutoBidContainer = () => {
     // 스케줄 중복 data finder
     const sameScheduleFinder = schedules => schedules.find(list => keywordOption.setting.target_Rank === list.targetRank && keywordOption.setting.max_bid === list.maxBid && keywordOption.setting.min_bid === list.minBid);
 
+    useEffect(() => {
+        console.info('min_bid !== 0', keywordOption.setting.min_bid !== 0);
+        console.info('min_bid', keywordOption.setting.min_bid);
+        console.info('max_bid', keywordOption.setting.max_bid);
+    }, [keywordOption]);
+
     // 스케줄 추가
     const onAddSchedule = () => {
         if (keywordOption.keyword_info.length === 0) {
@@ -351,6 +357,12 @@ const PowerLinkAutoBidContainer = () => {
             return;
         } else if (sameScheduleFinder(scheduleChips)) {
             alert('동일한 스케줄이 이미 추가되었습니다.');
+            return;
+        } else if (keywordOption.setting.min_bid < 70) {
+            alert('최소입찰가는 최소 70원 이상으로 입력해주세요.');
+            return;
+        } else if (keywordOption.setting.max_bid !== 0 && (keywordOption.setting.min_bid >= keywordOption.setting.max_bid)) {
+            alert("최대 입찰가는 최소 입찰가보다 큰 금액을 입력해주세요.");
             return;
         }
 
@@ -609,8 +621,15 @@ const PowerLinkAutoBidContainer = () => {
         } else if (!keywordOption.setting.target_Rank) {
             alert('희망 순위를 설정해주세요.');
             return;
-        } else if (highKeywordOption.length < 1) {
+        } else if ((!!radioState.simpleHigh) && (highKeywordOption.length < 1)) {
             alert('스케줄의 시간을 설정해주세요.');
+            return;
+        } else if (keywordOption.setting.min_bid < 70) {
+            alert('최소입찰가는 최소 70원 이상으로 입력해주세요.');
+            return;
+        }
+        if ((!radioState.simpleHigh) && (keywordOption.setting.max_bid !== 0 && (keywordOption.setting.min_bid > keywordOption.setting.max_bid))) {
+            alert("최대 입찰가는 최소 입찰가보다 큰 금액을 입력해주세요.");
             return;
         }
         setLoading(true);
@@ -647,13 +666,13 @@ const PowerLinkAutoBidContainer = () => {
                         sun: '0~23',
                         target_Rank: 0,
                         max_bid: 0,
-                        min_bid: 0,
+                        min_bid: 70,
                         bid_adj_amount: 0,
                     }
                 });
             }
         } catch (e) {
-            throw new Error(e);
+            toast.error(e);
         }
     }
 
