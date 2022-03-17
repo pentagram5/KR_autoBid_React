@@ -6,6 +6,11 @@ export default createGlobalStyle`
   * {
     box-sizing: border-box;
     white-space: nowrap;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    *::-webkit-scrollbar {
+      display: none;
+    }
   }
   body {
     font-size: 16px;=

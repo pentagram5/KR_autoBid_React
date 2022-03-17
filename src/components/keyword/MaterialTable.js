@@ -54,9 +54,15 @@ function TablePaginationActions(props) {
 }
 
 const TableWrapper = styled.div`
-  position: relative;
   padding: 58px 0;
+  position: relative;
   overflow-x: scroll;
+
+  // Paper Component
+  .css-11xur9t-MuiPaper-root-MuiTableContainer-root {
+    width: 1920px !important;
+    height: 552px;
+  }
 
   // 테이블 헤더 span 
   .css-1qgma8u-MuiButtonBase-root-MuiTableSortLabel-root {
@@ -64,11 +70,6 @@ const TableWrapper = styled.div`
     left: 12px;
   }
 
-  .css-11xur9t-MuiPaper-root-MuiTableContainer-root {
-    width: 1920px;
-    height: 552px;
-  }
-  
   thead {
     width: 1920px !important;
     position: absolute;
@@ -80,11 +81,11 @@ const TableWrapper = styled.div`
   td {
     text-align: center;
   }
-  
+
   th {
     padding: 16px 0;
   }
-    
+
   td {
     padding: 6px 0;
   }
@@ -109,10 +110,12 @@ const TableWrapper = styled.div`
     width: 312px !important;
     white-space: pre;
   }
+
   th:nth-child(6),
   td:nth-child(6) {
     width: 190px !important;
   }
+
   th:nth-child(7),
   td:nth-child(7),
   th:nth-child(10),
@@ -123,16 +126,19 @@ const TableWrapper = styled.div`
   td:nth-child(14) {
     width: 100px !important;
   }
+
   th:nth-child(8),
   td:nth-child(8),
   th:nth-child(9),
   td:nth-child(9) {
     width: 150px !important;
   }
+
   th:nth-child(11),
   td:nth-child(11) {
     width: 140px !important;
   }
+
   th:nth-child(13),
   td:nth-child(13) {
     width: 120px !important;
@@ -146,6 +152,10 @@ const TableWrapper = styled.div`
 
   tfoot td {
     border-bottom: none;
+    & > * {
+      -ms-overflow-style: none; /* IE and Edge */
+      scrollbar-width: none;
+    }
   }
 `;
 
