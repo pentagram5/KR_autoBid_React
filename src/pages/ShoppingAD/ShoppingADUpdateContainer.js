@@ -493,7 +493,7 @@ const ShoppingADUpdateContainer = () => {
             alert('희망 순위를 설정해주세요.');
             return;
         }
-        if ((!radioState.simpleHigh) && (keywordOption.setting.max_bid !== 0 && (keywordOption.setting.min_bid > keywordOption.setting.max_bid))) {
+        if ((!radioState.simpleHigh) && (keywordOption.setting.max_bid !== 0 && (keywordOption.setting.min_bid >= keywordOption.setting.max_bid))) {
             alert("최대 입찰가는 최소 입찰가보다 큰 금액을 입력해주세요.");
             return;
         } else if (keywordOption.setting.min_bid < 70) {
