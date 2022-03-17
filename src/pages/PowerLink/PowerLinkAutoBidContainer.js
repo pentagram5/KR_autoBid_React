@@ -338,12 +338,6 @@ const PowerLinkAutoBidContainer = () => {
     // 스케줄 중복 data finder
     const sameScheduleFinder = schedules => schedules.find(list => keywordOption.setting.target_Rank === list.targetRank && keywordOption.setting.max_bid === list.maxBid && keywordOption.setting.min_bid === list.minBid);
 
-    useEffect(() => {
-        console.info('min_bid !== 0', keywordOption.setting.min_bid !== 0);
-        console.info('min_bid', keywordOption.setting.min_bid);
-        console.info('max_bid', keywordOption.setting.max_bid);
-    }, [keywordOption]);
-
     // 스케줄 추가
     const onAddSchedule = () => {
         if (keywordOption.keyword_info.length === 0) {

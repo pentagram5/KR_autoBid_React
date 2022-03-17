@@ -70,6 +70,10 @@ const TableWrapper = styled.div`
     left: 12px;
   }
 
+  table {
+    width: 1920px !important;
+  }
+  
   thead {
     width: 1920px !important;
     position: absolute;
@@ -94,26 +98,26 @@ const TableWrapper = styled.div`
   td:nth-child(1),
   th:nth-child(2),
   td:nth-child(2) {
-    width: 50px !important;
+    width: 60px !important;
     padding: 6px 4px;
   }
 
   th:nth-child(3),
   td:nth-child(3) {
-    width: 104px !important;
+    width: 110px !important;
   }
 
   th:nth-child(4),
   td:nth-child(4),
   th:nth-child(5),
   td:nth-child(5) {
-    width: 312px !important;
+    width: 280px !important;
     white-space: pre;
   }
 
   th:nth-child(6),
   td:nth-child(6) {
-    width: 190px !important;
+    width: 180px !important;
   }
 
   th:nth-child(7),
@@ -136,7 +140,7 @@ const TableWrapper = styled.div`
 
   th:nth-child(11),
   td:nth-child(11) {
-    width: 140px !important;
+    width: 130px !important;
   }
 
   th:nth-child(13),
@@ -183,7 +187,7 @@ const MaterialTable = ({
 
     return (
         <TableWrapper>
-            <TableContainer component={Paper}>
+            <TableContainer component={Paper} style={{ width: 1920 }}>
                 <Table>
                     <TableHead>
                         <TableRow>
