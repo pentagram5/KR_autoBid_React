@@ -13,12 +13,12 @@ import colors from "../../styles/colors";
 import {TableSortLabel} from "@mui/material";
 
 const HiddenText = styled.div`
-  width: ${({width}) => width ? width : 218}px !important;
+  width: ${({width}) => width ? width : 245}px !important;
   overflow-x: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   padding: 0 5px;
-  margin: 0;
+  margin: 0 auto;
 `;
 
 const HoverBox = styled.div`
@@ -90,19 +90,20 @@ const TableWrapper = styled.div`
   }
 
   .css-11xur9t-MuiPaper-root-MuiTableContainer-root {
-    width: 1920px;
+    width: 2200px !important;
     height: 552px;
   }
-
+  table {
+    width: 2200px !important;
+  }
   thead {
-    width: 1920px !important;
+    width: 2200px !important;
     position: absolute;
     top: 0;
     background: ${colors.ultraLightGray};
   }
 
-  th,
-  td {
+  th, td {
     text-align: center;
   }
 
@@ -118,38 +119,34 @@ const TableWrapper = styled.div`
   td:nth-child(1),
   th:nth-child(2),
   td:nth-child(2) {
-    width: 50px !important;
+    width: 60px !important;
     padding: 6px 4px;
   }
 
   th:nth-child(3),
   td:nth-child(3) {
-    width: 80px !important;
+    width: 120px !important;
   }
 
   th:nth-child(4),
   td:nth-child(4),
   th:nth-child(5),
   td:nth-child(5) {
-    width: 180px !important;
+    width: 200px !important;
     white-space: pre;
   }
 
   th:nth-child(6),
-  td:nth-child(6) {
-    width: 220px !important;
-    position: relative;
-  }
-
+  td:nth-child(6),
   th:nth-child(7),
   td:nth-child(7) {
-    width: 200px !important;
+    width: 260px !important;
     position: relative;
   }
 
   th:nth-child(8),
   td:nth-child(8) {
-    width: 150px !important;
+    width: 140px !important;
   }
 
   th:nth-child(9),
@@ -160,7 +157,7 @@ const TableWrapper = styled.div`
   td:nth-child(14),
   th:nth-child(16),
   td:nth-child(16) {
-    width: 90px !important;
+    width: 100px !important;
   }
 
   th:nth-child(10),
@@ -425,7 +422,7 @@ const ShoppingTable = ({
                                         </HiddenText>
                                     </TableCell>
                                     <TableCell>
-                                        <HiddenText width={198}>
+                                        <HiddenText width={245}>
                                             {row.adId}
                                             <HoverBox>
                                                 {row.adId}

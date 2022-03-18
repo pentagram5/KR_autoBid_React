@@ -60,7 +60,7 @@ const TableWrapper = styled.div`
 
   // Paper Component
   .css-11xur9t-MuiPaper-root-MuiTableContainer-root {
-    width: 1920px !important;
+    width: 2000px !important;
     height: 552px;
   }
 
@@ -71,11 +71,11 @@ const TableWrapper = styled.div`
   }
 
   table {
-    width: 1920px !important;
+    width: 2000px !important;
   }
   
   thead {
-    width: 1920px !important;
+    width: 2000px !important;
     position: absolute;
     top: 0;
     background: ${colors.ultraLightGray};
@@ -104,7 +104,7 @@ const TableWrapper = styled.div`
 
   th:nth-child(3),
   td:nth-child(3) {
-    width: 110px !important;
+    width: 120px !important;
   }
 
   th:nth-child(4),
@@ -117,7 +117,7 @@ const TableWrapper = styled.div`
 
   th:nth-child(6),
   td:nth-child(6) {
-    width: 180px !important;
+    width: 200px !important;
   }
 
   th:nth-child(7),
@@ -128,7 +128,7 @@ const TableWrapper = styled.div`
   td:nth-child(12),
   th:nth-child(14),
   td:nth-child(14) {
-    width: 100px !important;
+    width: 110px !important;
   }
 
   th:nth-child(8),
@@ -145,7 +145,7 @@ const TableWrapper = styled.div`
 
   th:nth-child(13),
   td:nth-child(13) {
-    width: 120px !important;
+    width: 130px !important;
   }
 
   tfoot {
