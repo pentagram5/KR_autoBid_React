@@ -621,7 +621,7 @@ const PowerLinkAutoBidContainer = () => {
             } else { // 수정리스트 하나 일 때
                 setKeywordList(data.keyword_info);
                 setRadioState({
-                    ...radioState,
+                    bid_adj_amount: data.keyword_setting.setting[0].bid_adj_amount > 0 ? 1 : 0,
                     simpleHigh: data.setting_type,
                     usedDate: data.keyword_setting.start_Date !== "" ? data.keyword_setting.start_Date : 0
                 });

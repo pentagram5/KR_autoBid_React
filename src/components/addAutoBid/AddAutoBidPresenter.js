@@ -722,6 +722,7 @@ const AddAutoBidPresenter = ({
                                                 name="bid_adj_amount"
                                                 value={bid_adj_amount}
                                                 onChange={e => onAutoBidChange(e, 'bid_adj_amount')}
+                                                disabled={radioState.simpleHigh}
                                             /> 원
                                         </InputBox>}
                                     </SelectForm>
