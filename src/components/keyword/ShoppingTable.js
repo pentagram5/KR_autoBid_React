@@ -212,7 +212,7 @@ const ShoppingTable = ({
 
     return (
         <TableWrapper>
-            <TableContainer component={Paper}>
+            <TableContainer component={Paper} style={{ width: 2200 }}>
                 <Table>
                     <TableHead>
                         <TableRow>

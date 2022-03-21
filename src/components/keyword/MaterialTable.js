@@ -187,7 +187,7 @@ const MaterialTable = ({
 
     return (
         <TableWrapper>
-            <TableContainer component={Paper} style={{ width: 1920 }}>
+            <TableContainer component={Paper} style={{ width: 2000 }}>
                 <Table>
                     <TableHead>
                         <TableRow>
