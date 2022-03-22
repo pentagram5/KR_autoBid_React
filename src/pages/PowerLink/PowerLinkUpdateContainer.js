@@ -88,8 +88,8 @@ const PowerLinkAutoBidContainer = () => {
             });
             setKeywordOption({
                 ...keywordOption,
-                start_Date: toDay,
-                end_Date: toDay
+                start_Date: e.target.checked ? toDay : "",
+                end_Date: e.target.checked ? toDay : ""
             });
         } else if (type === "simpleHigh") {
             setRadioState({
@@ -110,9 +110,17 @@ const PowerLinkAutoBidContainer = () => {
                 }
             });
         } else {
+            let value = parseInt(e.target.value, 10);
             setRadioState({
                 ...radioState,
                 [type]: parseInt(e.target.value)
+            });
+            setKeywordOption({
+                ...keywordOption,
+                setting: {
+                    ...keywordOption.setting,
+                    bid_adj_amount: !!value ? keywordOption.setting.bid_adj_amount : 0
+                }
             });
         }
     }, [keywordOption, radioState]);
@@ -132,7 +140,10 @@ const PowerLinkAutoBidContainer = () => {
             case 'min_bid':
             case 'target_Rank':
             case 'bid_adj_amount':
+                console.info('value : ', e.target.value);
+                console.info('type : ', type);
                 value = parseInt(value);
+
                 if (isNaN(value)) value = 0;
                 setKeywordOption({
                     ...keywordOption,

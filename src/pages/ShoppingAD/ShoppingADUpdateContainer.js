@@ -97,8 +97,8 @@ const ShoppingADUpdateContainer = () => {
             });
             setKeywordOption({
                 ...keywordOption,
-                start_Date: toDay,
-                end_Date: toDay
+                start_Date: e.target.checked ? toDay : "",
+                end_Date: e.target.checked ? toDay : ""
             });
         } else if (type === "simpleHigh") {
             setRadioState({
@@ -119,9 +119,18 @@ const ShoppingADUpdateContainer = () => {
                 }
             });
         } else {
+            let value = parseInt(e.target.value, 10);
+
             setRadioState({
                 ...radioState,
                 [type]: parseInt(e.target.value)
+            });
+            setKeywordOption({
+                ...keywordOption,
+                setting: {
+                    ...keywordOption.setting,
+                    bid_adj_amount: !!value ? keywordOption.setting.bid_adj_amount : 0
+                }
             });
         }
     }, [keywordOption, radioState]);
