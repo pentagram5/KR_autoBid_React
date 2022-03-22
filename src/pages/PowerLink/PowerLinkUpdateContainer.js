@@ -91,6 +91,24 @@ const PowerLinkAutoBidContainer = () => {
                 start_Date: toDay,
                 end_Date: toDay
             });
+        } else if (type === "simpleHigh") {
+            setRadioState({
+                ...radioState,
+                [type]: parseInt(e.target.value)
+            });
+            setKeywordOption({
+               ...keywordOption,
+                setting: {
+                   ...keywordOption.setting,
+                    mon: '0~23',
+                    tue: '0~23',
+                    wed: '0~23',
+                    thu: '0~23',
+                    fri: '0~23',
+                    sat: '0~23',
+                    sun: '0~23',
+                }
+            });
         } else {
             setRadioState({
                 ...radioState,
@@ -488,6 +506,7 @@ const PowerLinkAutoBidContainer = () => {
             return;
         }
         setLoading(true);
+
         try {
             const response = await SendRequest().post(`${serverPROTOCOL}${serverURL}/autobid/powerlink/update?CUSTOMER_ID=${customer["CUSTOMER_ID"]}`, radioState.simpleHigh === 0 ? [keywordOption] : highKeywordOption);
 

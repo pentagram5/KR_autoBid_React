@@ -100,6 +100,24 @@ const ShoppingADUpdateContainer = () => {
                 start_Date: toDay,
                 end_Date: toDay
             });
+        } else if (type === "simpleHigh") {
+            setRadioState({
+                ...radioState,
+                [type]: parseInt(e.target.value)
+            });
+            setKeywordOption({
+                ...keywordOption,
+                setting: {
+                    ...keywordOption.setting,
+                    mon: '0~23',
+                    tue: '0~23',
+                    wed: '0~23',
+                    thu: '0~23',
+                    fri: '0~23',
+                    sat: '0~23',
+                    sun: '0~23',
+                }
+            });
         } else {
             setRadioState({
                 ...radioState,
