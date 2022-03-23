@@ -424,6 +424,7 @@ const UpdateAutoBidPresenter = ({
                                         <StyledSwitch
                                             onChange={e => handleRadioTab(e, "usedDate")}
                                             disabled={!!radioState.simpleHigh}
+                                            checked={!!radioState.usedDate}
                                         />
 
                                         {!!radioState.usedDate && (

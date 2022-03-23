@@ -314,12 +314,11 @@ const ShoppingADKeywordContainer = () => {
     const fetchPowerLinkData = async customerId => {
         tokenValidate();
         dispatch({type: 'LOADING'});
-
         try {
-            const powerLinkResponse = await SendRequest().get(`${serverPROTOCOL}${serverURL}/autobid/shopping_ad?CUSTOMER_ID=${customerId}`);
+            const shoppingResponse = await SendRequest().get(`${serverPROTOCOL}${serverURL}/autobid/shopping_ad?CUSTOMER_ID=${customerId}`);
             const customerResponse = await SendRequest().get(`${serverPROTOCOL}${serverURL}/autobid/id`);
 
-            dispatch({type: 'SUCCESS', data: powerLinkResponse.data});
+            dispatch({type: 'SUCCESS', data: shoppingResponse.data});
             setCustomerList(customerResponse.data.id_info);
 
         } catch (e) {

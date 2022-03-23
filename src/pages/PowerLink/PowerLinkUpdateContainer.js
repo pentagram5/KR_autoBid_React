@@ -140,8 +140,6 @@ const PowerLinkAutoBidContainer = () => {
             case 'min_bid':
             case 'target_Rank':
             case 'bid_adj_amount':
-                console.info('value : ', e.target.value);
-                console.info('type : ', type);
                 value = parseInt(value);
 
                 if (isNaN(value)) value = 0;
@@ -647,12 +645,11 @@ const PowerLinkAutoBidContainer = () => {
                    keyword_info: data.keyword_info.map(list => list.nccKeywordId)
                 });
             } else { // 수정리스트 하나 일 때
-                console.info(data)
                 setKeywordList(data.keyword_info);
                 setRadioState({
                     bid_adj_amount: data.keyword_setting.setting[0].bid_adj_amount > 0 ? 1 : 0,
                     simpleHigh: data.setting_type,
-                    usedDate: data.keyword_setting.start_Date !== "" ? data.keyword_setting.start_Date : 0
+                    usedDate: data.keyword_setting.start_Date !== "" ? 1 : 0
                 });
 
                 // 간편설정

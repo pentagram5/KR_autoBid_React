@@ -567,8 +567,8 @@ const ShoppingADUpdateContainer = () => {
                     }
                 });
                 setTimeout(() => {
-                    navigate('/shoppingAdKeyword');
-                }, 800);
+                    navigate('/shoppingADKeyword');
+                }, 1200);
             }
         } catch (e) {
             throw new Error(e);
