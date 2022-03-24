@@ -174,8 +174,16 @@ const PowerLinkAutoBidContainer = () => {
         let year = dt.getFullYear();
         let month = dt.getMonth() + 1;
         let day = dt.getDate();
-
         let date = year + '-' + month + '-' + day;
+
+        if (type === "end_Date") {
+            let startDate = new Date(keywordOption.start_Date);
+
+            if (startDate > dt) {
+                alert("종료날짜는 시작날짜 이후의 날짜만 선택가능합니다.");
+                return;
+            }
+        }
 
         switch (type) {
             case 'start_Date':
@@ -636,6 +644,9 @@ const PowerLinkAutoBidContainer = () => {
         }
     }, [simpleSchedule]);
 
+    useEffect(() => {
+        console.info('radioState,', radioState)
+    }, [radioState]);
 
     const fetchingData = async customerId => {
         tokenValidate();
@@ -654,7 +665,7 @@ const PowerLinkAutoBidContainer = () => {
                 setRadioState({
                     bid_adj_amount: data.keyword_setting.setting[0].bid_adj_amount > 0 ? 1 : 0,
                     simpleHigh: data.setting_type,
-                    usedDate: data.keyword_setting.start_Date !== "" ? data.keyword_setting.start_Date : 0
+                    usedDate: !!data.keyword_setting.start_Date ? data.keyword_setting.start_Date : 0
                 });
 
                 // 간편설정

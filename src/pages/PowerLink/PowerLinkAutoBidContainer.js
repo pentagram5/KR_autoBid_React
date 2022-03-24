@@ -192,8 +192,16 @@ const PowerLinkAutoBidContainer = () => {
         let year = dt.getFullYear();
         let month = dt.getMonth() + 1;
         let day = dt.getDate();
-
         let date = year + '-' + month + '-' + day;
+
+        if (type === "end_Date") {
+            let startDate = new Date(keywordOption.start_Date);
+
+            if (startDate > dt) {
+                alert("종료날짜는 시작날짜 이후의 날짜만 선택가능합니다.");
+                return;
+            }
+        }
 
         switch (type) {
             case 'start_Date':
