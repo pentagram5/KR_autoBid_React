@@ -644,10 +644,6 @@ const PowerLinkAutoBidContainer = () => {
         }
     }, [simpleSchedule]);
 
-    useEffect(() => {
-        console.info('radioState,', radioState)
-    }, [radioState]);
-
     const fetchingData = async customerId => {
         tokenValidate();
         try {
