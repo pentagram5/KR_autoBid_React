@@ -190,7 +190,7 @@ const PowerLinkKeywordContainer = () => {
     }, [customerList, customerId, customerName]);
 
     // 체크박스 선택 checked
-    const isChecked = id => checked.indexOf(id) !== -1;
+    const isChecked = id => (checked.indexOf(id) !== -1);
 
     // 체크박스 전체 선택
     const handleAllChecked = e => {
@@ -252,6 +252,7 @@ const PowerLinkKeywordContainer = () => {
                 const res = await SendRequest().delete(`${serverPROTOCOL}${serverURL}/autobid/powerlink/delete?CUSTOMER_ID=${customer["CUSTOMER_ID"]}`, {data: nccKeywordId});
                 if (res.status === 200) {
                     dispatch({type: 'SUCCESS', data: res.data});
+                    setChecked([]);
                     toast.info('선택한 키워드를 삭제하였습니다.');
                 }
             } catch (e) {

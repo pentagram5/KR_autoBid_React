@@ -248,6 +248,7 @@ const PowerContentsKeywordContainer = () => {
                 const res = await SendRequest().delete(`${serverPROTOCOL}${serverURL}/autobid/powercontents/delete?CUSTOMER_ID=${customer["CUSTOMER_ID"]}`, {data: nccKeywordId});
                 if (res.status === 200) {
                     dispatch({type: 'SUCCESS', data: res.data});
+                    setChecked([]);
                     toast.info('선택한 키워드를 삭제하였습니다.');
                 }
             } catch (e) {
