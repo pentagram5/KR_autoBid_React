@@ -1,7 +1,6 @@
 const prod = {
     PROTOCOL: 'http://',
-    URL: '192.168.0.10:3000'
-    // URL: 'autoad.catbellcompany.com'
+    URL: '183.96.29.35:3000'
 }
 const dev = {
     PROTOCOL: 'https://',
