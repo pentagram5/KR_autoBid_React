@@ -94,10 +94,10 @@ const TableWrapper = styled.div`
     padding: 6px 0;
   }
 
-  th:nth-child(1),
-  td:nth-child(1),
-  th:nth-child(2),
-  td:nth-child(2) {
+  tbody th:nth-child(1),
+  tbody td:nth-child(1),
+  tbody th:nth-child(2),
+  tbody td:nth-child(2) {
     width: 60px !important;
     padding: 6px 4px;
   }
@@ -155,6 +155,7 @@ const TableWrapper = styled.div`
   }
 
   tfoot td {
+    width: auto !important;
     border-bottom: none;
     & > * {
       -ms-overflow-style: none; /* IE and Edge */
