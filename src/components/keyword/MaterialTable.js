@@ -60,8 +60,15 @@ const TableWrapper = styled.div`
 
   // Paper Component
   .css-11xur9t-MuiPaper-root-MuiTableContainer-root {
-    width: 2000px !important;
+    width: 100%;
     height: 552px;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    .css-11xur9t-MuiPaper-root-MuiTableContainer-root::-webkit-scrollbar {
+      display: none;
+    }
   }
 
   // 테이블 헤더 span 
@@ -94,10 +101,10 @@ const TableWrapper = styled.div`
     padding: 6px 0;
   }
 
-  th:nth-child(1),
-  td:nth-child(1),
-  th:nth-child(2),
-  td:nth-child(2) {
+  thead th:nth-child(1),
+  tbody td:nth-child(1),
+  thead th:nth-child(2),
+  tbody td:nth-child(2) {
     width: 60px !important;
     padding: 6px 4px;
   }
@@ -148,16 +155,13 @@ const TableWrapper = styled.div`
     width: 130px !important;
   }
 
-  tfoot {
-    position: absolute;
-    right: 0;
-    bottom: 0;
-  }
-
   tfoot td {
-    width: auto !important;
     border-bottom: none;
-    & > * {
+    & > div {
+      position: absolute;
+      right: 0;
+      bottom: 0;
+      z-index: 1;
       -ms-overflow-style: none; /* IE and Edge */
       scrollbar-width: none;
     }

@@ -13,13 +13,13 @@ export default createGlobalStyle`
     font-family: 'Noto Sans KR', sans-serif;
     width: 100%;
     height: 100vh;
-    overflow: scroll;
+    //overflow: scroll;
     box-sizing: border-box;
-    //scrollbar-width: none;
-    //-ms-overflow-style: none;
-    //body::-webkit-scrollbar {
-    //  display: none;
-    //}
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    body::-webkit-scrollbar {
+      display: none;
+    }
   }
   a {
     text-decoration: none;
