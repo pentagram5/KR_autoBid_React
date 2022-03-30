@@ -10,7 +10,6 @@ import {toast} from "react-toastify";
 
 const serverPROTOCOL = constants.config.PROTOCOL;
 const serverURL = constants.config.URL;
-
 const scheduleBgColor = [colors.pastelRed, colors.pastelYellow, colors.pastelGreen, colors.pastelBlue, colors.pastelPurple];
 
 const PowerLinkAutoBidContainer = () => {
