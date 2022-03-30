@@ -80,24 +80,24 @@ const TableWrapper = styled.div`
     top: 0;
     background: ${colors.ultraLightGray};
   }
+  
+  th {
+    padding: 10px 0;
+  }
 
   th,
   td {
     text-align: center;
   }
 
-  th {
-    padding: 16px 0;
-  }
-
   td {
     padding: 6px 0;
   }
 
-  tbody th:nth-child(1),
-  tbody td:nth-child(1),
-  tbody th:nth-child(2),
-  tbody td:nth-child(2) {
+  th:nth-child(1),
+  td:nth-child(1),
+  th:nth-child(2),
+  td:nth-child(2) {
     width: 60px !important;
     padding: 6px 4px;
   }
