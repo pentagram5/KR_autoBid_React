@@ -44,7 +44,6 @@ function App() {
     }, []);
 
     return (
-
         <ThemeProvider theme={colors}>
             <AuthProvider isLoggedIn={isLoggedIn} customerList={customerList}>
                 <GlobalStyles/>
